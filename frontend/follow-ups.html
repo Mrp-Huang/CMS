@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CMS - Follow-ups</title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="follow-ups.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+            <a
+                href="follow-ups.html"
+                class="nav-link active"
+            >
+                Follow-ups
+            </a>
+<a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <section class="dashboard-section">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+                 ================================================= -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Follow-ups
+                    </h1>
+
+                    <p>
+                        Members and situations that require follow-up.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="newFollowUpButton"
+                >
+                    + Add Follow-up
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+                 ================================================= -->
+
+            <div class="attendance-summary followup-summary">
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Follow-ups
+                    </span>
+
+                    <strong id="totalFollowUps">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Pending
+                    </span>
+
+                    <strong id="pendingFollowUps">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        In Progress
+                    </span>
+
+                    <strong id="progressFollowUps">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Completed
+                    </span>
+
+                    <strong id="completedFollowUps">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FOLLOW-UP RECORDS
+                 ================================================= -->
+
+            <div class="dashboard-card followup-card">
+
+
+                <div class="followup-table-header">
+
+                    <div>
+
+                        <h2>
+                            Follow-up Records
+                        </h2>
+
+                        <p class="table-description">
+                            View and manage all member follow-up activities.
+                        </p>
+
+                    </div>
+
+
+                    <div class="followup-toolbar">
+
+                        <input
+                            type="text"
+                            id="followUpSearch"
+                            placeholder="Search follow-ups..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="table-responsive">
+
+                    <table class="followups-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Member</th>
+
+                                <th>Cell</th>
+
+                                <th>Reason</th>
+
+                                <th>Assigned To</th>
+
+                                <th>Priority</th>
+
+                                <th>Follow-up Date</th>
+
+                                <th>Status</th>
+
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="followUpsTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="empty-message"
+                                >
+                                    No follow-ups recorded yet.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     ADD / EDIT FOLLOW-UP MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="followUpModal"
+>
+
+
+    <div class="modal followup-form-modal">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="followUpModalTitle">
+                    Add Follow-up
+                </h2>
+
+                <p class="modal-subtitle">
+                    Create a follow-up record for a member.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeFollowUpModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <form
+            id="followUpForm"
+            novalidate
+        >
+
+            <input
+                type="hidden"
+                id="followUpId"
+            >
+
+
+            <!-- BASIC INFORMATION -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Follow-up Information
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="followUpCell">
+
+                            Cell
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="followUpCell"
+                            required
+                        >
+
+                            <option value="">
+                                Select a cell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpMember">
+
+                            Member
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="followUpMember"
+                            required
+                            disabled
+                        >
+
+                            <option value="">
+                                Select a cell first
+                            </option>
+
+                        </select>
+
+
+                        <small
+                            id="memberInfo"
+                            class="member-info"
+                        ></small>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpAssignedTo">
+
+                            Assigned To
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="followUpAssignedTo"
+                            required
+                            disabled
+                        >
+
+                            <option value="">
+                                Select a cell first
+                            </option>
+
+                        </select>
+
+
+                        <small class="form-help">
+                            Coordinator or Cell Leader
+                        </small>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpPriority">
+
+                            Priority
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="followUpPriority"
+                            required
+                        >
+
+                            <option value="Urgent">
+                                Urgent
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option
+                                value="Medium"
+                                selected
+                            >
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpDate">
+
+                            Follow-up Date
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="date"
+                            id="followUpDate"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpStatus">
+
+                            Status
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="followUpStatus"
+                            required
+                        >
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="In Progress">
+                                In Progress
+                            </option>
+
+                            <option value="Completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REASON -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Reason for Follow-up
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="followUpReason">
+
+                        Reason
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <textarea
+                        id="followUpReason"
+                        rows="3"
+                        placeholder="Explain why this member requires follow-up..."
+                        required
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DETAILS -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Details
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="followUpDetails">
+                        Additional Details
+                    </label>
+
+
+                    <textarea
+                        id="followUpDetails"
+                        rows="4"
+                        placeholder="Add any additional information..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ACTION -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Follow-up Action
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="followUpAction">
+                        Action Taken
+                    </label>
+
+
+                    <textarea
+                        id="followUpAction"
+                        rows="3"
+                        placeholder="Describe what has already been done..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="followUpNextAction">
+                        Next Action
+                    </label>
+
+
+                    <textarea
+                        id="followUpNextAction"
+                        rows="3"
+                        placeholder="Describe what should happen next..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+
+            <p
+                id="followUpMessage"
+                class="form-message"
+            ></p>
+
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelFollowUpButton"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Follow-up
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="follow-ups-supabase-bridge.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CMS - Cell Leaders</title>
+
+    <!-- MAIN CMS STYLE -->
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <!-- CELL LEADERS SPECIFIC STYLE -->
+    <link
+        rel="stylesheet"
+        href="cell-leaders.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link active"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+<a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="main-content">
+
+
+        <section class="dashboard-section leaders-page">
+
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+
+                <div class="page-title">
+
+                    <h1>
+                        Cell Leaders
+                    </h1>
+
+                    <p>
+                        All GBU Rukara cell leaders.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="addLeaderButton"
+                >
+
+                    + Add Cell Leader
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- SEARCH -->
+
+            <div class="search-container">
+
+                <input
+                    type="text"
+                    id="leaderSearch"
+                    placeholder="Search cell leaders..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+
+            <!-- LEADERS TABLE -->
+
+            <div class="dashboard-card leaders-table-card">
+
+
+                <div class="table-container">
+
+                    <table class="leaders-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Leader Name
+                                </th>
+
+
+                                <th>
+                                    Email
+                                </th>
+
+
+                                <th>
+                                    Phone
+                                </th>
+
+
+                                <th>
+                                    Cell
+                                </th>
+
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="leadersTableBody"
+                        >
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     ADD / EDIT LEADER MODAL
+===================================================== -->
+
+<div
+    class="leader-modal-overlay"
+    id="leaderModal"
+>
+
+
+    <div
+        class="leader-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="leaderModalTitle"
+    >
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="leader-modal-header">
+
+
+            <h2 id="leaderModalTitle">
+                Add Cell Leader
+            </h2>
+
+
+            <button
+                type="button"
+                class="leader-close-button"
+                id="closeLeaderModal"
+                aria-label="Close"
+            >
+
+                ×
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="leaderForm">
+
+
+            <input
+                type="hidden"
+                id="leaderId"
+            >
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="leaderName">
+
+                    Leader Name
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="leaderName"
+                    placeholder="Enter leader name"
+                    autocomplete="name"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="leaderEmail">
+
+                    Email Address
+
+                </label>
+
+
+                <input
+                    type="email"
+                    id="leaderEmail"
+                    placeholder="Enter email address"
+                    autocomplete="email"
+                >
+
+            </div>
+
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label for="leaderPhone">
+
+                    Phone Number
+
+                </label>
+
+
+                <input
+                    type="tel"
+                    id="leaderPhone"
+                    placeholder="Enter phone number"
+                    autocomplete="tel"
+                >
+
+            </div>
+
+
+
+            <!-- CELL -->
+
+            <div class="form-group">
+
+                <label for="leaderCell">
+
+                    Assign Cell
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <select
+                    id="leaderCell"
+                    required
+                >
+
+                    <option value="">
+                        Select a cell
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- ACTIONS -->
+
+            <div class="leader-modal-actions">
+
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelLeaderButton"
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button save-leader-button"
+                >
+
+                    Save Leader
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="cell-leaders.js"></script>
+
+</body>
+</html>

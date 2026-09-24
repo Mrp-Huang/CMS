@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - Visitors
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="visitors.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+
+            <a
+                href="evangelism.html"
+                class="nav-link"
+            >
+                Evangelism
+            </a>
+
+
+            <a
+                href="visitors.html"
+                class="nav-link active"
+            >
+                Visitors
+            </a>
+
+
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <section class="dashboard-section visitors-page">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+                 ================================================= -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Visitors
+                    </h1>
+
+                    <p>
+                        Manage visitors and their complete visit history.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="refreshVisitorsButton"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SUMMARY
+                 ================================================= -->
+
+            <div class="visitor-summary">
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Visitors
+                    </span>
+
+                    <strong id="totalVisitors">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        New Visitors
+                    </span>
+
+                    <strong id="newVisitors">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Converted to Members
+                    </span>
+
+                    <strong id="convertedVisitors">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Visits
+                    </span>
+
+                    <strong id="totalVisitorVisits">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VISITOR CARD
+                 ================================================= -->
+
+            <div class="dashboard-card visitor-card">
+
+
+                <!-- =============================================
+                     FILTERS
+                     ============================================= -->
+
+                <div class="visitor-toolbar">
+
+
+                    <input
+                        type="text"
+                        id="visitorSearch"
+                        placeholder="Search visitors..."
+                        autocomplete="off"
+                    >
+
+
+                    <select
+                        id="visitorCellFilter"
+                    >
+
+                        <option value="">
+                            All Cells
+                        </option>
+
+                    </select>
+
+
+                    <select
+                        id="visitorStatusFilter"
+                    >
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option value="visitor">
+                            Visitors
+                        </option>
+
+                        <option value="converted">
+                            Converted to Members
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="clearVisitorFiltersButton"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     TABLE HEADER
+                     ============================================= -->
+
+                <div class="visitor-table-header">
+
+                    <div>
+
+                        <h2>
+                            Visitor Records
+                        </h2>
+
+                        <span id="visitorCountText">
+                           
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     TABLE
+                     ============================================= -->
+
+                <div class="table-responsive">
+
+                    <table class="visitors-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Year
+                                </th>
+
+                                <th>
+                                    Combination
+                                </th>
+
+                                <th>
+                                    Association
+                                </th>
+
+                                <th>
+                                    First Visit
+                                </th>
+
+                                <th>
+                                    Last Visit
+                                </th>
+
+                                <th>
+                                    Visits
+                                </th>
+
+                                <th>
+                                    Cell
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="visitorsTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="11"
+                                    class="empty-message"
+                                >
+
+                                    Loading visitors...
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     EDIT VISITOR MODAL
+     ===================================================== -->
+
+<div
+    id="visitorModal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div class="modal-content visitor-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="visitorModalTitle">
+                    Edit Visitor
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeVisitorModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="visitorForm">
+
+            <input
+                type="hidden"
+                id="visitorId"
+            >
+
+
+            <div class="form-grid">
+
+
+                <div>
+
+                    <label for="visitorName">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="visitorName"
+                        required
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="visitorPhone">
+                        Phone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="visitorPhone"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="visitorYear">
+                        Year
+                    </label>
+
+                    <input
+                        type="text"
+                        id="visitorYear"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="visitorCombination">
+                        Combination
+                    </label>
+
+                    <input
+                        type="text"
+                        id="visitorCombination"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="visitorAssociation">
+                        Association
+                    </label>
+
+                    <input
+                        type="text"
+                        id="visitorAssociation"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label for="visitorCell">
+                        Cell
+                    </label>
+
+                    <select
+                        id="visitorCell"
+                        required
+                    >
+
+                        <option value="">
+                            Select a cell
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="cancelVisitorButton"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     VIEW VISITOR MODAL
+     ===================================================== -->
+
+<div
+    id="visitorViewModal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div class="modal-content visitor-view-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="visitorViewTitle">
+                    Visitor Details
+                </h2>
+
+                <p id="visitorViewSubtitle">
+                    Visitor information
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeVisitorViewModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="visitorViewContent"
+            class="visitor-view-content"
+        ></div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="visitorViewHistoryButton"
+            >
+                Visit History
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="visitorViewEditButton"
+            >
+                Edit
+            </button>
+
+
+            <button
+                type="button"
+                class="primary-button"
+                id="visitorViewConvertButton"
+            >
+                Convert to Member
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     VISIT HISTORY MODAL
+     ===================================================== -->
+
+<div
+    id="visitorHistoryModal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div class="modal-content visitor-history-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+                    Visit History
+                </h2>
+
+                <p id="visitorHistorySubtitle">
+                    Visitor visits
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeVisitorHistoryModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="visitor-history-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Cell
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Attendance Session
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="visitorHistoryTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="cms-role-guard.js"></script>
+<script src="visitors.js"></script>
+
+</body>
+
+</html>

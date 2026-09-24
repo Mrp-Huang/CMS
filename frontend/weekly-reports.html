@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CMS - Weekly Reports</title>
+
+    <!-- MAIN CMS STYLE -->
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <!-- WEEKLY REPORTS PAGE STYLE -->
+    <link
+        rel="stylesheet"
+        href="weekly-reports.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link active"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+<a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <section class="dashboard-section">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+                 ================================================= -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Weekly Reports
+                    </h1>
+
+                    <p>
+                        Weekly reports submitted by cell leaders.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="newReportButton"
+                >
+                    + New Report
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+                 ================================================= -->
+
+            <div class="attendance-summary">
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Reports
+                    </span>
+
+                    <strong id="totalReports">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Submitted
+                    </span>
+
+                    <strong id="submittedReports">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Drafts
+                    </span>
+
+                    <strong id="draftReports">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Today
+                    </span>
+
+                    <strong id="todayReports">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 REPORT RECORDS
+                 ================================================= -->
+
+            <div class="dashboard-card">
+
+
+                <div class="weekly-report-table-header">
+
+
+                    <div>
+
+                        <h2>
+                            Saved Weekly Reports
+                        </h2>
+
+                        <p>
+                            View, edit, print, download or delete reports and drafts.
+                        </p>
+
+                    </div>
+
+
+                    <div class="report-search">
+
+                        <input
+                            type="text"
+                            id="reportSearch"
+                            placeholder="Search reports..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="table-responsive">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Cell
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Meeting Location
+                                </th>
+
+                                <th>
+                                    Attendance
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="reportsTableBody">
+
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="empty-message"
+                                >
+                                    No weekly reports submitted yet.
+                                </td>
+
+                            </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================================
+     NEW / EDIT REPORT MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="reportModal"
+>
+
+
+    <div
+        class="modal report-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reportModalTitle"
+    >
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+
+            <div>
+
+                <h2 id="reportModalTitle">
+                    New Weekly Report
+                </h2>
+
+                <p class="modal-subtitle">
+                    Record the activities and condition of the cell.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeReportModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form
+            id="weeklyReportForm"
+            novalidate
+        >
+
+
+            <input
+                type="hidden"
+                id="reportId"
+            >
+
+
+
+            <!-- CELL -->
+
+            <div class="form-group">
+
+                <label for="reportCell">
+
+                    Cell
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <select
+                    id="reportCell"
+                    required
+                >
+
+                    <option value="">
+                        Select a cell
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="reportDate">
+
+                    Report / Meeting Date
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <input
+                    type="date"
+                    id="reportDate"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- LOCATION -->
+
+            <div class="form-group">
+
+                <label for="meetingLocation">
+
+                    Meeting Location
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="meetingLocation"
+                    placeholder="e.g. UR Rukara Campus"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="report-section">
+
+                <h3>
+                    Attendance Summary
+                </h3>
+
+
+                <p id="reportAttendanceSummary">
+
+                    Select a cell and date to load attendance.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- MEMBERS LIFE -->
+
+            <div class="form-group">
+
+                <label for="membersLife">
+
+                    Members' Life
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <textarea
+                    id="membersLife"
+                    rows="4"
+                    placeholder="Describe important observations about members' lives, progress, concerns or situations..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- ACTIVITY -->
+
+            <div class="form-group">
+
+                <label for="activityDone">
+
+                    Activity Done
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <textarea
+                    id="activityDone"
+                    rows="4"
+                    placeholder="Describe the activity done by the cell this week..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- CHALLENGES -->
+
+            <div class="form-group">
+
+                <label for="challengesNeeds">
+
+                    Challenges / Needs
+
+                </label>
+
+
+                <textarea
+                    id="challengesNeeds"
+                    rows="4"
+                    placeholder="Describe challenges, problems or needs requiring attention..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- FOLLOW-UP -->
+
+            <div class="form-group">
+
+                <label for="followUpNeeded">
+
+                    Follow-up Needed
+
+                </label>
+
+
+                <textarea
+                    id="followUpNeeded"
+                    rows="4"
+                    placeholder="Mention members or situations that require follow-up..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- NEXT WEEK -->
+
+            <div class="form-group">
+
+                <label for="nextWeekPlan">
+
+                    Next Week's Plan
+
+                </label>
+
+
+                <textarea
+                    id="nextWeekPlan"
+                    rows="3"
+                    placeholder="What is planned for next week?"
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- COMMENTS -->
+
+            <div class="form-group">
+
+                <label for="additionalComments">
+
+                    Additional Comments
+
+                </label>
+
+
+                <textarea
+                    id="additionalComments"
+                    rows="3"
+                    placeholder="Any additional information..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- MESSAGE -->
+
+            <p
+                id="draftSavedMessage"
+                class="draft-saved-message"
+            ></p>
+
+
+
+            <!-- ACTIONS -->
+
+            <div class="modal-actions">
+
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelReportButton"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="saveDraftButton"
+                >
+                    Save Draft
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Submit Report
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     VIEW REPORT MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="viewReportModal"
+>
+
+
+    <div
+        class="modal view-report-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="viewReportTitle"
+    >
+
+
+        <!-- HEADER -->
+
+        <div class="modal-header">
+
+
+            <div>
+
+                <h2 id="viewReportTitle">
+                    Weekly Report
+                </h2>
+
+
+                <p
+                    id="viewReportSubtitle"
+                    class="view-report-subtitle"
+                ></p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeViewReportModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+
+        </div>
+
+
+
+        <!-- REPORT CONTENT -->
+
+        <div
+            id="viewReportContent"
+            class="view-report-content"
+        ></div>
+
+
+
+        <!-- ACTIONS -->
+
+        <div class="view-report-actions">
+
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="printReportButton"
+            >
+                Print
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="downloadReportButton"
+            >
+                Download
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-button"
+                id="closeViewReportButton"
+            >
+                Close
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="weekly-reports-supabase-bridge.js"></script>
+
+</body>
+
+</html>

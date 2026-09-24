@@ -1,0 +1,602 @@
+# Members HTML
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CMS - Members</title>
+
+    <!-- MAIN CMS STYLE -->
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <!-- MEMBERS PAGE STYLE -->
+    <link
+        rel="stylesheet"
+        href="members.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link active"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+<a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+
+        <section class="dashboard-section">
+
+
+            <!-- HEADER -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Members
+                    </h1>
+
+                    <p>
+                        All GBU Rukara cell members
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="addMemberButton"
+                >
+
+                    + Add Member
+
+                </button>
+
+            </div>
+
+
+
+            <!-- SEARCH -->
+
+            <div class="search-container">
+
+                <input
+                    type="text"
+                    id="memberSearch"
+                    placeholder="Search members..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+
+            <!-- MEMBERS TABLE -->
+
+            <div class="dashboard-card table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Full Name
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Gender
+                            </th>
+
+                            <th>
+                                Year
+                            </th>
+
+                            <th>
+                                Combination
+                            </th>
+
+                            <th>
+                                Cell
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="membersTableBody"
+                    >
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================
+     ADD / EDIT MEMBER MODAL
+     ========================================= -->
+
+<div
+    class="modal-overlay"
+    id="memberModal"
+>
+
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="memberModalTitle"
+    >
+
+
+        <div class="modal-header">
+
+
+            <h2 id="memberModalTitle">
+                Add Member
+            </h2>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeMemberModal"
+                aria-label="Close"
+            >
+
+                ×
+
+            </button>
+
+
+        </div>
+
+
+
+        <form id="memberForm">
+
+
+            <input
+                type="hidden"
+                id="memberId"
+            >
+
+
+
+            <!-- FULL NAME -->
+
+            <label for="memberName">
+                Full Name *
+            </label>
+
+
+            <input
+                type="text"
+                id="memberName"
+                placeholder="Enter member's full name"
+                required
+            >
+
+
+
+            <!-- PHONE -->
+
+            <label for="memberPhone">
+                Phone Number
+            </label>
+
+
+            <input
+                type="tel"
+                id="memberPhone"
+                placeholder="Enter phone number"
+            >
+
+
+
+            <!-- GENDER -->
+
+            <label for="memberGender">
+                Gender
+            </label>
+
+
+            <select id="memberGender">
+
+                <option value="">
+                    Select gender
+                </option>
+
+                <option value="Male">
+                    Male
+                </option>
+
+                <option value="Female">
+                    Female
+                </option>
+
+            </select>
+
+
+
+            <!-- YEAR -->
+
+            <label for="memberYear">
+                Year of Study *
+            </label>
+
+
+            <select
+                id="memberYear"
+                required
+            >
+
+                <option value="">
+                    Select year
+                </option>
+
+                <option value="Year 1">
+                    Year 1
+                </option>
+
+                <option value="Year 2">
+                    Year 2
+                </option>
+
+                <option value="Year 3">
+                    Year 3
+                </option>
+
+                <option value="Year 4">
+                    Year 4
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+
+
+            <!-- COMBINATION -->
+
+            <label for="memberCombination">
+                Combination
+            </label>
+
+
+            <input
+                type="text"
+                id="memberCombination"
+                placeholder="e.g. MEE, MCE, MPE, BCE, PCE, SNE"
+            >
+
+
+
+            <!-- CELL -->
+
+            <label for="memberCell">
+                Cell *
+            </label>
+
+
+            <select
+                id="memberCell"
+                required
+            >
+
+                <option value="">
+                    Select a cell
+                </option>
+
+            </select>
+
+
+
+            <!-- DATE JOINED -->
+
+            <label for="memberDateJoined">
+                Date Joined
+            </label>
+
+
+            <input
+                type="date"
+                id="memberDateJoined"
+            >
+
+
+
+            <!-- STATUS -->
+
+            <label for="memberStatus">
+                Status *
+            </label>
+
+
+            <select
+                id="memberStatus"
+                required
+            >
+
+                <option value="Active">
+                    Active
+                </option>
+
+                <option value="Inactive">
+                    Inactive
+                </option>
+
+                <option value="Moved to another cell">
+                    Moved to another cell
+                </option>
+
+            </select>
+
+
+
+            <!-- NOTES -->
+
+            <label for="memberNotes">
+                Notes
+            </label>
+
+
+            <textarea
+                id="memberNotes"
+                rows="3"
+                placeholder="Additional information..."
+            ></textarea>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="modal-actions">
+
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelMemberButton"
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+
+                    Save Member
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="members.js"></script>
+
+
+<!-- =====================================================
+     LOGOUT
+     ===================================================== -->
+
+<script>
+const logoutButton =
+    document.getElementById("logoutBtn");
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                if (window.supabaseClient) {
+
+                    await window.supabaseClient
+                        .auth
+                        .signOut();
+
+                }
+
+                window.location.href =
+                    "index.html";
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+                window.location.href =
+                    "index.html";
+
+            }
+
+        }
+    );
+
+}
+</script>
+
+</body>
+</html>

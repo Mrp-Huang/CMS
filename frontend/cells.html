@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CMS - Cells</title>
+
+    <!-- Main CMS design -->
+    <link rel="stylesheet" href="dashboard.css">
+
+    <!-- Cells page design -->
+    <link rel="stylesheet" href="cells.css">
+
+    <link rel="stylesheet" href="cms-responsive.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <h2>CELL MANAGEMENT<br>SYSTEM</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="cells.html" class="nav-link active">
+                Cells
+            </a>
+
+            <a href="cell-leaders.html" class="nav-link">
+                Cell Leaders
+            </a>
+
+            <a href="members.html" class="nav-link">
+                Members
+            </a>
+
+            <a href="attendance.html" class="nav-link">
+                Attendance
+            </a>
+
+            <a href="records.html" class="nav-link">
+                Records
+            </a>
+
+            <a href="weekly-reports.html" class="nav-link">
+                Weekly Reports
+            </a>
+
+            <a href="follow-ups.html" class="nav-link">
+                Follow-ups
+            </a>
+
+            <a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a href="settings.html" class="nav-link">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content cells-page">
+
+        <!-- PAGE HEADER -->
+
+        <section class="dashboard-section cells-section">
+
+            <div class="cells-page-header">
+
+                <div>
+
+                    <h1>Cells Management</h1>
+
+                    <p>
+                       GBU Rukara cells, their leaders and members.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="addCellButton">
+
+                    + Add Cell
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 SEARCH
+                 ================================================= -->
+
+            <div class="cells-search-container">
+
+                <input
+                    type="text"
+                    id="cellSearch"
+                    placeholder="🔍 Search cells..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- =================================================
+                 CELLS TABLE
+                 ================================================= -->
+
+            <div class="cells-table-card">
+
+                <div class="table-responsive">
+
+                    <table class="cells-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Cell Name</th>
+
+                                <th>Cell Leader</th>
+
+                                <th>Members</th>
+
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="cellsTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     ADD / EDIT CELL MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="cellModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal cell-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Add Cell
+            </h2>
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form id="cellForm">
+
+            <input
+                type="hidden"
+                id="cellId"
+            >
+
+
+            <label for="cellName">
+                Cell Name <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="cellName"
+                placeholder="Enter cell name"
+                required
+                autocomplete="off"
+            >
+
+
+            <div class="cell-form-info">
+
+                <strong>Note:</strong>
+
+                <span>
+                    Cell leaders are assigned from the
+                    <b>Cell Leaders</b> section.
+                </span>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelButton"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Cell
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="cells.js"></script>
+
+</body>
+</html>

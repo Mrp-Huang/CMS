@@ -1,0 +1,1026 @@
+/* =====================================================
+   CMS - COORDINATOR DASHBOARD
+   ===================================================== */
+
+
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #333;
+}
+
+
+/* =====================================================
+   DASHBOARD CONTAINER
+   ===================================================== */
+
+.dashboard-container {
+    min-height: 100vh;
+}
+
+
+/* =====================================================
+   SIDEBAR
+   ===================================================== */
+
+.sidebar {
+    width: 285px;
+    height: 100vh;
+    min-height: 100vh;
+
+    background: #294895;
+    color: white;
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    padding: 30px 20px;
+
+    z-index: 1000;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(255, 255, 255, 0.35)
+        transparent;
+}
+
+
+/* =====================================================
+   SIDEBAR SCROLLBAR
+   ===================================================== */
+
+.sidebar::-webkit-scrollbar {
+    width: 7px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background:
+        rgba(255, 255, 255, 0.35);
+
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background:
+        rgba(255, 255, 255, 0.55);
+}
+
+
+/* =====================================================
+   SIDEBAR BRAND
+   ===================================================== */
+
+.sidebar-brand {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.sidebar-brand h2 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 23px;
+
+    line-height: 1.35;
+}
+
+
+/* =====================================================
+   SIDEBAR NAVIGATION
+   ===================================================== */
+
+.sidebar-nav {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding-bottom: 30px;
+}
+
+
+.sidebar .nav-link {
+    display: block;
+
+    width: 100%;
+
+    padding: 14px 18px;
+
+    color: white;
+
+    background: transparent;
+
+    text-decoration: none;
+
+    border-radius: 9px;
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.sidebar .nav-link:visited {
+    color: white;
+}
+
+
+.sidebar .nav-link:hover {
+    background:
+        rgba(255, 255, 255, 0.10);
+
+    color: white;
+
+    text-decoration: none;
+}
+
+
+.sidebar .nav-link.active {
+    background:
+        rgba(0, 0, 0, 0.18);
+
+    color: white;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+   ===================================================== */
+
+.main-content {
+    margin-left: 285px;
+
+    padding: 30px;
+
+    min-height: 100vh;
+
+    max-width: 1800px;
+}
+
+
+/* =====================================================
+   TOP BAR
+   ===================================================== */
+
+.top-bar {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    background: white;
+
+    padding: 20px 24px;
+
+    border-radius: 12px;
+
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.04);
+}
+
+
+.top-bar h1 {
+    margin: 0;
+
+    color: #1f3c88;
+
+    font-size: 25px;
+}
+
+
+.top-bar p {
+    margin: 6px 0 0;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+.user-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+.user-info span {
+    font-weight: 600;
+
+    color: #555;
+}
+
+
+.user-info button {
+    border: none;
+
+    background: #1f3c88;
+
+    color: white;
+
+    padding: 9px 16px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.user-info button:hover {
+    background: #162d68;
+}
+
+
+/* =====================================================
+   WELCOME
+   ===================================================== */
+
+.welcome-section {
+    margin-bottom: 22px;
+}
+
+
+.welcome-section h2 {
+    margin: 0 0 7px;
+
+    color: #333;
+
+    font-size: 22px;
+}
+
+
+.welcome-section p {
+    margin: 5px 0;
+
+    color: #666;
+}
+
+
+.dashboard-last-updated {
+    font-size: 12px;
+
+    color: #888 !important;
+}
+
+
+/* =====================================================
+   STATISTICS
+   ===================================================== */
+
+.statistics {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 25px;
+}
+
+
+.stat-card {
+    background: white;
+
+    padding: 19px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    min-height: 125px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.05);
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.stat-card:hover {
+    transform:
+        translateY(-2px);
+}
+
+
+.stat-icon {
+    width: 48px;
+
+    height: 48px;
+
+    border-radius: 10px;
+
+    background: #eef2ff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 23px;
+
+    flex-shrink: 0;
+}
+
+
+.stat-card h3 {
+    margin: 0;
+
+    color: #666;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.stat-card p {
+    margin: 6px 0 2px;
+
+    color: #1f3c88;
+
+    font-size: 28px;
+
+    font-weight: bold;
+}
+
+
+.stat-card small {
+    color: #888;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   SECTIONS
+   ===================================================== */
+
+.dashboard-section {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 23px;
+
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.04);
+}
+
+
+.section-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+
+.section-header h2 {
+    margin: 0;
+
+    color: #1f3c88;
+
+    font-size: 20px;
+}
+
+
+.section-header p {
+    margin: 5px 0 0;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+
+.view-button {
+    display: inline-block;
+
+    background: #1f3c88;
+
+    color: white;
+
+    text-decoration: none;
+
+    border: none;
+
+    padding: 9px 15px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+.view-button:hover {
+    background: #162d68;
+
+    color: white;
+}
+
+
+.dashboard-actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+
+.dashboard-button {
+    display: inline-block;
+
+    padding: 10px 15px;
+
+    background: #23418f;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 7px;
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+    transition:
+        0.2s ease;
+}
+
+
+.dashboard-button:hover {
+    opacity: 0.9;
+
+    color: white;
+}
+
+
+.dashboard-button.secondary {
+    background: #555;
+}
+
+
+/* =====================================================
+   EVANGELISM QUICK ACTION
+   ===================================================== */
+
+.dashboard-button.evangelism-button {
+    background: #23418f;
+}
+
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 650px;
+}
+
+
+th {
+    text-align: left;
+
+    padding: 13px;
+
+    color: #555;
+
+    background: #f8f9fc;
+
+    border-bottom:
+        2px solid #e5e5e5;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+td {
+    padding: 13px;
+
+    border-bottom:
+        1px solid #eeeeee;
+
+    color: #444;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+
+tbody tr:hover {
+    background: #fafbfe;
+}
+
+
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+.status-submitted,
+.status-ok,
+.status-warning {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 12px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+.status-submitted {
+    background: #e8f5e9;
+
+    color: #2e7d32;
+}
+
+
+.status-ok {
+    background: #e8f5e9;
+
+    color: #2e7d32;
+}
+
+
+.status-warning {
+    background: #fff3cd;
+
+    color: #856404;
+}
+
+
+/* =====================================================
+   EMPTY TABLE
+   ===================================================== */
+
+.empty-message {
+    text-align: center;
+
+    padding: 28px !important;
+
+    color: #888 !important;
+}
+
+
+/* =====================================================
+   ANALYTICS
+   ===================================================== */
+
+.analytics-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+.analytics-card {
+    background: #f7f9fd;
+
+    border:
+        1px solid #e5e9f2;
+
+    border-radius: 9px;
+
+    padding: 18px;
+
+    text-align: center;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.analytics-card:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 4px 14px
+        rgba(0, 0, 0, 0.05);
+}
+
+
+.analytics-card span {
+    display: block;
+
+    color: #777;
+
+    font-size: 12px;
+
+    margin-bottom: 8px;
+}
+
+
+.analytics-card strong {
+    display: block;
+
+    color: #1f3c88;
+
+    font-size: 25px;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   EVANGELISM ANALYTICS
+   ===================================================== */
+
+#dashboard-evangelism-activities,
+#dashboard-evangelism-reached,
+#dashboard-evangelism-new,
+#dashboard-evangelism-saved,
+#dashboard-evangelism-progress,
+#dashboard-evangelism-interested,
+#dashboard-evangelism-followup,
+#dashboard-evangelism-notyet {
+    color: #1f3c88;
+}
+
+
+/* =====================================================
+   ATTENTION
+   ===================================================== */
+
+.attention-container {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+}
+
+
+.attention-item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 15px;
+
+    border-radius: 8px;
+
+    background: #fff8e6;
+
+    border-left:
+        4px solid #e0a800;
+}
+
+
+.attention-item strong {
+    display: block;
+
+    color: #444;
+
+    margin-bottom: 3px;
+}
+
+
+.attention-item span {
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.attention-type {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 5px 9px;
+
+    font-size: 10px !important;
+
+    font-weight: bold;
+
+    color: #856404 !important;
+
+    white-space: nowrap;
+}
+
+
+.attention-success {
+    padding: 17px;
+
+    border-radius: 8px;
+
+    background: #edf8ef;
+
+    border-left:
+        4px solid #2e7d32;
+}
+
+
+.attention-success strong {
+    color: #2e7d32;
+}
+
+
+.attention-success p {
+    margin: 5px 0 0;
+
+    color: #666;
+
+    font-size: 13px;
+}
+
+
+.attention-empty {
+    padding: 20px;
+
+    text-align: center;
+
+    color: #888;
+
+    background: #f8f9fa;
+
+    border-radius: 8px;
+}
+
+
+/* =====================================================
+   RECORDS SUMMARY
+   ===================================================== */
+
+.records-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+.records-summary > div {
+    background: #f7f9fd;
+
+    border:
+        1px solid #e5e9f2;
+
+    border-radius: 9px;
+
+    padding: 18px;
+
+    text-align: center;
+}
+
+
+.records-summary span {
+    display: block;
+
+    color: #777;
+
+    font-size: 12px;
+
+    margin-bottom: 7px;
+}
+
+
+.records-summary strong {
+    display: block;
+
+    color: #1f3c88;
+
+    font-size: 25px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .statistics {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .analytics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 210px;
+
+        padding: 25px 13px;
+    }
+
+
+    .sidebar-brand h2 {
+        font-size: 18px;
+    }
+
+
+    .sidebar .nav-link {
+        font-size: 14px;
+
+        padding: 12px;
+    }
+
+
+    .main-content {
+        margin-left: 210px;
+
+        padding: 20px;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        display: none;
+    }
+
+
+    .main-content {
+        margin-left: 0;
+
+        padding: 14px;
+    }
+
+
+    .top-bar {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+
+    .top-bar h1 {
+        font-size: 21px;
+    }
+
+
+    .statistics {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .analytics-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .section-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .view-button {
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .dashboard-actions {
+        flex-direction: column;
+    }
+
+
+    .dashboard-button {
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .records-summary {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .attention-item {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 400px) {
+
+    .analytics-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}

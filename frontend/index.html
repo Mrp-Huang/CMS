@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CMS - Login</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <div class="public-shell">
+
+            <section class="welcome-panel">
+
+                <div class="welcome-branding">
+                    <img src="./logo.png" alt="GBU Rukara Logo" class="cms-logo">
+                    <p class="welcome-eyebrow">GBU Rukara</p>
+                    <h1>Cell's Management System</h1>
+                </div>
+
+                <div class="welcome-copy">
+                    <p class="welcome-kicker">Organizing the work that happens in every cell</p>
+                    <h2>Connected cells. Faithful leaders. Growing communities.</h2>
+                    <p>
+                        A simple workspace for coordinators and cell leaders to keep member care,
+                        attendance, follow-ups, and weekly reports in one place.
+                    </p>
+                </div>
+
+                <div class="vision-block">
+                    <span>GBUR Vision</span>
+                    <p>
+                        To see every student and graduate become an agent of godly transformation
+                        in the church and in society.
+                    </p>
+                </div>
+
+                <div class="welcome-note">
+                    <strong>Built for the people serving on the ground.</strong>
+                    <span>Sign in to manage your cell's records and activities.</span>
+                </div>
+
+                <div class="welcome-footer">
+                    <span>GBU Rukara</span>
+                    <span>Cell leadership workspace</span>
+                </div>
+
+            </section>
+
+            <section class="login-card">
+
+            <p class="welcome-text">Welcome!</p>
+
+            <p class="instruction">
+                Sign in to continue to CMS
+            </p>
+
+
+            <!-- =================================================
+                 LOGIN MODE
+                 ================================================= -->
+
+            <div class="login-role-selector">
+
+                <label>
+                    <input
+                        type="radio"
+                        name="login-role"
+                        value="coordinator"
+                        checked
+                    >
+                    Coordinator
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="login-role"
+                        value="cell_leader"
+                    >
+                    Cell Leader
+                </label>
+
+            </div>
+
+
+            <!-- =================================================
+                 LOGIN FORM
+                 ================================================= -->
+
+            <form id="login-form">
+
+                <!-- Coordinator Email -->
+                <div id="coordinator-login-fields">
+
+                    <label for="email">
+                        Email Address
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                    >
+
+                    <p
+                        id="email-error"
+                        class="error-message"
+                    ></p>
+
+                </div>
+
+
+                <!-- Cell Leader Username -->
+                <div
+                    id="cell-leader-login-fields"
+                    style="display:none;"
+                >
+
+                    <label for="username">
+                        Username
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter your username"
+                        autocomplete="username"
+                    >
+
+                    <p
+                        id="username-error"
+                        class="error-message"
+                    ></p>
+
+                </div>
+
+
+                <!-- Password -->
+                <label for="password">
+                    Password
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                >
+
+                <label class="password-toggle">
+                    <input
+                        type="checkbox"
+                        class="password-toggle-input"
+                        data-password-target="password"
+                    >
+                    Show password
+                </label>
+
+                <p
+                    id="password-error"
+                    class="error-message"
+                ></p>
+
+
+                <button type="submit">
+                    LOGIN
+                </button>
+
+            </form>
+
+
+            <p id="login-message"></p>
+
+
+            <!-- =================================================
+                 PASSWORD RESET
+                 ================================================= -->
+
+            <a
+                href="#"
+                class="forgot-password"
+                id="forgot-password"
+            >
+                Forgot password?
+            </a>
+
+
+            <!-- =================================================
+                 CELL LEADER ACTIVATION
+                 ================================================= -->
+
+            <div class="activation-link-container">
+
+                <a
+                    href="#"
+                    id="show-activation"
+                >
+                    First time here? Activate Cell Leader Account
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 ROLE INFORMATION
+                 ================================================= -->
+
+            <p class="role-info">
+                Cell Coordinator | Cell Leader
+            </p>
+
+
+            <!-- =================================================
+                 CELL LEADER ACTIVATION FORM
+                 ================================================= -->
+
+            <div
+                id="activation-panel"
+                style="display:none;"
+            >
+
+                <hr>
+
+                <h3>
+                    Activate Cell Leader Account
+                </h3>
+
+                <p class="instruction">
+                    Use the activation code given to you by a Coordinator.
+                </p>
+
+
+                <form id="activation-form">
+
+                    <label for="activation-name">
+                        Registered Full Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="activation-name"
+                        placeholder="Enter your registered name"
+                        required
+                    >
+
+
+                    <label for="activation-code">
+                        Activation Code
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="activation-code"
+                        placeholder="Example: WLAS-5DBE"
+                        autocomplete="off"
+                        required
+                    >
+
+
+                    <label for="new-username">
+                        Create Username
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="new-username"
+                        placeholder="Choose your username"
+                        autocomplete="username"
+                        required
+                    >
+
+
+                    <label for="new-password">
+                        Create Password
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="password"
+                        id="new-password"
+                        placeholder="At least 8 characters"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <label class="password-toggle">
+                        <input
+                            type="checkbox"
+                            class="password-toggle-input"
+                            data-password-target="new-password"
+                        >
+                        Show password
+                    </label>
+
+
+                    <label for="confirm-password">
+                        Confirm Password
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        placeholder="Repeat your password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <label class="password-toggle">
+                        <input
+                            type="checkbox"
+                            class="password-toggle-input"
+                            data-password-target="confirm-password"
+                        >
+                        Show password
+                    </label>
+
+
+                    <p
+                        id="activation-message"
+                    ></p>
+
+
+                    <button
+                        type="submit"
+                        id="activate-button"
+                    >
+                        ACTIVATE ACCOUNT
+                    </button>
+
+                </form>
+
+            </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SUPABASE
+         ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

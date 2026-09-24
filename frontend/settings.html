@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CMS - Settings</title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="settings.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+<a
+    href="evangelism.html"
+    class="nav-link"
+>
+    Evangelism
+</a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link active"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <section class="dashboard-section">
+
+
+            <!-- HEADER -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Settings
+                    </h1>
+
+                    <p>
+                        Manage your CMS system information and preferences.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =====================================================
+                 SYSTEM SETTINGS
+                 ===================================================== -->
+
+            <div class="dashboard-card settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            System Settings
+                        </h2>
+
+                        <p>
+                            Configure the basic information displayed throughout the CMS.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <form
+                    id="settingsForm"
+                    novalidate
+                >
+
+
+                    <div class="settings-form-group">
+
+                        <label for="system-name">
+                            System Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="system-name"
+                            placeholder="CELL MANAGEMENT SYSTEM"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="settings-form-group">
+
+                        <label for="organization">
+                            Organization
+                        </label>
+
+                        <input
+                            type="text"
+                            id="organization"
+                            placeholder="GBU Rukara"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div
+                        id="settingsMessage"
+                        class="settings-message"
+                    ></div>
+
+
+
+                    <div class="settings-actions">
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Save Settings
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- =====================================================
+                 DATA INFORMATION
+                 ===================================================== -->
+
+            <div class="dashboard-card settings-card">
+
+                <div class="settings-card-header">
+
+                    <div>
+
+                        <h2>
+                            CMS Data
+                        </h2>
+
+                        <p>
+                            Your CMS currently stores its working data locally in this browser.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-info-grid">
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Cells
+                        </span>
+
+                        <strong id="settingsCellsCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Cell Leaders
+                        </span>
+
+                        <strong id="settingsLeadersCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Members
+                        </span>
+
+                        <strong id="settingsMembersCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Follow-ups
+                        </span>
+
+                        <strong id="settingsFollowUpsCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Weekly Reports
+                        </span>
+
+                        <strong id="settingsReportsCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="settings-info-item">
+
+                        <span>
+                            Attendance Records
+                        </span>
+
+                        <strong id="settingsAttendanceCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+<script src="cms-page-guard.js"></script>
+
+<script src="cms-access.js"></script>
+<script src="settings.js"></script>
+
+</body>
+
+</html>

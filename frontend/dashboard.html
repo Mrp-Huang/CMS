@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - Coordinator Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link active"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+
+            <a
+                href="evangelism.html"
+                class="nav-link"
+            >
+                Evangelism
+            </a>
+
+
+            <a
+                href="visitors.html"
+                class="nav-link"
+            >
+                Visitors
+            </a>
+
+
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             TOP BAR
+             ================================================= -->
+
+        <header class="top-bar">
+
+            <div>
+
+                <h1>
+                    Coordinator Dashboard
+                </h1>
+
+                <p>
+                    GBU Rukara Cell — Overall Management Overview
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <span>
+                    Coordinator
+                </span>
+
+
+                <button
+                    id="logoutBtn"
+                    type="button"
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             WELCOME
+             ================================================= -->
+
+        <section class="welcome-section">
+
+            <h2>
+                Welcome back! 👋
+            </h2>
+
+
+            <p>
+                Cells, leaders, members, attendance,
+                weekly reports, follow-ups and evangelism
+                in general.
+            </p>
+
+
+            <p class="dashboard-last-updated">
+
+                Last updated:
+
+                <strong id="lastUpdated">
+                    —
+                </strong>
+
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             MAIN STATISTICS
+             ================================================= -->
+
+        <section class="statistics">
+
+
+            <!-- CELLS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🏠
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Cells
+                    </h3>
+
+
+                    <p id="total-cells">
+                        0
+                    </p>
+
+
+                    <small>
+                        Registered cells
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- LEADERS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Cell Leaders
+                    </h3>
+
+
+                    <p id="total-leaders">
+                        0
+                    </p>
+
+
+                    <small>
+                        Registered leaders
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- MEMBERS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👤
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Members
+                    </h3>
+
+
+                    <p id="total-members">
+                        0
+                    </p>
+
+
+                    <small>
+                        Registered members
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- VISITORS -->
+
+            <div
+                class="stat-card"
+                data-coordinator-only="true"
+            >
+
+                <div class="stat-icon">
+                    🧑‍🤝‍🧑
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Visitors
+                    </h3>
+
+
+                    <p id="total-visitors">
+                        0
+                    </p>
+
+
+                    <small>
+                        Registered visitors
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Attendance
+                    </h3>
+
+
+                    <p id="attendance-rate">
+                        0%
+                    </p>
+
+
+                    <small>
+                        Overall attendance
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REPORTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📝
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Reports
+                    </h3>
+
+
+                    <p id="total-reports">
+                        0
+                    </p>
+
+
+                    <small>
+                        Weekly reports
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PENDING REPORTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⏳
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Pending Reports
+                    </h3>
+
+
+                    <p id="pending-reports">
+                        0
+                    </p>
+
+
+                    <small>
+                        Cells needing reports
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FOLLOW-UPS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔄
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Follow-ups
+                    </h3>
+
+
+                    <p id="total-followups">
+                        0
+                    </p>
+
+
+                    <small>
+                        Follow-up records
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PENDING FOLLOW-UPS -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Pending Follow-ups
+                    </h3>
+
+
+                    <p id="pending-followups">
+                        0
+                    </p>
+
+
+                    <small>
+                        Need attention
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+
+                    <p>
+                        Access the main CMS management areas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="dashboard-actions">
+
+
+                <a
+                    href="cells.html"
+                    class="dashboard-button"
+                >
+                    🏠 Manage Cells
+                </a>
+
+
+                <a
+                    href="cell-leaders.html"
+                    class="dashboard-button"
+                >
+                    👥 Manage Leaders
+                </a>
+
+
+                <a
+                    href="members.html"
+                    class="dashboard-button"
+                >
+                    👤 Manage Members
+                </a>
+
+
+                <a
+                    href="attendance.html"
+                    class="dashboard-button"
+                >
+                    📋 Record Attendance
+                </a>
+
+
+                <a
+                    href="weekly-reports.html"
+                    class="dashboard-button"
+                >
+                    📝 Weekly Reports
+                </a>
+
+
+                <a
+                    href="follow-ups.html"
+                    class="dashboard-button"
+                >
+                    🔄 Follow-ups
+                </a>
+
+
+                <a
+                    href="evangelism.html"
+                    class="dashboard-button"
+                >
+                    ✝️ Evangelism
+                </a>
+
+
+                <a
+                    href="records.html"
+                    class="dashboard-button secondary"
+                >
+                    📂 All Records
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             ATTENDANCE ANALYTICS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Attendance Overview
+                    </h2>
+
+
+                    <p>
+                        General attendance statistics from recorded meetings.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="attendance.html"
+                    class="view-button"
+                >
+                    View Attendance
+                </a>
+
+            </div>
+
+
+
+            <div class="analytics-grid">
+
+
+                <!-- ATTENDANCE RECORDS -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Total Attendance Records
+                    </span>
+
+
+                    <strong id="attendance-records">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- PRESENT -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Present
+                    </span>
+
+
+                    <strong id="attendance-present">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- ABSENT -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Absent
+                    </span>
+
+
+                    <strong id="attendance-absent">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- EXCUSED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Excused
+                    </span>
+
+
+                    <strong id="attendance-excused">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             VISITOR ANALYTICS
+             ================================================= -->
+
+        <section
+            class="dashboard-section"
+            data-coordinator-only="true"
+        >
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Visitors Overview
+                    </h2>
+
+
+                    <p>
+                        Visitor records collected across all cells.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="visitors.html"
+                    class="view-button"
+                >
+                    Manage Visitors
+                </a>
+
+            </div>
+
+
+
+            <div class="analytics-grid">
+
+
+                <!-- TOTAL VISITORS -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Total Visitors
+                    </span>
+
+
+                    <strong
+                        id="dashboard-total-visitors"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- TOTAL VISITS -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Total Visits
+                    </span>
+
+
+                    <strong
+                        id="dashboard-visitor-visits"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- CONVERTED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Converted to Members
+                    </span>
+
+
+                    <strong
+                        id="dashboard-converted-visitors"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             EVANGELISM ANALYTICS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Evangelism Overview
+                    </h2>
+
+
+                    <p>
+                        Evangelism activities and outcomes
+                        recorded by cell leaders.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="evangelism.html"
+                    class="view-button"
+                >
+                    View Evangelism
+                </a>
+
+            </div>
+
+
+
+            <div class="analytics-grid">
+
+
+                <!-- ACTIVITIES -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Activities
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-activities"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- PEOPLE REACHED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        People Reached
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-reached"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- NEW PEOPLE -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        New People
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-new"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- SAVED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Saved
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-saved"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- IN PROGRESS -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        In Progress
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-progress"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- INTERESTED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Interested
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-interested"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- FOLLOW-UP -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Follow-up Needed
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-followup"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- NOT YET -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Not Yet / No Decision
+                    </span>
+
+
+                    <strong
+                        id="dashboard-evangelism-notyet"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             WEEKLY REPORTS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Recent Weekly Reports
+                    </h2>
+
+
+                    <p>
+                        Latest reports submitted by cell leaders.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="weekly-reports.html"
+                    class="view-button"
+                >
+                    View All
+                </a>
+
+            </div>
+
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Cell
+                            </th>
+
+
+                            <th>
+                                Date
+                            </th>
+
+
+                            <th>
+                                Activity
+                            </th>
+
+
+                            <th>
+                                Follow-up
+                            </th>
+
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="weeklyReportsTableBody"
+                    >
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOLLOW-UPS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Recent Follow-ups
+                    </h2>
+
+
+                    <p>
+                        Members and issues requiring follow-up.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="follow-ups.html"
+                    class="view-button"
+                >
+                    View All
+                </a>
+
+            </div>
+
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Member
+                            </th>
+
+
+                            <th>
+                                Cell
+                            </th>
+
+
+                            <th>
+                                Date
+                            </th>
+
+
+                            <th>
+                                Reason
+                            </th>
+
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="followUpsTableBody"
+                    >
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CELLS OVERVIEW
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Cells Overview
+                    </h2>
+
+
+                    <p>
+                        Current status of all registered cells.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="cells.html"
+                    class="view-button"
+                >
+                    Manage Cells
+                </a>
+
+            </div>
+
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Cell
+                            </th>
+
+
+                            <th>
+                                Leader
+                            </th>
+
+
+                            <th>
+                                Members
+                            </th>
+
+
+                            <th>
+                                Reports
+                            </th>
+
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="cellsOverviewBody"
+                    >
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CELLS NEEDING ATTENTION
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        ⚠️ Cells Needing Attention
+                    </h2>
+
+
+                    <p>
+                        Areas that may require coordinator attention.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div
+                id="cells-needing-attention"
+                class="attention-container"
+            >
+
+                <div class="attention-empty">
+                    Checking cells...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             OVERALL CMS ANALYTICS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Overall CMS Analytics
+                    </h2>
+
+
+                    <p>
+                        General indicators calculated from
+                        all CMS records.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="analytics-grid">
+
+
+                <!-- ACTIVE MEMBERS -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Active Members
+                    </span>
+
+
+                    <strong
+                        id="dashboard-active-members"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- REPORT COVERAGE -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Report Coverage
+                    </span>
+
+
+                    <strong
+                        id="dashboard-report-coverage"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+
+
+                <!-- FOLLOW-UP COMPLETION -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        Follow-up Completion
+                    </span>
+
+
+                    <strong
+                        id="dashboard-followup-completion"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+
+
+                <!-- ATTENDANCE PEOPLE -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        People in Attendance Records
+                    </span>
+
+
+                    <strong
+                        id="dashboard-attendance-people"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- PEOPLE REACHED -->
+
+                <div class="analytics-card">
+
+                    <span>
+                        People Reached Through Evangelism
+                    </span>
+
+
+                    <strong
+                        id="dashboard-total-reached"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RECORDS
+             ================================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Records & History
+                    </h2>
+
+
+                    <p>
+                        Access saved attendance, reports,
+                        follow-up history and other CMS records.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="records.html"
+                    class="view-button"
+                >
+                    Open Records
+                </a>
+
+            </div>
+
+
+
+            <div class="records-summary">
+
+
+                <!-- ATTENDANCE -->
+
+                <div>
+
+                    <span>
+                        Attendance Records
+                    </span>
+
+
+                    <strong
+                        id="records-attendance"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- REPORTS -->
+
+                <div>
+
+                    <span>
+                        Weekly Reports
+                    </span>
+
+
+                    <strong
+                        id="records-reports"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <!-- FOLLOW-UPS -->
+
+                <div>
+
+                    <span>
+                        Follow-ups
+                    </span>
+
+
+                    <strong
+                        id="records-followups"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+<script src="cms-page-guard.js"></script>
+
+<script src="cms-role-guard.js"></script>
+
+<script src="dashboard-supabase.js"></script>
+
+
+<!-- =====================================================
+     LOGOUT
+     ===================================================== -->
+
+<script>
+
+const logoutButton =
+    document.getElementById(
+        "logoutBtn"
+    );
+
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                if (
+                    typeof supabaseClient !==
+                    "undefined"
+                    &&
+                    supabaseClient
+                ) {
+
+                    await supabaseClient
+                        .auth
+                        .signOut();
+
+                }
+
+
+                window.location.href =
+                    "index.html";
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+
+                window.location.href =
+                    "index.html";
+
+            }
+
+        }
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

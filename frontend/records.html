@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - Records Center
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="records.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+<div class="cms-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+
+            CELL MANAGEMENT<br>
+            SYSTEM
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+
+            <a href="cells.html">
+                Cells
+            </a>
+
+
+            <a href="cell-leaders.html">
+                Cell Leaders
+            </a>
+
+
+            <a href="members.html">
+                Members
+            </a>
+
+
+            <a href="attendance.html">
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="active"
+            >
+                Records
+            </a>
+
+
+            <a href="weekly-reports.html">
+                Weekly Reports
+            </a>
+
+
+            <a href="follow-ups.html">
+                Follow-ups
+            </a>
+
+
+            <a href="evangelism.html">
+                Evangelism
+            </a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a href="settings.html">
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
+    <main class="main-content">
+
+
+        <!-- =====================================
+             HEADER
+             ===================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Records Center
+                </h1>
+
+                <p>
+                    All saved attendance, weekly reports,
+                    follow-ups and evangelism records.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <button
+                    id="exportAllButton"
+                    class="primary-button"
+                    type="button"
+                >
+                    Export All
+                </button>
+
+
+                <button
+                    id="printButton"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Print
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================
+             SUMMARY
+             ===================================== -->
+
+        <section class="record-summary">
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total Records
+                </span>
+
+                <strong id="totalRecords">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <span>
+                    Attendance
+                </span>
+
+                <strong id="totalAttendance">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <span>
+                    Weekly Reports
+                </span>
+
+                <strong id="totalReports">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <span>
+                    Follow-ups
+                </span>
+
+                <strong id="totalFollowUps">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <span>
+                    Evangelism
+                </span>
+
+                <strong id="totalEvangelism">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <span>
+                    Latest Record
+                </span>
+
+                <strong id="latestRecord">
+                    —
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================
+             FILTERS
+             ===================================== -->
+
+        <section class="records-controls">
+
+
+            <div class="record-tabs">
+
+
+                <button
+                    type="button"
+                    class="record-tab active"
+                    data-type="all"
+                >
+                    All Records
+                </button>
+
+
+                <button
+                    type="button"
+                    class="record-tab"
+                    data-type="attendance"
+                >
+                    Attendance
+                </button>
+
+
+                <button
+                    type="button"
+                    class="record-tab"
+                    data-type="report"
+                >
+                    Weekly Reports
+                </button>
+
+
+                <button
+                    type="button"
+                    class="record-tab"
+                    data-type="followup"
+                >
+                    Follow-ups
+                </button>
+
+
+                <button
+                    type="button"
+                    class="record-tab"
+                    data-type="evangelism"
+                >
+                    Evangelism
+                </button>
+
+            </div>
+
+
+
+            <div class="record-filters">
+
+
+                <input
+                    type="text"
+                    id="recordSearch"
+                    placeholder="Search records..."
+                    autocomplete="off"
+                >
+
+
+                <input
+                    type="date"
+                    id="recordDate"
+                >
+
+
+                <button
+                    type="button"
+                    id="clearFiltersButton"
+                    class="secondary-button"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             RECORD TABLE
+             ===================================== -->
+
+        <section class="records-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Saved Records
+                    </h2>
+
+                    <p id="recordCountText">
+                        0 records
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Cell
+                            </th>
+
+                            <th>
+                                Summary
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="recordsTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================
+     DETAILS MODAL
+     ========================================= -->
+
+<div
+    id="recordModal"
+    class="record-modal"
+>
+
+
+    <div class="record-modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="modalRecordTitle">
+                    Record Details
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closeRecordModal"
+                class="close-button"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <div
+            id="recordDetails"
+            class="record-details"
+        >
+        </div>
+
+
+
+        <div class="modal-actions">
+
+
+            <button
+                type="button"
+                id="downloadRecordButton"
+                class="primary-button"
+            >
+                Download CSV
+            </button>
+
+
+            <button
+                type="button"
+                id="printRecordButton"
+                class="secondary-button"
+            >
+                Print / Save PDF
+            </button>
+
+
+            <button
+                type="button"
+                id="closeRecordButton"
+                class="secondary-button"
+            >
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="records.js"></script>
+<script src="records-supabase-bridge.js"></script>
+
+
+</body>
+
+</html>

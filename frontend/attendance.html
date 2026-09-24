@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - Attendance
+    </title>
+
+
+    <!-- =====================================================
+         CMS GLOBAL / SHARED SIDEBAR
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+
+    <style>
+
+        /* =====================================================
+           ATTENDANCE PAGE
+           ===================================================== */
+
+        .attendance-page {
+
+            padding: 30px;
+
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+           ===================================================== */
+
+        .page-header {
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .page-header h1 {
+
+            color: #21418f;
+
+            margin-bottom: 6px;
+
+            font-size: 34px;
+
+        }
+
+
+        .page-header p {
+
+            color: #555;
+
+            margin: 0;
+
+        }
+
+
+        /* =====================================================
+           FILTER CARD
+           ===================================================== */
+
+        .attendance-filter {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 3px 15px rgba(0,0,0,0.08);
+
+            display: grid;
+
+            grid-template-columns:
+                1.2fr 1fr auto;
+
+            gap: 18px;
+
+            align-items: end;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+        }
+
+
+        .form-group label {
+
+            font-weight: 600;
+
+            color: #333;
+
+        }
+
+
+        .form-group select,
+        .form-group input {
+
+            height: 45px;
+
+            border: 1px solid #d5dbe8;
+
+            border-radius: 7px;
+
+            padding: 0 12px;
+
+            font-size: 15px;
+
+            background: white;
+
+        }
+
+
+        .primary-button {
+
+            height: 45px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 0 25px;
+
+            background: #21418f;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+        }
+
+
+        .primary-button:hover {
+
+            background: #173575;
+
+        }
+
+
+        /* =====================================================
+           ATTENDANCE SUMMARY
+           ===================================================== */
+
+        .attendance-summary {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .summary-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 3px 15px rgba(0,0,0,0.07);
+
+        }
+
+
+        .summary-card span {
+
+            display: block;
+
+            color: #666;
+
+            font-size: 14px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .summary-card strong {
+
+            font-size: 27px;
+
+            color: #21418f;
+
+        }
+
+
+        /* =====================================================
+           ATTENDANCE CARD
+           ===================================================== */
+
+        .attendance-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 15px rgba(0,0,0,0.07);
+
+            margin-bottom: 25px;
+
+            overflow: hidden;
+
+        }
+
+
+        .attendance-card-header {
+
+            padding: 20px 24px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-bottom: 1px solid #eee;
+
+        }
+
+
+        .attendance-card-header h2 {
+
+            margin: 0;
+
+            color: #21418f;
+
+            font-size: 21px;
+
+        }
+
+
+        /* =====================================================
+           ATTENDANCE TABLE
+           ===================================================== */
+
+        .attendance-table-container {
+
+            width: 100%;
+
+            overflow-x: auto;
+
+        }
+
+
+        .attendance-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        .attendance-table th,
+        .attendance-table td {
+
+            padding: 14px 18px;
+
+            text-align: left;
+
+            border-bottom: 1px solid #eee;
+
+        }
+
+
+        .attendance-table th {
+
+            color: #444;
+
+            background: #fafbfe;
+
+            font-size: 14px;
+
+        }
+
+
+        .attendance-table td {
+
+            color: #333;
+
+        }
+
+
+        .attendance-table select {
+
+            min-width: 130px;
+
+            padding: 9px 10px;
+
+            border: 1px solid #d5dbe8;
+
+            border-radius: 6px;
+
+            background: white;
+
+        }
+
+
+        /* =====================================================
+           VISITORS
+           ===================================================== */
+
+        .visitor-button {
+
+            background: #21418f;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 10px 17px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+        }
+
+
+        .visitor-button:hover {
+
+            background: #173575;
+
+        }
+
+
+        .remove-button {
+
+            background: #dc3545;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 6px;
+
+            padding: 8px 13px;
+
+            cursor: pointer;
+
+        }
+
+
+        .visitor-input {
+
+            width: 100%;
+
+            padding: 9px;
+
+            border: 1px solid #d5dbe8;
+
+            border-radius: 6px;
+
+        }
+
+
+        /* =====================================================
+           SAVE AREA
+           ===================================================== */
+
+        .save-area {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            padding-bottom: 30px;
+
+        }
+
+
+        .save-attendance-button {
+
+            min-width: 260px;
+
+            padding: 14px 25px;
+
+            background: #21418f;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .save-attendance-button:hover {
+
+            background: #173575;
+
+        }
+
+
+        /* =====================================================
+           EMPTY ROW
+           ===================================================== */
+
+        .empty-row {
+
+            text-align: center !important;
+
+            color: #777;
+
+            padding: 30px !important;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .attendance-filter {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .attendance-summary {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .attendance-page {
+
+                padding: 14px;
+
+            }
+
+
+            .attendance-summary {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+
+            .page-header h1 {
+
+                font-size: 28px;
+
+            }
+
+
+            .attendance-card-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 12px;
+
+            }
+
+
+            .visitor-button {
+
+                width: 100%;
+
+            }
+
+
+            .save-area {
+
+                justify-content: stretch;
+
+            }
+
+
+            .save-attendance-button {
+
+                width: 100%;
+
+            }
+
+        }
+
+
+        @media (max-width: 400px) {
+
+            .attendance-summary {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-brand">
+
+            <h2>
+
+                CELL MANAGEMENT<br>
+
+                SYSTEM
+
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link active"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+
+            <a
+                href="evangelism.html"
+                class="nav-link"
+            >
+                Evangelism
+            </a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <div class="attendance-page">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+                 ================================================= -->
+
+            <div class="page-header">
+
+                <h1>
+                    Attendance
+                </h1>
+
+
+                <p>
+                    Cell meeting attendance records.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CELL + DATE
+                 ================================================= -->
+
+            <div class="attendance-filter">
+
+
+                <div class="form-group">
+
+                    <label
+                        for="attendanceCell"
+                    >
+                        Select Cell *
+                    </label>
+
+
+                    <select
+                        id="attendanceCell"
+                    >
+
+                        <option value="">
+                            Select a cell
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label
+                        for="attendanceDate"
+                    >
+                        Meeting Date *
+                    </label>
+
+
+                    <input
+                        type="date"
+                        id="attendanceDate"
+                    >
+
+                </div>
+
+
+
+                <button
+                    type="button"
+                    id="loadMembersButton"
+                    class="primary-button"
+                >
+                    Load Members
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SUMMARY
+                 ================================================= -->
+
+            <div class="attendance-summary">
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Total Members
+                    </span>
+
+
+                    <strong id="totalMembers">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Present
+                    </span>
+
+
+                    <strong id="presentCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Absent
+                    </span>
+
+
+                    <strong id="absentCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Late
+                    </span>
+
+
+                    <strong id="lateCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Excused
+                    </span>
+
+
+                    <strong id="excusedCount">
+                        0
+                    </strong>
+
+                </div>
+
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Attendance Rate
+                    </span>
+
+
+                    <strong id="attendanceRate">
+                        0%
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 REGISTERED MEMBERS
+                 ================================================= -->
+
+            <div class="attendance-card">
+
+
+                <div class="attendance-card-header">
+
+                    <h2>
+                        Meeting Attendance
+                        (Registered Members)
+                    </h2>
+
+                </div>
+
+
+
+                <div class="attendance-table-container">
+
+
+                    <table class="attendance-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    #
+                                </th>
+
+
+                                <th>
+                                    Member
+                                </th>
+
+
+                                <th>
+                                    Year
+                                </th>
+
+
+                                <th>
+                                    Combination
+                                </th>
+
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody
+                            id="attendanceMembersBody"
+                        >
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="empty-row"
+                                >
+
+                                    Select a cell and date,
+                                    then click
+
+                                    <strong>
+                                        Load Members
+                                    </strong>.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VISITORS / NEWCOMERS
+                 ================================================= -->
+
+            <div class="attendance-card">
+
+
+                <div class="attendance-card-header">
+
+
+                    <h2>
+                        Newcomers / Visitors
+                    </h2>
+
+
+                    <button
+                        type="button"
+                        id="addVisitorButton"
+                        class="visitor-button"
+                    >
+                        + Add Visitor
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="attendance-table-container">
+
+
+                    <table class="attendance-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    #
+                                </th>
+
+<th>Visitor Name</th>
+<th>Phone</th>
+<th>Year</th>
+<th>Combination</th>
+<th>Association / Belongs To</th>
+<th>Status</th>
+<th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody
+                            id="visitorsBody"
+                        >
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="empty-row"
+                                >
+                                    No visitors added.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SAVE
+                 ================================================= -->
+
+            <div class="save-area">
+
+
+                <button
+                    type="button"
+                    id="saveAttendanceButton"
+                    class="save-attendance-button"
+                >
+                    SAVE ATTENDANCE
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SCRIPTS
+     ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="attendance.js"></script>
+
+</body>
+
+</html>

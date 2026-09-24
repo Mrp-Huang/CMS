@@ -1,0 +1,1192 @@
+/* =========================================================
+   CMS - EVANGELISM
+   ========================================================= */
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.evangelism-summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+
+}
+
+
+.summary-card {
+
+    background: #ffffff;
+
+    border:
+        1px solid #e2e7ef;
+
+    border-radius: 10px;
+
+    padding: 17px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.05);
+
+}
+
+
+.summary-card span {
+
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+    margin-bottom: 7px;
+
+}
+
+
+.summary-card strong {
+
+    color: #294895;
+
+    font-size: 25px;
+
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.evangelism-card {
+
+    background: #ffffff;
+
+    border:
+        1px solid #e1e6ee;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.05);
+
+    overflow: hidden;
+
+}
+
+
+.evangelism-card-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 19px 22px;
+
+    border-bottom:
+        1px solid #e6eaf0;
+
+}
+
+
+.evangelism-card-header h2 {
+
+    margin: 0;
+
+    color: #294895;
+
+    font-size: 18px;
+
+}
+
+
+.evangelism-card-header p {
+
+    margin: 4px 0 0;
+
+    color: #718096;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+#evangelismSearch {
+
+    width: 235px;
+
+    height: 38px;
+
+    padding: 0 12px;
+
+    border:
+        1px solid #d4dae3;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    font-size: 13px;
+
+    background: #ffffff;
+
+}
+
+
+#evangelismSearch:focus {
+
+    border-color: #294895;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(41, 72, 149, 0.09);
+
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-responsive {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+.evangelism-table {
+
+    width: 100%;
+
+    min-width: 950px;
+
+    border-collapse: collapse;
+
+}
+
+
+.evangelism-table th {
+
+    background: #f7f9fc;
+
+    color: #4b5563;
+
+    padding:
+        13px 14px;
+
+    border-bottom:
+        1px solid #dfe5ee;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+}
+
+
+.evangelism-table td {
+
+    padding:
+        13px 14px;
+
+    border-bottom:
+        1px solid #edf0f4;
+
+    color: #374151;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+
+}
+
+
+.evangelism-table tbody tr:hover {
+
+    background: #f8faff;
+
+}
+
+
+.evangelism-table td:first-child {
+
+    min-width: 130px;
+
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.evangelism-action-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    height: 30px;
+
+    padding:
+        0 9px;
+
+    margin: 2px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    background: #294895;
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        0.15s ease;
+
+}
+
+
+.evangelism-action-button:hover {
+
+    opacity: 0.9;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.evangelism-action-button.danger {
+
+    background: #d93025;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-row {
+
+    text-align: center;
+
+    padding: 35px !important;
+
+    color: #7b8492;
+
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+#evangelismModal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.52
+        );
+
+}
+
+
+.evangelism-modal {
+
+    width:
+        min(
+            820px,
+            95vw
+        );
+
+    max-height: 92vh;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(
+            0,
+            0,
+            0,
+            0.23
+        );
+
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.evangelism-modal .modal-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    padding:
+        20px 24px;
+
+    border-bottom:
+        1px solid #e5e9ef;
+
+}
+
+
+.evangelism-modal .modal-header h2 {
+
+    margin: 0;
+
+    color: #294895;
+
+    font-size: 22px;
+
+}
+
+
+.modal-subtitle {
+
+    margin:
+        4px 0 0;
+
+    color: #718096;
+
+    font-size: 12px;
+
+}
+
+
+.close-button {
+
+    width: 34px;
+
+    height: 34px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #5d6674;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+}
+
+
+.close-button:hover {
+
+    background: #f1f4f8;
+
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+#evangelismForm {
+
+    padding:
+        0 24px 24px;
+
+}
+
+
+.form-section {
+
+    margin-top: 20px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid #e7ebf1;
+
+}
+
+
+.form-section:last-of-type {
+
+    border-bottom:
+        none;
+
+}
+
+
+.form-section-title {
+
+    margin-bottom: 13px;
+
+    color: #3155a4;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+}
+
+
+.form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        15px 18px;
+
+}
+
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.form-group label {
+
+    margin-bottom: 6px;
+
+    color: #374151;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+.required {
+
+    color: #d93025;
+
+}
+
+
+/* =========================================================
+   FORM CONTROLS
+   ========================================================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid #d4dae3;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #26354d;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+}
+
+
+.form-group input,
+.form-group select {
+
+    height: 41px;
+
+    padding:
+        0 11px;
+
+}
+
+
+.form-group textarea {
+
+    min-height: 88px;
+
+    padding:
+        10px 11px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    border-color:
+        #294895;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            41,
+            72,
+            149,
+            0.08
+        );
+
+}
+
+
+.form-group input:disabled,
+.form-group select:disabled {
+
+    background:
+        #f3f5f8;
+
+    color:
+        #8a93a1;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+/* =========================================================
+   FORM HELP
+   ========================================================= */
+
+.form-help {
+
+    margin-top:
+        5px;
+
+    color:
+        #7b8492;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.4;
+
+}
+
+
+/* =========================================================
+   PEOPLE SECTION
+   ========================================================= */
+
+.people-section {
+
+    background:
+        #fbfcfe;
+
+    padding:
+        18px;
+
+    border:
+        1px solid #e2e7ef;
+
+    border-radius:
+        9px;
+
+    margin-top:
+        20px;
+
+}
+
+
+.people-section-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
+
+    gap:
+        15px;
+
+}
+
+
+.section-description {
+
+    margin:
+        -5px 0 0;
+
+    color:
+        #7b8492;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+
+}
+
+
+.add-person-button {
+
+    white-space:
+        nowrap;
+
+}
+
+
+/* =========================================================
+   PEOPLE CONTAINER
+   ========================================================= */
+
+.people-reached-container {
+
+    margin-top:
+        15px;
+
+}
+
+
+.people-empty-state {
+
+    padding:
+        18px;
+
+    border:
+        1px dashed #cfd7e3;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        #7b8492;
+
+    text-align:
+        center;
+
+    font-size:
+        12px;
+
+}
+
+
+/* =========================================================
+   INDIVIDUAL PERSON ROW
+   ========================================================= */
+
+.person-row {
+
+    display:
+        grid;
+
+    /*
+       Name
+       Phone
+       Year
+       Combination
+       New?
+       Outcome
+       Remove
+    */
+
+    grid-template-columns:
+        1.55fr
+        1.25fr
+        0.7fr
+        1.05fr
+        0.7fr
+        1.45fr
+        auto;
+
+    gap:
+        9px;
+
+    align-items:
+        end;
+
+    margin-bottom:
+        10px;
+
+    padding:
+        12px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #e0e6ef;
+
+    border-radius:
+        8px;
+
+}
+
+
+.person-row:last-child {
+
+    margin-bottom:
+        0;
+
+}
+
+
+.person-field {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+}
+
+
+.person-field label {
+
+    margin-bottom:
+        5px;
+
+    color:
+        #667085;
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.03em;
+
+}
+
+
+.person-field input,
+.person-field select {
+
+    width:
+        100%;
+
+    height:
+        36px;
+
+    box-sizing:
+        border-box;
+
+    padding:
+        0 9px;
+
+    border:
+        1px solid #d4dae3;
+
+    border-radius:
+        6px;
+
+    background:
+        #ffffff;
+
+    color:
+        #26354d;
+
+    font-family:
+        inherit;
+
+    font-size:
+        12px;
+
+    outline:
+        none;
+
+}
+
+
+.person-field input:focus,
+.person-field select:focus {
+
+    border-color:
+        #294895;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(
+            41,
+            72,
+            149,
+            0.08
+        );
+
+}
+
+
+.person-remove-button {
+
+    height:
+        36px;
+
+    padding:
+        0 9px;
+
+    border:
+        none;
+
+    border-radius:
+        6px;
+
+    background:
+        #d93025;
+
+    color:
+        #ffffff;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+
+    cursor:
+        pointer;
+
+}
+
+
+.person-remove-button:hover {
+
+    background:
+        #b42318;
+
+}
+
+
+/* =========================================================
+   PEOPLE SUMMARY
+   ========================================================= */
+
+.people-records-summary {
+
+    margin-top:
+        12px;
+
+    padding:
+        10px 12px;
+
+    border-radius:
+        7px;
+
+    background:
+        #edf3ff;
+
+    color:
+        #294895;
+
+    font-size:
+        12px;
+
+    font-weight:
+        600;
+
+}
+
+
+/* =========================================================
+   OUTCOME SUMMARY
+   ========================================================= */
+
+.outcome-summary {
+
+    margin-top:
+        12px;
+
+    padding:
+        11px 13px;
+
+    border-radius:
+        7px;
+
+    background:
+        #f5f7fb;
+
+    border:
+        1px solid #e0e6ef;
+
+    color:
+        #294895;
+
+    font-size:
+        12px;
+
+    font-weight:
+        600;
+
+}
+
+
+.outcome-summary.warning {
+
+    background:
+        #fff4d6;
+
+    border-color:
+        #f0d899;
+
+    color:
+        #8a6200;
+
+}
+
+
+/* =========================================================
+   DETAIL MESSAGE
+   ========================================================= */
+
+.form-message {
+
+    min-height:
+        17px;
+
+    margin:
+        13px 0 0;
+
+    color:
+        #d93025;
+
+    font-size:
+        12px;
+
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 1150px) {
+
+    .evangelism-summary {
+
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .person-row {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .person-remove-button {
+
+        width:
+            100%;
+
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    .evangelism-summary {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .evangelism-card-header {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+    }
+
+
+    #evangelismSearch {
+
+        width:
+            100%;
+
+    }
+
+
+    .form-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .people-section-header {
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .add-person-button {
+
+        width:
+            100%;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .evangelism-summary {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .evangelism-modal {
+
+        width:
+            96vw;
+
+        max-height:
+            94vh;
+
+    }
+
+
+    #evangelismForm {
+
+        padding:
+            0 16px 18px;
+
+    }
+
+
+    .evangelism-modal .modal-header {
+
+        padding:
+            16px;
+
+    }
+
+
+    .person-row {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - Evangelism
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="evangelism.css"
+    >
+
+    <link rel="stylesheet" href="cms-responsive.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+
+            <a
+                href="evangelism.html"
+                class="nav-link active"
+            >
+                Evangelism
+            </a>
+
+<a
+    href="visitors.html"
+    class="nav-link"
+>
+    Visitors
+</a>
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <section class="dashboard-section">
+
+
+            <!-- HEADER -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Evangelism
+                    </h1>
+
+                    <p>
+                        Evangelism activities carried out by cells.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="newEvangelismButton"
+                >
+                    + Record Evangelism
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+                 ================================================= -->
+
+            <div class="evangelism-summary">
+
+                <div class="summary-card">
+
+                    <span>
+                        Activities
+                    </span>
+
+                    <strong id="totalActivities">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <span>
+                        People Reached
+                    </span>
+
+                    <strong id="totalReached">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Saved
+                    </span>
+
+                    <strong id="totalSaved">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <span>
+                        In Progress
+                    </span>
+
+                    <strong id="totalProgress">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Interested
+                    </span>
+
+                    <strong id="totalInterested">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <span>
+                        Follow-up Needed
+                    </span>
+
+                    <strong id="totalFollowUpNeeded">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 RECORDS
+                 ================================================= -->
+
+            <div class="dashboard-card evangelism-card">
+
+                <div class="evangelism-card-header">
+
+                    <div>
+
+                        <h2>
+                            Evangelism Records
+                        </h2>
+
+                        <p>
+                            Activities recorded by cell leaders.
+                        </p>
+
+                    </div>
+
+
+                    <input
+                        type="text"
+                        id="evangelismSearch"
+                        placeholder="Search evangelism..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="evangelism-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Cell
+                                </th>
+
+                                <th>
+                                    Leader
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Type
+                                </th>
+
+                                <th>
+                                    Reached
+                                </th>
+
+                                <th>
+                                    Saved
+                                </th>
+
+                                <th>
+                                    Follow-up
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="evangelismTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="empty-row"
+                                >
+                                    No evangelism activities recorded yet.
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     ADD / EDIT EVANGELISM MODAL
+     ========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="evangelismModal"
+>
+
+    <div class="modal evangelism-modal">
+
+
+        <!-- HEADER -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="evangelismModalTitle">
+                    Record Evangelism
+                </h2>
+
+                <p class="modal-subtitle">
+                    Record an evangelism activity carried out by a cell.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeEvangelismModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form
+            id="evangelismForm"
+            novalidate
+        >
+
+            <input
+                type="hidden"
+                id="evangelismId"
+            >
+
+
+            <!-- =============================================
+                 ACTIVITY INFORMATION
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Activity Information
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="evangelismCell">
+
+                            Cell
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="evangelismCell"
+                            required
+                        >
+
+                            <option value="">
+                                Select a cell
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="evangelismLeader">
+
+                            Recorded By
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="evangelismLeader"
+                            required
+                            disabled
+                        >
+
+                            <option value="">
+                                Select a cell first
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="evangelismDate">
+
+                            Date
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="date"
+                            id="evangelismDate"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="evangelismType">
+
+                            Evangelism Type
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="evangelismType"
+                            required
+                        >
+
+                            <option value="">
+                                Select type
+                            </option>
+
+                            <option value="Friendship Evangelism">
+                                Friendship Evangelism
+                            </option>
+
+                            <option value="One-on-One Evangelism">
+                                One-on-One Evangelism
+                            </option>
+
+                            <option value="Door-to-Door Evangelism">
+                                Door-to-Door Evangelism
+                            </option>
+
+                            <option value="Group Evangelism">
+                                Group Evangelism
+                            </option>
+
+                            <option value="Campus / School Evangelism">
+                                Campus / School Evangelism
+                            </option>
+
+                            <option value="Outreach Event">
+                                Outreach Event
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 LOCATION
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Location
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="evangelismLocation">
+                        Location / Area
+                    </label>
+
+
+                    <input
+                        type="text"
+                        id="evangelismLocation"
+                        placeholder="e.g. Rukara Campus, nearby community..."
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 PEOPLE REACHED SUMMARY
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    People Reached
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="peopleReached">
+
+                            People Reached
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="peopleReached"
+                            min="0"
+                            value="0"
+                            required
+                        >
+
+
+                        <small class="form-help">
+                            Automatically updated when individual people are recorded.
+                        </small>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="newPeople">
+                            New People
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="newPeople"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 INDIVIDUAL PEOPLE
+                 ============================================= -->
+
+            <div class="form-section people-section">
+
+                <div class="people-section-header">
+
+                    <div>
+
+                        <div class="form-section-title">
+                            People Reached — Detailed Records
+                        </div>
+
+                        <p class="section-description">
+                            Add the people who were reached. Their outcomes will automatically update the totals above.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button add-person-button"
+                        id="addPersonButton"
+                    >
+                        + Add Person
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="peopleReachedContainer"
+                    class="people-reached-container"
+                >
+
+                    <div
+                        id="peopleEmptyState"
+                        class="people-empty-state"
+                    >
+                        No individual people added yet.
+                        You can still use the summary totals above for a quick report.
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="peopleRecordsSummary"
+                    class="people-records-summary"
+                >
+                    Individual records: 0
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 OUTCOME SUMMARY
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Evangelism Outcomes
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="savedCount">
+                            Saved
+                        </label>
+
+                        <input
+                            type="number"
+                            id="savedCount"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="progressCount">
+                            In Progress
+                        </label>
+
+                        <input
+                            type="number"
+                            id="progressCount"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="interestedCount">
+                            Interested
+                        </label>
+
+                        <input
+                            type="number"
+                            id="interestedCount"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="followUpCount">
+                            Follow-up Needed
+                        </label>
+
+                        <input
+                            type="number"
+                            id="followUpCount"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="notYetCount">
+                            Not Yet / No Decision
+                        </label>
+
+                        <input
+                            type="number"
+                            id="notYetCount"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="outcome-summary"
+                    id="outcomeSummary"
+                >
+                    Total outcomes: 0 / 0
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 DETAILS
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <div class="form-section-title">
+                    Details
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="evangelismDetails">
+                        Details / Experience
+                    </label>
+
+
+                    <textarea
+                        id="evangelismDetails"
+                        rows="4"
+                        placeholder="Describe what happened during the evangelism activity..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="evangelismNextAction">
+                        Next Action
+                    </label>
+
+
+                    <textarea
+                        id="evangelismNextAction"
+                        rows="3"
+                        placeholder="What should happen next?"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+
+            <p
+                id="evangelismMessage"
+                class="form-message"
+            ></p>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelEvangelismButton"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Evangelism
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+<script src="cms-page-guard.js"></script>
+<script src="cms-access.js"></script>
+<script src="evangelism.js"></script>
+<script src="evangelism-supabase-bridge.js"></script>
+
+</body>
+
+</html>

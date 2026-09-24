@@ -1,0 +1,1403 @@
+/* =====================================================
+   CMS - VISITORS
+   FINAL STABLE VERSION
+   Matches the existing Members / Follow-ups design
+   ===================================================== */
+
+
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
+.visitors-page {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+
+/* =====================================================
+   SUMMARY
+   ===================================================== */
+
+.visitor-summary {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.visitor-summary .summary-item {
+
+    min-width: 0;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e3e8f0;
+
+    border-radius:
+        10px;
+
+    padding:
+        17px 18px;
+
+    min-height:
+        78px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    box-shadow:
+        0 2px 7px
+        rgba(
+            20,
+            38,
+            70,
+            0.05
+        );
+
+}
+
+
+.visitor-summary .summary-item span {
+
+    font-size:
+        13px;
+
+    color:
+        #6b7280;
+
+    margin-bottom:
+        6px;
+
+}
+
+
+.visitor-summary .summary-item strong {
+
+    font-size:
+        25px;
+
+    line-height:
+        1;
+
+    color:
+        #294895;
+
+}
+
+
+/* =====================================================
+   MAIN CARD
+   ===================================================== */
+
+.visitor-card {
+
+    width:
+        100%;
+
+    min-width:
+        0;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e1e6ee;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 3px 10px
+        rgba(
+            30,
+            50,
+            80,
+            0.06
+        );
+
+    overflow:
+        hidden;
+
+}
+
+
+/* =====================================================
+   TOOLBAR
+   ===================================================== */
+
+.visitor-toolbar {
+
+    width:
+        100%;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            220px,
+            1fr
+        )
+        190px
+        190px
+        auto;
+
+    gap:
+        12px;
+
+    padding:
+        18px 20px;
+
+    border-bottom:
+        1px solid
+        #e6eaf0;
+
+}
+
+
+.visitor-toolbar input,
+.visitor-toolbar select {
+
+    width:
+        100%;
+
+    min-width:
+        0;
+
+    height:
+        38px;
+
+    box-sizing:
+        border-box;
+
+    padding:
+        0 12px;
+
+    border:
+        1px solid
+        #cfd6e1;
+
+    border-radius:
+        7px;
+
+    background:
+        #ffffff;
+
+    color:
+        #26354d;
+
+    font-family:
+        inherit;
+
+    font-size:
+        13px;
+
+    outline:
+        none;
+
+}
+
+
+.visitor-toolbar input:focus,
+.visitor-toolbar select:focus {
+
+    border-color:
+        #294895;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            41,
+            72,
+            149,
+            0.08
+        );
+
+}
+
+
+/* =====================================================
+   TABLE HEADER
+   ===================================================== */
+
+.visitor-table-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding:
+        19px 20px;
+
+    border-bottom:
+        1px solid
+        #e6eaf0;
+
+}
+
+
+.visitor-table-header h2 {
+
+    margin:
+        0;
+
+    color:
+        #23385f;
+
+    font-size:
+        18px;
+
+    font-weight:
+        700;
+
+}
+
+
+.visitor-table-header span {
+
+    display:
+        block;
+
+    margin-top:
+        5px;
+
+    color:
+        #7a8493;
+
+    font-size:
+        13px;
+
+}
+
+
+/* =====================================================
+   TABLE CONTAINER
+   HORIZONTAL SCROLL ENABLED
+   ===================================================== */
+
+.visitor-card .table-responsive {
+
+    width:
+        100%;
+
+    max-width:
+        100%;
+
+    overflow-x:
+        auto;
+
+    overflow-y:
+        visible;
+
+    -webkit-overflow-scrolling:
+        touch;
+
+    scrollbar-width:
+        thin;
+
+}
+
+
+/*
+   Keep the complete table wide enough so all
+   columns remain properly aligned.
+
+   The container above handles horizontal scrolling.
+*/
+
+.visitors-table {
+
+    width:
+        max-content;
+
+    min-width:
+        1100px;
+
+    border-collapse:
+        collapse;
+
+    table-layout:
+        auto;
+
+}
+
+
+/* =====================================================
+   TABLE HEADER
+   ===================================================== */
+
+.visitors-table thead th {
+
+    background:
+        #f7f9fc;
+
+    color:
+        #555;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    text-align:
+        left;
+
+    padding:
+        11px 12px;
+
+    border-bottom:
+        1px solid
+        #e3e7ed;
+
+    white-space:
+        nowrap;
+
+}
+
+
+/* =====================================================
+   TABLE BODY
+   ===================================================== */
+
+.visitors-table tbody td {
+
+    padding:
+        11px 12px;
+
+    border-bottom:
+        1px solid
+        #edf0f4;
+
+    color:
+        #444;
+
+    font-size:
+        13px;
+
+    vertical-align:
+        middle;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.visitors-table tbody tr:nth-child(
+    even
+) {
+
+    background:
+        #fafbfd;
+
+}
+
+
+.visitors-table tbody tr:hover {
+
+    background:
+        #f4f7fb;
+
+}
+
+
+/* =====================================================
+   NAME
+   ===================================================== */
+
+.visitor-name {
+
+    color:
+        #333;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+}
+
+
+/* =====================================================
+   VISITS
+   ===================================================== */
+
+.visitor-visits {
+
+    color:
+        #294895;
+
+    font-weight:
+        700;
+
+    text-align:
+        center;
+
+}
+
+
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+.visitor-status {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        5px 9px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.2;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.visitor-status.new {
+
+    background:
+        #e7f5e8;
+
+    color:
+        #168447;
+
+}
+
+
+.visitor-status.converted {
+
+    background:
+        #e6efff;
+
+    color:
+        #2455a6;
+
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+   ===================================================== */
+
+.visitor-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.visitor-action {
+
+    border:
+        none;
+
+    background:
+        #294895;
+
+    color:
+        #ffffff;
+
+    border-radius:
+        6px;
+
+    padding:
+        6px 9px;
+
+    cursor:
+        pointer;
+
+    font-family:
+        inherit;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+
+    transition:
+        0.15s ease;
+
+}
+
+
+.visitor-action:hover {
+
+    opacity:
+        0.9;
+
+    transform:
+        translateY(
+            -1px
+        );
+
+}
+
+
+.visitor-action.history {
+
+    background:
+        #687386;
+
+}
+
+
+.visitor-action.convert {
+
+    background:
+        #168447;
+
+}
+
+
+.visitor-action.delete {
+
+    background:
+        #b42318;
+
+}
+
+
+/* =====================================================
+   EMPTY
+   ===================================================== */
+
+.empty-message {
+
+    padding:
+        40px 20px !important;
+
+    text-align:
+        center !important;
+
+    color:
+        #8a93a1 !important;
+
+    font-size:
+        13px !important;
+
+}
+
+
+/* =====================================================
+   MODAL OVERLAY
+   ===================================================== */
+
+.modal-overlay {
+
+    display:
+        none;
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    width:
+        100vw;
+
+    height:
+        100vh;
+
+    z-index:
+        9999;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
+    box-sizing:
+        border-box;
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.50
+        );
+
+}
+
+
+.modal-overlay.show {
+
+    display:
+        flex;
+
+}
+
+
+/* =====================================================
+   VISITOR EDIT MODAL
+   ===================================================== */
+
+.visitor-modal {
+
+    width:
+        min(
+            680px,
+            95vw
+        );
+
+    max-width:
+        680px;
+
+    max-height:
+        92vh;
+
+    overflow-y:
+        auto;
+
+    background:
+        #ffffff;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(
+            0,
+            0,
+            0,
+            0.24
+        );
+
+}
+
+
+/* =====================================================
+   VIEW / HISTORY MODALS
+   ===================================================== */
+
+.visitor-view-modal,
+.visitor-history-modal {
+
+    width:
+        min(
+            850px,
+            95vw
+        );
+
+    max-width:
+        850px;
+
+    max-height:
+        90vh;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    overflow:
+        hidden;
+
+    background:
+        #ffffff;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(
+            0,
+            0,
+            0,
+            0.24
+        );
+
+}
+
+
+/* =====================================================
+   MODAL HEADER
+   ===================================================== */
+
+.visitor-modal .modal-header,
+.visitor-view-modal .modal-header,
+.visitor-history-modal .modal-header {
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    padding:
+        19px 22px;
+
+    border-bottom:
+        1px solid
+        #e5e9ef;
+
+    background:
+        #ffffff;
+
+}
+
+
+.visitor-modal .modal-header h2,
+.visitor-view-modal .modal-header h2,
+.visitor-history-modal .modal-header h2 {
+
+    margin:
+        0;
+
+    color:
+        #294895;
+
+    font-size:
+        21px;
+
+    font-weight:
+        700;
+
+}
+
+
+.visitor-view-modal .modal-header p,
+.visitor-history-modal .modal-header p {
+
+    margin:
+        4px 0 0;
+
+    color:
+        #7b8492;
+
+    font-size:
+        12px;
+
+}
+
+
+/* =====================================================
+   MODAL CLOSE
+   ===================================================== */
+
+.visitor-modal .close-button,
+.visitor-view-modal .close-button,
+.visitor-history-modal .close-button {
+
+    flex:
+        0 0 auto;
+
+    width:
+        34px;
+
+    height:
+        34px;
+
+    border:
+        none;
+
+    border-radius:
+        6px;
+
+    background:
+        transparent;
+
+    color:
+        #5d6674;
+
+    font-size:
+        25px;
+
+    line-height:
+        1;
+
+    cursor:
+        pointer;
+
+}
+
+
+.visitor-modal .close-button:hover,
+.visitor-view-modal .close-button:hover,
+.visitor-history-modal .close-button:hover {
+
+    background:
+        #f1f4f8;
+
+}
+
+
+/* =====================================================
+   EDIT FORM
+   ===================================================== */
+
+.visitor-modal form {
+
+    padding:
+        20px 22px 22px;
+
+}
+
+
+.visitor-modal .form-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        14px 18px;
+
+}
+
+
+.visitor-modal .form-grid > div {
+
+    min-width:
+        0;
+
+}
+
+
+.visitor-modal label {
+
+    display:
+        block;
+
+    margin-bottom:
+        6px;
+
+    color:
+        #374151;
+
+    font-size:
+        13px;
+
+    font-weight:
+        600;
+
+}
+
+
+.visitor-modal input,
+.visitor-modal select {
+
+    width:
+        100%;
+
+    min-height:
+        40px;
+
+    padding:
+        0 10px;
+
+    border:
+        1px solid
+        #d4dae3;
+
+    border-radius:
+        6px;
+
+    background:
+        #ffffff;
+
+    color:
+        #243047;
+
+    font-family:
+        inherit;
+
+    font-size:
+        13px;
+
+    box-sizing:
+        border-box;
+
+}
+
+
+.visitor-modal input:focus,
+.visitor-modal select:focus {
+
+    border-color:
+        #294895;
+
+    outline:
+        none;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            41,
+            72,
+            149,
+            0.08
+        );
+
+}
+
+
+/* =====================================================
+   VIEW CONTENT
+   ===================================================== */
+
+.visitor-view-content {
+
+    flex:
+        1 1 auto;
+
+    min-height:
+        0;
+
+    overflow-y:
+        auto;
+
+    padding:
+        22px;
+
+}
+
+
+/* =====================================================
+   DETAIL GRID
+   ===================================================== */
+
+.visitor-detail-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        12px;
+
+}
+
+
+.visitor-detail-item {
+
+    min-width:
+        0;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid
+        #edf1f7;
+
+    border-radius:
+        8px;
+
+    padding:
+        13px;
+
+}
+
+
+.visitor-detail-item span {
+
+    display:
+        block;
+
+    margin-bottom:
+        5px;
+
+    color:
+        #667085;
+
+    font-size:
+        10px;
+
+    font-weight:
+        600;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+.visitor-detail-item strong {
+
+    color:
+        #243047;
+
+    font-size:
+        14px;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+/* =====================================================
+   RECENT HISTORY
+   ===================================================== */
+
+.visitor-history-preview {
+
+    margin-top:
+        20px;
+
+}
+
+
+.visitor-history-preview h3 {
+
+    margin:
+        0 0 12px;
+
+    color:
+        #23385f;
+
+    font-size:
+        16px;
+
+}
+
+
+/* =====================================================
+   HISTORY TABLE
+   ===================================================== */
+
+.visitor-history-table {
+
+    width:
+        100%;
+
+    border-collapse:
+        collapse;
+
+}
+
+
+.visitor-history-table th {
+
+    background:
+        #f7f9fc;
+
+    color:
+        #555;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    padding:
+        11px 13px;
+
+    text-align:
+        left;
+
+}
+
+
+.visitor-history-table td {
+
+    padding:
+        11px 13px;
+
+    border-top:
+        1px solid
+        #edf1f7;
+
+    color:
+        #444;
+
+    font-size:
+        13px;
+
+}
+
+
+/* =====================================================
+   MODAL ACTIONS
+   ===================================================== */
+
+.visitor-modal .modal-actions,
+.visitor-view-modal .modal-actions,
+.visitor-history-modal .modal-actions {
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    gap:
+        8px;
+
+    padding:
+        14px 22px;
+
+    border-top:
+        1px solid
+        #e5e9ef;
+
+    background:
+        #ffffff;
+
+}
+
+
+/* =====================================================
+   MEDIUM SCREEN
+   ===================================================== */
+
+@media (
+    max-width: 1150px
+) {
+
+    .visitor-summary {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .visitor-toolbar {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+
+    .visitor-toolbar button {
+
+        width:
+            100%;
+
+    }
+
+}
+
+
+/* =====================================================
+   TABLET / SMALL SCREEN
+   ===================================================== */
+
+@media (
+    max-width: 850px
+) {
+
+    /*
+       Keep the table wide.
+
+       The user scrolls left/right instead of
+       columns becoming misaligned.
+    */
+
+    .visitors-table {
+
+        min-width:
+            1100px;
+
+    }
+
+
+    .visitor-card .table-responsive {
+
+        overflow-x:
+            auto;
+
+    }
+
+
+    .visitor-modal .form-grid,
+    .visitor-detail-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .visitor-view-modal,
+    .visitor-history-modal {
+
+        width:
+            95vw;
+
+        max-height:
+            92vh;
+
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (
+    max-width: 600px
+) {
+
+    .visitor-summary {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .visitor-toolbar {
+
+        grid-template-columns:
+            1fr;
+
+        padding:
+            14px;
+
+    }
+
+
+    .visitor-table-header {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        padding:
+            16px;
+
+    }
+
+
+    .visitor-view-content {
+
+        padding:
+            16px;
+
+    }
+
+
+    .visitor-modal .modal-actions,
+    .visitor-view-modal .modal-actions,
+    .visitor-history-modal .modal-actions {
+
+        flex-wrap:
+            wrap;
+
+        padding:
+            12px 16px;
+
+    }
+
+}
