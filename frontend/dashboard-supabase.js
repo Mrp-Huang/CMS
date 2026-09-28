@@ -877,16 +877,77 @@ function dashboardRestoreCellLeaderVisitors() {
 
 
 /* =========================================================
+   PAGINATED DATA LOADER
+   ========================================================= */
+
+async function dashboardFetchAllRows(
+    createQuery
+) {
+
+    const pageSize =
+        500;
+
+
+    const rows =
+        [];
+
+
+    for (
+        let offset = 0;
+        ;
+        offset += pageSize
+    ) {
+
+        const {
+            data,
+            error
+        } =
+            await createQuery()
+                .range(
+                    offset,
+                    offset + pageSize - 1
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        const page =
+            data || [];
+
+
+        rows.push(
+            ...page
+        );
+
+
+        if (
+            page.length <
+            pageSize
+        ) {
+
+            return rows;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
    LOAD CELLS
    ========================================================= */
 
 async function dashboardLoadCells() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "cells"
             )
@@ -905,17 +966,8 @@ async function dashboardLoadCells() {
                 {
                     ascending: true
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -926,15 +978,15 @@ async function dashboardLoadCells() {
 
 async function dashboardLoadLeaders() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
-            .from(
-                "cell_leader_directory"
-            )
-            .select(
+    return dashboardFetchAllRows(
+        () => {
+
+            let query =
+                CMS_DASHBOARD_SUPABASE
+                    .from(
+                        "cell_leader_directory"
+                    )
+                    .select(
                 `
                 id,
                 full_name,
@@ -944,23 +996,33 @@ async function dashboardLoadLeaders() {
                 active,
                 created_at
                 `
-            )
-            .order(
+                    );
+
+
+            if (
+                cmsDashboardRole ===
+                    "cell_leader" &&
+                cmsDashboardMyCell?.cell_id
+            ) {
+
+                query =
+                    query.eq(
+                        "cell_id",
+                        cmsDashboardMyCell.cell_id
+                    );
+
+            }
+
+
+            return query.order(
                 "created_at",
                 {
                     ascending: true
                 }
             );
 
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+        }
+    );
 
 }
 
@@ -971,11 +1033,9 @@ async function dashboardLoadLeaders() {
 
 async function dashboardLoadMembers() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "members"
             )
@@ -1001,17 +1061,8 @@ async function dashboardLoadMembers() {
                 {
                     ascending: true
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1022,11 +1073,9 @@ async function dashboardLoadMembers() {
 
 async function dashboardLoadAttendanceSessions() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "attendance_sessions"
             )
@@ -1045,17 +1094,8 @@ async function dashboardLoadAttendanceSessions() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1066,11 +1106,9 @@ async function dashboardLoadAttendanceSessions() {
 
 async function dashboardLoadAttendance() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "attendance"
             )
@@ -1091,17 +1129,8 @@ async function dashboardLoadAttendance() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1112,11 +1141,9 @@ async function dashboardLoadAttendance() {
 
 async function dashboardLoadVisitors() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "visitors"
             )
@@ -1144,20 +1171,10 @@ async function dashboardLoadVisitors() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
-
 
 /* =========================================================
    LOAD VISITOR VISITS
@@ -1165,11 +1182,9 @@ async function dashboardLoadVisitors() {
 
 async function dashboardLoadVisitorVisits() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "visitor_visits"
             )
@@ -1190,17 +1205,8 @@ async function dashboardLoadVisitorVisits() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1211,11 +1217,9 @@ async function dashboardLoadVisitorVisits() {
 
 async function dashboardLoadReports() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "weekly_reports"
             )
@@ -1243,17 +1247,8 @@ async function dashboardLoadReports() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1264,11 +1259,9 @@ async function dashboardLoadReports() {
 
 async function dashboardLoadFollowUps() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "follow_ups"
             )
@@ -1296,17 +1289,8 @@ async function dashboardLoadFollowUps() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -1317,11 +1301,9 @@ async function dashboardLoadFollowUps() {
 
 async function dashboardLoadEvangelism() {
 
-    const {
-        data,
-        error
-    } =
-        await CMS_DASHBOARD_SUPABASE
+    return dashboardFetchAllRows(
+        () =>
+            CMS_DASHBOARD_SUPABASE
             .from(
                 "evangelism"
             )
@@ -1354,17 +1336,8 @@ async function dashboardLoadEvangelism() {
                 {
                     ascending: false
                 }
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    return data || [];
+            )
+    );
 
 }
 
@@ -2736,58 +2709,52 @@ function dashboardRenderCellsNeedingAttention() {
     }
 
 
+    const table = document.createElement("table");
+    table.className = "attention-table";
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th scope="col">Cell</th>
+                <th scope="col">Members</th>
+                <th scope="col">Leader</th>
+                <th scope="col">Weekly report</th>
+                <th scope="col">Attendance</th>
+                <th scope="col">Follow-ups</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tableBody = table.querySelector("tbody");
+
     rows
-        .slice(
-            0,
-            10
-        )
-        .forEach(
-            item => {
+        .slice(0, 10)
+        .forEach(item => {
+            const reasonSet = new Set(item.reasons);
+            const status = reason => reasonSet.has(reason)
+                ? `<span class="attention-status attention-status-warning">${escapeDashboardHTML(reason)}</span>`
+                : `<span class="attention-status attention-status-ok">No issue</span>`;
 
-                const div =
-                    document.createElement(
-                        "div"
-                    );
+            const followUpReason = item.reasons.find(
+                reason => reason.endsWith("open follow-ups")
+            );
 
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <th scope="row">${escapeDashboardHTML(item.cell.name)}</th>
+                <td>${status("No active members")}</td>
+                <td>${status("No cell leader assigned")}</td>
+                <td>${status("No recent weekly report")}</td>
+                <td>${status("No recent attendance")}</td>
+                <td>${followUpReason
+                    ? `<span class="attention-status attention-status-warning">${escapeDashboardHTML(followUpReason)}</span>`
+                    : `<span class="attention-status attention-status-ok">No open follow-ups</span>`}</td>
+            `;
 
-                div.className =
-                    "dashboard-list-item";
+            tableBody.appendChild(row);
+        });
 
-
-                div.innerHTML = `
-
-                    <div>
-
-                        <strong>
-                            ${escapeDashboardHTML(
-                                item.cell.name
-                            )}
-                        </strong>
-
-                        <small>
-                            ${item.reasons
-                                .map(
-                                    reason =>
-                                        escapeDashboardHTML(
-                                            reason
-                                        )
-                                )
-                                .join(
-                                    " • "
-                                )}
-                        </small>
-
-                    </div>
-
-                `;
-
-
-                target.appendChild(
-                    div
-                );
-
-            }
-        );
+    target.appendChild(table);
 
 }
 
@@ -2911,7 +2878,39 @@ function dashboardApplyCellLeaderPresentation() {
         cmsDashboardMyCell.cell_name ||
         "My Cell";
 
+/* =====================================================
+   SHOW ALL LEADERS ASSIGNED TO MY CELL
+   ===================================================== */
 
+const myCellId =
+    cmsDashboardMyCell.cell_id;
+
+
+const myCellLeaders =
+    (cmsDashboardData.leaders || [])
+        .filter(
+            leader =>
+                String(
+                    leader.cell_id
+                ) ===
+                String(
+                    myCellId
+                )
+        );
+
+
+const leadersCardValue =
+    document.getElementById(
+        "total-leaders"
+    );
+
+
+if (leadersCardValue) {
+
+    leadersCardValue.textContent =
+        myCellLeaders.length;
+
+}
     /* =====================================================
        TOP BAR
        ===================================================== */
@@ -3002,7 +3001,19 @@ function dashboardApplyCellLeaderPresentation() {
             "Assigned cell",
 
         "total-leaders":
-            "Leaders in my cell",
+            myCellLeaders.length === 0
+                ? "No leader assigned"
+                : `Leaders: ${
+                    myCellLeaders
+                        .map(
+                            leader =>
+                                leader.full_name ||
+                                "—"
+                        )
+                        .join(
+                            " & "
+                        )
+                }`,
 
         "total-members":
             "Members in my cell",

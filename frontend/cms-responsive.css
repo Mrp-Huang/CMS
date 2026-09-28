@@ -66,9 +66,11 @@ table tbody td {
 
 .table-container,
 .table-wrapper,
+.table-responsive,
 .data-table-wrapper,
 .records-table-container,
-.dashboard-table-container {
+.dashboard-table-container,
+.attendance-table-container {
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -113,6 +115,7 @@ textarea {
 @media (max-width: 700px) {
     .sidebar,
     .cms-layout .sidebar {
+        display: block;
         position: relative;
         top: auto;
         left: auto;
@@ -189,11 +192,12 @@ textarea {
     .card,
     .panel {
         max-width: 100%;
-        overflow-x: hidden;
     }
 
     table {
         display: block;
+        width: 100%;
+        min-width: 0;
         max-width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;

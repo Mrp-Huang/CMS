@@ -1203,6 +1203,24 @@ async function cmsWeeklyBridgeSyncReports(
         }
 
 
+        const databaseReportsByKey =
+            new Map();
+
+
+        (dbReports || []).forEach(
+            function(report) {
+
+                databaseReportsByKey.set(
+                    String(report.cell_id) +
+                    "|" +
+                    String(report.report_date),
+                    report
+                );
+
+            }
+        );
+
+
         const localById =
             {};
 
@@ -1256,10 +1274,28 @@ async function cmsWeeklyBridgeSyncReports(
                 null;
 
 
-            const reportHasUUID =
+            const reportKey =
+                cmsWeeklyBridgeReportKey(
+                    report
+                );
+
+
+            const existingDatabaseReport =
+                databaseReportsByKey.get(
+                    reportKey
+                );
+
+
+            const reportId =
                 cmsWeeklyBridgeIsUUID(
                     report.id
-                );
+                )
+                    ? report.id
+                    : existingDatabaseReport?.id;
+
+
+            const reportHasUUID =
+                Boolean(reportId);
 
 
             if (
@@ -1282,7 +1318,7 @@ async function cmsWeeklyBridgeSyncReports(
 
                         .eq(
                             "id",
-                            report.id
+                            reportId
                         )
 
                         .select(
@@ -1312,6 +1348,18 @@ async function cmsWeeklyBridgeSyncReports(
 
                     savedReport =
                         data;
+
+                }
+
+
+                if (
+                    savedReport
+                ) {
+
+                    databaseReportsByKey.set(
+                        reportKey,
+                        savedReport
+                    );
 
                 }
 
@@ -1362,57 +1410,169 @@ async function cmsWeeklyBridgeSyncReports(
                         .single();
 
 
-                if (error) {
+                /*
+                   A second Cell Leader may have
+                   submitted the same cell/date.
+                */
+
+                if (
+                    error &&
+                    error.code === "23505"
+                ) {
+
+                    const {
+                        data:
+                            existingReport,
+                        error:
+                            existingReportError
+                    } =
+                        await CMS_WEEKLY_BRIDGE_SUPABASE
+
+                            .from(
+                                "weekly_reports"
+                            )
+
+                            .select(
+                                `
+                                id,
+                                cell_id,
+                                report_date,
+                                status,
+                                created_at,
+                                updated_at,
+                                submitted_at,
+                                created_by
+                                `
+                            )
+
+                            .eq(
+                                "cell_id",
+                                payload.cell_id
+                            )
+
+                            .eq(
+                                "report_date",
+                                payload.report_date
+                            )
+
+                            .maybeSingle();
+
+
+                    if (
+                        existingReportError ||
+                        !existingReport
+                    ) {
+
+                        throw (
+                            existingReportError ||
+                            new Error(
+                                "The shared weekly report could not be found."
+                            )
+                        );
+
+                    }
+
+
+                    const updatePayload =
+                        {
+                            ...payload,
+
+                            created_by:
+                                existingReport.created_by
+                        };
+
+
+                    const {
+                        data:
+                            updatedReport,
+                        error:
+                            updateError
+                    } =
+                        await CMS_WEEKLY_BRIDGE_SUPABASE
+
+                            .from(
+                                "weekly_reports"
+                            )
+
+                            .update(
+                                updatePayload
+                            )
+
+                            .eq(
+                                "id",
+                                existingReport.id
+                            )
+
+                            .select(
+                                `
+                                id,
+                                cell_id,
+                                report_date,
+                                status,
+                                created_at,
+                                updated_at,
+                                submitted_at,
+                                created_by
+                                `
+                            )
+
+                            .single();
+
+
+                    if (
+                        updateError
+                    ) {
+
+                        throw updateError;
+
+                    }
+
+
+                    savedReport =
+                        updatedReport;
+
+                }
+
+                else if (
+                    error
+                ) {
 
                     throw error;
 
                 }
 
+                else {
 
-                savedReport =
-                    data;
+                    savedReport =
+                        data;
+
+                }
 
             }
 
 
-            canonicalReports.push({
+            canonicalReports.push(
+                {
+                    ...report,
 
-                ...report,
+                    id:
+                        savedReport.id,
 
-                id:
-                    savedReport.id,
+                    createdAt:
+                        savedReport.created_at,
 
-                cellId:
-                    savedReport.cell_id,
+                    updatedAt:
+                        savedReport.updated_at,
 
-                date:
-                    savedReport.report_date,
+                    submittedAt:
+                        savedReport.submitted_at,
 
-                status:
-                    savedReport.status,
-
-                createdAt:
-                    savedReport.created_at ||
-                    report.createdAt,
-
-                updatedAt:
-                    savedReport.updated_at ||
-                    report.updatedAt,
-
-                submittedAt:
-                    savedReport.submitted_at ||
-                    report.submittedAt ||
-                    null,
-
-                createdBy:
-                    savedReport.created_by ||
-                    report.createdBy ||
-                    null
-
-            });
+                    createdBy:
+                        savedReport.created_by
+                }
+            );
 
         }
-
 
         /* =================================================
            DELETE REPORTS REMOVED FROM LOCAL UI

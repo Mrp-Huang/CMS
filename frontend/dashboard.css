@@ -194,6 +194,60 @@ body {
 
 
 /* =====================================================
+   SHARED PAGE HEADERS AND ACTIONS
+   ===================================================== */
+
+.dashboard-container .main-content .page-header h1,
+.dashboard-container .main-content .cells-page-header h1 {
+    color: #1f3c88;
+}
+
+.dashboard-container .main-content .page-header > .primary-button,
+.dashboard-container .main-content .cells-page-header > .primary-button {
+    border: none;
+    border-radius: 7px;
+    padding: 11px 18px;
+    background: #1f3c88;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.dashboard-container .main-content .page-header > .primary-button:hover,
+.dashboard-container .main-content .cells-page-header > .primary-button:hover {
+    background: #162d68;
+}
+
+.dashboard-container .main-content .page-header > .primary-button:active,
+.dashboard-container .main-content .cells-page-header > .primary-button:active {
+    transform: translateY(1px);
+}
+
+.dashboard-container .main-content .page-header > .secondary-button,
+.dashboard-container .main-content .cells-page-header > .secondary-button {
+    border: 1px solid #cbd5eb;
+    border-radius: 7px;
+    padding: 10px 17px;
+    background: #eef2fc;
+    color: #1f3c88;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-container .main-content .page-header > .secondary-button:hover,
+.dashboard-container .main-content .cells-page-header > .secondary-button:hover {
+    border-color: #aebde0;
+    background: #dbe4fa;
+}
+
+
+/* =====================================================
    TOP BAR
    ===================================================== */
 
@@ -737,11 +791,83 @@ tbody tr:hover {
    ===================================================== */
 
 .attention-container {
-    display: flex;
+    overflow-x: auto;
+}
 
-    flex-direction: column;
 
-    gap: 9px;
+.attention-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    background: #ffffff;
+    border: 1px solid #e3e8f2;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+
+.attention-table th,
+.attention-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf0f5;
+    text-align: left;
+    vertical-align: middle;
+}
+
+
+.attention-table thead th {
+    background: #f1f4fa;
+    color: #53627c;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+
+.attention-table tbody th {
+    color: #1f3c88;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+.attention-table tbody tr:last-child th,
+.attention-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.attention-table tbody tr:hover {
+    background: #fafbfe;
+}
+
+
+.attention-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+
+.attention-status-warning {
+    background: #fff1d6;
+    color: #9a5a00;
+}
+
+
+.attention-status-ok {
+    background: #e9f6ed;
+    color: #28743c;
 }
 
 

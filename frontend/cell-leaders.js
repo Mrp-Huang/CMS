@@ -1300,10 +1300,19 @@ function getCellName(
 
 }
 /* =====================================================
-   GENERATE CELL LEADER ACTIVATION CODE
+   CMS - CELL LEADER ACCOUNT MANAGEMENT
    ===================================================== */
 
-async function generateActivationCode(
+const CELL_LEADER_ACCOUNT_FUNCTION =
+    "cms-cell-leader-account-manager";
+
+
+/* =====================================================
+   ACCOUNT MANAGEMENT
+   ===================================================== */
+
+async function manageCellLeaderAccount(
+    action,
     leaderId
 ) {
 
@@ -1323,12 +1332,8 @@ async function generateActivationCode(
             function(item) {
 
                 return (
-                    String(
-                        item.id
-                    ) ===
-                    String(
-                        leaderId
-                    )
+                    String(item.id) ===
+                    String(leaderId)
                 );
 
             }
@@ -1346,20 +1351,11 @@ async function generateActivationCode(
     }
 
 
-    if (leader.authUserId) {
-
-        alert(
-            `${leader.name} already has an activated account.`
-        );
-
-        return;
-
-    }
-
-
     const confirmed =
         confirm(
-            `Generate an activation code for ${leader.name}?`
+            action === "reset_password"
+                ? `Reset the password for ${leader.name} to the CMS general password?`
+                : `Create a CMS account for ${leader.name}?`
         );
 
 
@@ -1377,12 +1373,18 @@ async function generateActivationCode(
             error
         } =
             await cmsSupabase.functions.invoke(
-                "cms-cell-leader-create-code",
+                CELL_LEADER_ACCOUNT_FUNCTION,
                 {
                     body: {
+
+                        action:
+                            action,
+
                         leader_id:
                             leaderId
+
                     }
+
                 }
             );
 
@@ -1390,12 +1392,13 @@ async function generateActivationCode(
         if (error) {
 
             console.error(
-                "Activation code function error:",
+                "Cell Leader account function error:",
                 error
             );
 
             throw new Error(
-                "Unable to contact the activation service."
+                error.message ||
+                "Unable to manage the Cell Leader account."
             );
 
         }
@@ -1408,72 +1411,53 @@ async function generateActivationCode(
 
             throw new Error(
                 data?.error ||
-                "Unable to generate activation code."
+                "Unable to manage the Cell Leader account."
             );
 
         }
 
 
-        const code =
-            data.activation_code;
+        const account =
+            data.account ||
+            data;
 
 
-        let copied =
-            false;
+        const username =
+            account.username ||
+            leader.username ||
+            "—";
 
 
-        try {
+        const password =
+            account.password ||
+            data.password ||
+            "—";
 
-            if (
-                navigator.clipboard &&
-                navigator.clipboard.writeText
-            ) {
 
-                await navigator.clipboard.writeText(
-                    code
+        const message =
+            action ===
+            "reset_password"
+
+                ? (
+                    `PASSWORD RESET SUCCESSFUL\n\n` +
+                    `Leader: ${leader.name}\n` +
+                    `Username: ${username}\n` +
+                    `New Password: ${password}\n\n` +
+                    `The Cell Leader can continue using this password ` +
+                    `or change it later.`
+                )
+
+                : (
+                    `ACCOUNT CREATED SUCCESSFULLY\n\n` +
+                    `Leader: ${leader.name}\n` +
+                    `Username: ${username}\n` +
+                    `Initial Password: ${password}\n\n` +
+                    `Give these credentials to the Cell Leader.`
                 );
-
-                copied =
-                    true;
-
-            }
-
-        }
-
-        catch {
-
-            copied =
-                false;
-
-        }
-
-
-        const expiryDate =
-            data.expires_at
-                ? new Date(
-                    data.expires_at
-                ).toLocaleString()
-                : "7 days";
 
 
         alert(
-
-            `ACTIVATION CODE\n\n` +
-
-            `${code}\n\n` +
-
-            `Leader: ${leader.name}\n` +
-
-            `Expires: ${expiryDate}\n\n` +
-
-            (
-                copied
-                    ? "The code has been copied to your clipboard."
-                    : "Please copy the code manually."
-            ) +
-
-            `\n\nGive this code directly to the Cell Leader.`
-
+            message
         );
 
 
@@ -1481,17 +1465,19 @@ async function generateActivationCode(
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
         console.error(
-            "CMS activation code error:",
+            "CMS Cell Leader account error:",
             error
         );
 
 
         alert(
             error.message ||
-            "Unable to generate activation code."
+            "Unable to manage the Cell Leader account."
         );
 
     }
@@ -1499,8 +1485,286 @@ async function generateActivationCode(
 }
 
 
-window.generateActivationCode =
-    generateActivationCode;
+window.manageCellLeaderAccount =
+    manageCellLeaderAccount;
+
+
+/* =====================================================
+   CREATE ACCOUNTS FOR ALL LEADERS
+   ===================================================== */
+
+async function createAllCellLeaderAccounts() {
+
+    if (!cmsSupabase) {
+
+        alert(
+            "Supabase is not connected."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "Create accounts for all active Cell Leaders who do not already have accounts?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await cmsSupabase.functions.invoke(
+                CELL_LEADER_ACCOUNT_FUNCTION,
+                {
+                    body: {
+
+                        action:
+                            "create_all"
+
+                    }
+
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Create all accounts error:",
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                "Unable to create Cell Leader accounts."
+            );
+
+        }
+
+
+        if (
+            !data ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data?.error ||
+                "Unable to create Cell Leader accounts."
+            );
+
+        }
+
+
+        const accounts =
+            data.accounts ||
+            [];
+
+
+        const created =
+            accounts.filter(
+                item =>
+                    item.status ===
+                    "created"
+            );
+
+
+        const existing =
+            accounts.filter(
+                item =>
+                    item.status ===
+                    "existing"
+            );
+
+
+        const failed =
+            accounts.filter(
+                item =>
+                    item.status ===
+                    "error"
+            );
+
+
+        let message =
+            "CELL LEADER ACCOUNTS\n\n";
+
+
+        message +=
+            `GENERAL PASSWORD:\n${data.password}\n\n`;
+
+
+        if (
+            created.length > 0
+        ) {
+
+            message +=
+                "NEW ACCOUNTS\n\n";
+
+
+            created.forEach(
+                account => {
+
+                    message +=
+                        `${account.leader}\n` +
+                        `Username: ${account.username}\n` +
+                        `Password: ${account.password}\n\n`;
+
+                }
+            );
+
+        }
+
+
+        if (
+            existing.length > 0
+        ) {
+
+            message +=
+                `Already active: ${existing.length}\n`;
+
+        }
+
+
+        if (
+            failed.length > 0
+        ) {
+
+            message +=
+                `Failed: ${failed.length}\n\n`;
+
+
+            failed.forEach(
+                account => {
+
+                    message +=
+                        `${account.leader}: ${account.error}\n`;
+
+                }
+            );
+
+        }
+
+
+        alert(
+            message
+        );
+
+
+        /*
+           Copy the complete credentials
+           for Coordinator use.
+        */
+
+        try {
+
+            await navigator.clipboard.writeText(
+                message
+            );
+
+        }
+
+        catch {
+
+            /* Clipboard is optional. */
+
+        }
+
+
+        await refreshData();
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Create all Cell Leader accounts error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to create Cell Leader accounts."
+        );
+
+    }
+
+}
+
+
+window.createAllCellLeaderAccounts =
+    createAllCellLeaderAccounts;
+
+
+/* =====================================================
+   CREATE ACCOUNT TOOLBAR BUTTON
+   ===================================================== */
+
+function addAccountManagementButton() {
+
+    if (
+        !addLeaderButton ||
+        document.getElementById(
+            "createAllLeaderAccountsButton"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+
+    button.type =
+        "button";
+
+
+    button.id =
+        "createAllLeaderAccountsButton";
+
+
+    button.className =
+        "secondary-button";
+
+
+    button.textContent =
+        "Create All Accounts";
+
+
+    button.style.marginLeft =
+        "8px";
+
+
+    button.addEventListener(
+        "click",
+        createAllCellLeaderAccounts
+    );
+
+
+    addLeaderButton.parentNode.insertBefore(
+        button,
+        addLeaderButton.nextSibling
+    );
+
+}
 
 /* =====================================================
    DISPLAY LEADERS
@@ -1706,9 +1970,7 @@ function renderLeaders(
             leader.id
         )}')"
     >
-
         Edit
-
     </button>
 
 
@@ -1730,19 +1992,33 @@ function renderLeaders(
                 >
                     Account Active
                 </span>
+
+                <button
+                    type="button"
+                    class="action-button edit"
+                    onclick="manageCellLeaderAccount(
+                        'reset_password',
+                        '${escapeHTML(
+                            leader.id
+                        )}'
+                    )"
+                >
+                    Reset Password
+                </button>
             `
 
             : `
                 <button
                     type="button"
                     class="action-button edit"
-                    onclick="generateActivationCode('${escapeHTML(
-                        leader.id
-                    )}')"
+                    onclick="manageCellLeaderAccount(
+                        'create_one',
+                        '${escapeHTML(
+                            leader.id
+                        )}'
+                    )"
                 >
-
-                    Generate Code
-
+                    Create Account
                 </button>
             `
     }
@@ -1755,13 +2031,10 @@ function renderLeaders(
             leader.id
         )}')"
     >
-
         Delete
-
     </button>
 
 </td>
-
             `;
 
 
@@ -1840,6 +2113,7 @@ function escapeHTML(
 /* =====================================================
    INITIALIZE
    ===================================================== */
+addAccountManagementButton();
 
 (async function initializeCellLeaders() {
 

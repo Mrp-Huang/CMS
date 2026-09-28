@@ -3768,67 +3768,134 @@ async function saveAttendance() {
            CREATE SESSION
            ========================================== */
 
+       if (
+    !sessionId
+) {
+
+    const {
+        data:
+            createdSession,
+        error
+    } =
+        await cmsAttendanceSupabase
+            .from(
+                "attendance_sessions"
+            )
+            .insert(
+                {
+                    cell_id:
+                        selectedCellId,
+
+                    meeting_date:
+                        selectedDate,
+
+                    visitors:
+                        [],
+
+                    notes:
+                        null,
+
+                    created_by:
+                        attendanceAccess.userId ||
+                        null
+                }
+            )
+            .select()
+            .single();
+
+
+    /*
+       Another leader may have created
+       the same cell/date at almost the
+       same time.
+
+       Because of the unique index,
+       Supabase returns 23505.
+
+       In that situation, simply load
+       the existing shared session.
+    */
+
+    if (
+        error &&
+        error.code === "23505"
+    ) {
+
+        const {
+            data:
+                existingSession,
+            error:
+                existingSessionError
+        } =
+            await cmsAttendanceSupabase
+                .from(
+                    "attendance_sessions"
+                )
+                .select()
+                .eq(
+                    "cell_id",
+                    selectedCellId
+                )
+                .eq(
+                    "meeting_date",
+                    selectedDate
+                )
+                .maybeSingle();
+
+
         if (
-            !sessionId
+            existingSessionError ||
+            !existingSession
         ) {
 
-            const {
-                data:
-                    createdSession,
-                error
-            } =
-                await cmsAttendanceSupabase
-                    .from(
-                        "attendance_sessions"
-                    )
-                    .insert(
-                        {
+            attendanceError(
+                "load shared Attendance Session",
+                existingSessionError ||
+                {
+                    message:
+                        "The shared attendance session could not be found."
+                }
+            );
 
-                            cell_id:
-                                selectedCellId,
-
-                            meeting_date:
-                                selectedDate,
-
-                            visitors:
-                                [],
-
-                            notes:
-                                null,
-
-                            created_by:
-                                attendanceAccess.userId ||
-                                null
-
-                        }
-                    )
-                    .select()
-                    .single();
-
-
-            if (
-                error
-            ) {
-
-                attendanceError(
-                    "create Attendance Session",
-                    error
-                );
-
-
-                return;
-
-            }
-
-
-            currentSession =
-                createdSession;
-
-
-            sessionId =
-                createdSession.id;
+            return;
 
         }
+
+
+        currentSession =
+            existingSession;
+
+
+        sessionId =
+            existingSession.id;
+
+    }
+
+    else if (
+        error
+    ) {
+
+        attendanceError(
+            "create Attendance Session",
+            error
+        );
+
+        return;
+
+    }
+
+    else {
+
+        currentSession =
+            createdSession;
+
+
+        sessionId =
+            createdSession.id;
+
+    }
+
+}
 
 
         /* ==========================================
