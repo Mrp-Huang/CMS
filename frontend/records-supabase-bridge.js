@@ -772,7 +772,392 @@
         };
     }
 
+/* =====================================================
+   COMBINE ATTENDANCE MEMBER ROWS
+   INTO ONE RECORD PER CELL + DATE / SESSION
+   ===================================================== */
 
+function convertAttendanceSessions(
+    attendanceRows,
+    sessionRows
+) {
+
+    const rows =
+        Array.isArray(attendanceRows)
+            ? attendanceRows
+            : [];
+
+    const sessions =
+        Array.isArray(sessionRows)
+            ? sessionRows
+            : [];
+
+
+    const sessionMap =
+        new Map();
+
+
+    sessions.forEach(function(session) {
+
+        const sessionId =
+            String(
+                session.id || ""
+            );
+
+        if (sessionId) {
+            sessionMap.set(
+                sessionId,
+                session
+            );
+        }
+
+    });
+
+
+    const grouped =
+        new Map();
+
+
+    rows.forEach(function(row) {
+
+        const converted =
+            convertAttendance(row);
+
+        const sessionId =
+            String(
+                row.session_id ||
+                row.sessionId ||
+                ""
+            );
+
+
+        const cellId =
+            String(
+                converted.cellId ||
+                row.cell_id ||
+                ""
+            );
+
+
+        const date =
+            String(
+                converted.date ||
+                row.meeting_date ||
+                row.date ||
+                ""
+            )
+            .substring(0, 10);
+
+
+        /*
+           Prefer the real attendance session.
+
+           Fallback:
+           cell + date
+        */
+        const groupKey =
+            sessionId
+                ? "session:" + sessionId
+                : "cell:" +
+                  cellId +
+                  "|date:" +
+                  date;
+
+
+        if (!grouped.has(groupKey)) {
+
+            const session =
+                sessionMap.get(
+                    sessionId
+                ) || null;
+
+
+            grouped.set(
+                groupKey,
+                {
+                    id:
+                        sessionId
+                        ||
+                        (
+                            "attendance-" +
+                            cellId +
+                            "-" +
+                            date
+                        ),
+
+                    sessionId:
+                        sessionId,
+
+                    cellId:
+                        cellId,
+
+                    cellName:
+                        converted.cellName
+                        ||
+                        resolveCellName(
+                            cellId
+                        ),
+
+                    date:
+                        date,
+
+                    members: [],
+
+                    visitors:
+                        [],
+
+                    notes:
+                        session?.notes
+                        ||
+                        "",
+
+                    createdAt:
+                        session?.created_at
+                        ||
+                        row.created_at
+                        ||
+                        null
+
+                }
+            );
+
+        }
+
+
+        const group =
+            grouped.get(
+                groupKey
+            );
+
+
+        /*
+           Add each member only once.
+        */
+        const entries =
+            Array.isArray(
+                converted.members
+            )
+                ? converted.members
+                : [];
+
+
+        entries.forEach(function(entry) {
+
+            const memberId =
+                String(
+                    entry.memberId ||
+                    entry.member_id ||
+                    entry.id ||
+                    ""
+                );
+
+
+            const alreadyExists =
+                group.members.some(
+                    function(existing) {
+
+                        return String(
+                            existing.memberId ||
+                            existing.member_id ||
+                            existing.id ||
+                            ""
+                        )
+                        ===
+                        memberId;
+
+                    }
+                );
+
+
+            if (
+                !alreadyExists
+            ) {
+
+                group.members.push(
+                    entry
+                );
+
+            }
+
+        });
+
+
+        /*
+           Use the visitor snapshot stored
+           on attendance_sessions when available.
+        */
+        const session =
+            sessionMap.get(
+                sessionId
+            );
+
+
+        if (
+            session &&
+            Array.isArray(
+                session.visitors
+            )
+        ) {
+
+            group.visitors =
+                session.visitors;
+
+        }
+
+    });
+
+
+    /*
+       Final attendance record conversion.
+    */
+    return Array.from(
+        grouped.values()
+    )
+    .map(function(record) {
+
+        let present = 0;
+        let absent = 0;
+        let late = 0;
+        let excused = 0;
+
+
+        record.members.forEach(
+            function(member) {
+
+                const status =
+                    String(
+                        member.status || ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                if (
+                    status ===
+                    "present"
+                ) {
+
+                    present++;
+
+                }
+
+                else if (
+                    status ===
+                    "absent"
+                ) {
+
+                    absent++;
+
+                }
+
+                else if (
+                    status ===
+                    "late"
+                ) {
+
+                    late++;
+
+                }
+
+                else if (
+                    status ===
+                    "excused"
+                ) {
+
+                    excused++;
+
+                }
+
+            }
+        );
+
+
+        const total =
+            record.members.length;
+
+
+        const rate =
+            total > 0
+                ? Math.round(
+                    (
+                        (
+                            present +
+                            late
+                        )
+                        /
+                        total
+                    ) * 100
+                )
+                : 0;
+
+
+        return {
+
+            ...record,
+
+            entries:
+                record.members,
+
+            attendance:
+                record.members,
+
+            totalMembers:
+                total,
+
+            present:
+                present,
+
+            absent:
+                absent,
+
+            late:
+                late,
+
+            excused:
+                excused,
+
+            attendanceRate:
+                rate,
+
+            summary: {
+
+                total:
+                    total,
+
+                present:
+                    present,
+
+                absent:
+                    absent,
+
+                late:
+                    late,
+
+                excused:
+                    excused,
+
+                rate:
+                    rate
+
+            }
+
+        };
+
+    })
+    .sort(function(a, b) {
+
+        return String(
+            b.date || ""
+        )
+        .localeCompare(
+            String(
+                a.date || ""
+            )
+        );
+
+    });
+
+}
     /* =====================================================
        WEEKLY REPORT NORMALIZATION
        ===================================================== */
@@ -1379,18 +1764,21 @@
              * Load record tables.
              */
 
-            const [
-                attendanceResult,
-                reportsResult,
-                followUpsResult,
-                evangelismResult
-            ] = await Promise.all([
+           const [
+    attendanceResult,
+    attendanceSessionsResult,
+    reportsResult,
+    followUpsResult,
+    evangelismResult
+] = await Promise.all([
 
                 loadTable([
                     "attendance",
                     "attendances"
                 ]),
-
+loadTable([
+    "attendance_sessions"
+]),
                 loadTable([
                     "weekly_reports",
                     "weeklyReports"
@@ -1413,9 +1801,10 @@
                ================================================= */
 
             const convertedAttendance =
-                attendanceResult.data.map(
-                    convertAttendance
-                );
+    convertAttendanceSessions(
+        attendanceResult.data,
+        attendanceSessionsResult.data
+    );
 
             const convertedReports =
                 reportsResult.data.map(
