@@ -1386,7 +1386,6 @@ async function dashboardLoadEvangelism() {
 
 }
 
-
 /* =========================================================
    ATTENDANCE ANALYTICS
    ========================================================= */
@@ -1394,20 +1393,33 @@ async function dashboardLoadEvangelism() {
 function calculateDashboardAttendance() {
 
     const rows =
-        cmsDashboardData.attendance;
+        Array.isArray(
+            cmsDashboardData.attendance
+        )
+            ? cmsDashboardData.attendance
+            : [];
+
+
+    const sessions =
+        Array.isArray(
+            cmsDashboardData.attendanceSessions
+        )
+            ? cmsDashboardData.attendanceSessions
+            : [];
 
 
     let present = 0;
-
     let absent = 0;
-
     let late = 0;
-
     let excused = 0;
 
 
+    /* =====================================================
+       COUNT MEMBER ATTENDANCE STATUS
+       ===================================================== */
+
     rows.forEach(
-        row => {
+        function(row) {
 
             const status =
                 dashboardStatus(
@@ -1416,8 +1428,7 @@ function calculateDashboardAttendance() {
 
 
             if (
-                status ===
-                "present"
+                status === "present"
             ) {
 
                 present++;
@@ -1425,8 +1436,7 @@ function calculateDashboardAttendance() {
             }
 
             else if (
-                status ===
-                "absent"
+                status === "absent"
             ) {
 
                 absent++;
@@ -1434,8 +1444,7 @@ function calculateDashboardAttendance() {
             }
 
             else if (
-                status ===
-                "late"
+                status === "late"
             ) {
 
                 late++;
@@ -1443,8 +1452,7 @@ function calculateDashboardAttendance() {
             }
 
             else if (
-                status ===
-                "excused"
+                status === "excused"
             ) {
 
                 excused++;
@@ -1460,16 +1468,35 @@ function calculateDashboardAttendance() {
         late;
 
 
+    /*
+       IMPORTANT:
+
+       "total" now means REAL ATTENDANCE SESSIONS,
+       not individual member attendance rows.
+    */
     const total =
-        rows.length;
+        sessions.length;
+
+
+    /*
+       Attendance percentage still uses
+       the individual member attendance rows,
+       because that is what determines the
+       actual attendance rate.
+    */
+    const totalPeople =
+        present +
+        absent +
+        late +
+        excused;
 
 
     const rate =
-        total > 0
+        totalPeople > 0
             ? Math.round(
                 (
                     attended /
-                    total
+                    totalPeople
                 ) * 100
             )
             : 0;
@@ -1478,16 +1505,26 @@ function calculateDashboardAttendance() {
     return {
 
         total,
+
+        sessions:
+            total,
+
+        peopleRows:
+            rows.length,
+
         present,
+
         absent,
+
         late,
+
         excused,
+
         rate
 
     };
 
 }
-
 
 /* =========================================================
    EVANGELISM ANALYTICS
