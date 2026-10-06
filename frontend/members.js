@@ -330,6 +330,58 @@ function showMemberDatabaseError(
     );
 
 
+    /*
+     * ================================================
+     * DUPLICATE MEMBER
+     * ================================================
+     */
+
+    if (
+        error?.code === "23505"
+    ) {
+
+        const message =
+            String(
+                error?.message ||
+                ""
+            ).toLowerCase();
+
+
+        if (
+            message.includes(
+                "members_cell_identity_unique"
+            )
+        ) {
+
+            alert(
+                "This member is already registered in this cell.\n\n" +
+                "The same name, year of study and combination already exist."
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Keep any other duplicate error understandable.
+         */
+
+        alert(
+            "This member already exists in the system."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * ================================================
+     * NORMAL DATABASE ERROR
+     * ================================================
+     */
+
     const message =
         error?.message ||
         error?.details ||

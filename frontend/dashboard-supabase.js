@@ -975,18 +975,66 @@ async function dashboardLoadCells() {
 /* =========================================================
    LOAD LEADERS
    ========================================================= */
-
 async function dashboardLoadLeaders() {
 
-    return dashboardFetchAllRows(
-        () => {
+    /* =====================================================
+       CELL LEADER WORKSPACE
+       -----------------------------------------------------
+       A Cell Leader must see ALL active leaders assigned
+       to the SAME cell, not only themselves.
+       ===================================================== */
 
-            let query =
-                CMS_DASHBOARD_SUPABASE
-                    .from(
-                        "cell_leader_directory"
-                    )
-                    .select(
+    if (
+        cmsDashboardRole ===
+        "cell_leader"
+        &&
+        cmsDashboardMyCell?.cell_id
+    ) {
+
+        const {
+            data,
+            error
+        } =
+            await CMS_DASHBOARD_SUPABASE
+                .rpc(
+                    "cms_my_cell_leaders"
+                );
+
+
+        if (
+            error
+        ) {
+
+            throw error;
+
+        }
+
+
+        return (
+            data ||
+            []
+        );
+
+    }
+
+
+    /* =====================================================
+       COORDINATOR
+       -----------------------------------------------------
+       Existing Coordinator behavior remains unchanged.
+       ===================================================== */
+
+    const {
+        data,
+        error
+    } =
+        await CMS_DASHBOARD_SUPABASE
+
+            .from(
+                "cell_leader_directory"
+            )
+
+            .select(
                 `
                 id,
                 full_name,
@@ -996,32 +1044,29 @@ async function dashboardLoadLeaders() {
                 active,
                 created_at
                 `
-                    );
+            )
 
-
-            if (
-                cmsDashboardRole ===
-                    "cell_leader" &&
-                cmsDashboardMyCell?.cell_id
-            ) {
-
-                query =
-                    query.eq(
-                        "cell_id",
-                        cmsDashboardMyCell.cell_id
-                    );
-
-            }
-
-
-            return query.order(
+            .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending:
+                        true
                 }
             );
 
-        }
+
+    if (
+        error
+    ) {
+
+        throw error;
+
+    }
+
+
+    return (
+        data ||
+        []
     );
 
 }
@@ -3090,7 +3135,95 @@ if (leadersCardValue) {
             }
         );
 
+/* =====================================================
+   SHARED CELL LEADERS
+   -----------------------------------------------------
+   Show the active leaders assigned to this same cell.
+   The number comes from the shared Supabase data.
+   ===================================================== */
 
+const cellLeadersValueElement =
+    document.getElementById(
+        "total-leaders"
+    );
+
+
+if (
+    cellLeadersValueElement
+) {
+
+    const cellLeadersCard =
+        cellLeadersValueElement.closest(
+            ".stat-card, .card, .dashboard-card"
+        );
+
+
+    if (
+        cellLeadersCard
+    ) {
+
+        const cellLeadersDescription =
+            cellLeadersCard.querySelector(
+                "small"
+            );
+
+
+        const sharedCellLeaders =
+            (
+                cmsDashboardData?.leaders ||
+                []
+            )
+                .filter(
+                    leader => {
+
+                        return (
+                            String(
+                                leader.cell_id
+                            ) ===
+                            String(
+                                cmsDashboardMyCell.cell_id
+                            )
+                            &&
+                            leader.active !== false
+                        );
+
+                    }
+                );
+
+
+        const leaderNames =
+            sharedCellLeaders
+                .map(
+                    leader =>
+                        String(
+                            leader.full_name ||
+                            ""
+                        ).trim()
+                )
+                .filter(
+                    Boolean
+                );
+
+
+        if (
+            cellLeadersDescription
+        ) {
+
+            cellLeadersDescription.textContent =
+
+                leaderNames.length
+
+                    ? leaderNames.join(
+                        " • "
+                    )
+
+                    : "No active co-leader";
+
+        }
+
+    }
+
+}
     /* =====================================================
        VISITOR STAT CARD
        ===================================================== */
