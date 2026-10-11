@@ -2651,23 +2651,95 @@ function printFollowUp(followUp) {
     }
 
 
-    const printWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=900,height=800"
+    const printFrame =
+        document.createElement(
+            "iframe"
         );
+
+
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    printFrame.style.position =
+        "fixed";
+
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    printFrame.onload =
+        function() {
+
+            const printWindow =
+                printFrame.contentWindow;
+
+
+            if (!printWindow) {
+
+                printFrame.remove();
+
+                console.error(
+                    "CMS Follow-ups could not access the print frame."
+                );
+
+                return;
+            }
+
+
+            printWindow.addEventListener(
+                "afterprint",
+                function() {
+
+                    printFrame.remove();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+            printWindow.focus();
+
+            printWindow.print();
+
+        };
+
+
+    document.body.appendChild(
+        printFrame
+    );
+
+
+    const printWindow =
+        printFrame.contentWindow;
 
 
     if (!printWindow) {
 
+        printFrame.remove();
+
         alert(
-            "Please allow pop-ups to print the record."
+            "The print dialog could not be opened. Please try again."
         );
 
         return;
     }
 
+
+    printWindow.document.open();
 
     printWindow.document.write(`
 
@@ -2950,17 +3022,6 @@ function printFollowUp(followUp) {
 
             </div>
 
-
-            <script>
-
-                window.onload =
-                    function() {
-
-                        window.print();
-
-                    };
-
-            <\/script>
 
         </body>
 

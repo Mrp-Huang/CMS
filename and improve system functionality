@@ -1,0 +1,22 @@
+ frontend/attendance.html                           |    7 [32m+[m
+ frontend/cell-leaders.html                         |    7 [32m+[m
+ frontend/cells.html                                |    7 [32m+[m
+ frontend/cms-ai.html                               |  542 [32m+++++++++[m
+ frontend/cms-ai.js                                 |  335 [32m++++++[m
+ frontend/dashboard.html                            |    8 [32m+[m[31m-[m
+ frontend/evangelism.html                           |    8 [32m+[m
+ frontend/evangelism.js                             |  192 [32m+[m[31m--[m
+ frontend/follow-ups.html                           |    8 [32m+[m
+ frontend/follow-ups.js                             |  145 [32m+[m[31m--[m
+ frontend/members.html                              |    8 [32m+[m
+ frontend/records.html                              |    8 [32m+[m
+ frontend/records.js                                |   76 [32m+[m[31m-[m
+ frontend/settings.html                             |    8 [32m+[m
+ frontend/supabase.js                               |   49 [32m+[m[31m-[m
+ frontend/visitors.html                             |    8 [32m+[m[31m-[m
+ frontend/weekly-reports-supabase-bridge.js         |  107 [32m+[m[31m-[m
+ frontend/weekly-reports.css                        |  155 [32m+++[m
+ frontend/weekly-reports.html                       |   50 [32m+[m[31m-[m
+ frontend/weekly-reports.js                         | 1217 [32m++++++++++++++[m[31m------[m
+ .../20261008132100_weekly_report_photos.sql        |   70 [32m++[m
+ 21 files changed, 2226 insertions(+), 789 deletions(-)

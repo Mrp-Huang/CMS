@@ -18,6 +18,8 @@ let evangelismRecords = [];
 
 let reachedPeople = [];
 
+let currentEvangelismViewId = null;
+
 
 /* =====================================================
    ELEMENTS
@@ -109,6 +111,21 @@ const cancelEvangelismButton =
 
 const evangelismModalTitle =
     document.getElementById("evangelismModalTitle");
+
+const evangelismViewModal =
+    document.getElementById("evangelismViewModal");
+
+const evangelismViewContent =
+    document.getElementById("evangelismViewContent");
+
+const closeEvangelismViewModal =
+    document.getElementById("closeEvangelismViewModal");
+
+const closeEvangelismViewButton =
+    document.getElementById("closeEvangelismViewButton");
+
+const printEvangelismViewButton =
+    document.getElementById("printEvangelismViewButton");
 
 
 /* =====================================================
@@ -418,23 +435,90 @@ function getCellName(cellId) {
    LEADER
    ===================================================== */
 
+function normalizeIdValue(value) {
+
+    return String(value ?? "")
+        .trim()
+        .toLowerCase();
+
+}
+
+
+function getLeaderDisplayName(leader) {
+
+    if (!leader) {
+
+        return "Unknown Leader";
+
+    }
+
+    const candidates = [
+        leader.name,
+        leader.fullName,
+        leader.full_name,
+        leader.leaderName,
+        leader.leader_name,
+        leader.displayName,
+        leader.display_name,
+        leader.firstName,
+        leader.last_name,
+        leader.first_name,
+        leader.lastName,
+        leader.memberName,
+        leader.member_name,
+        leader.email,
+        leader.phone
+    ];
+
+    for (const candidate of candidates) {
+
+        const text = String(candidate ?? "").trim();
+
+        if (text) {
+
+            return text;
+
+        }
+
+    }
+
+    if (leader.id) {
+
+        return `Leader ${String(leader.id).slice(0, 8)}`;
+
+    }
+
+    return "Unknown Leader";
+
+}
+
+
 function getLeaderName(leaderId) {
+
+    if (!leaderId) {
+
+        return "Unknown Leader";
+
+    }
 
     const leader =
         cellLeaders.find(
             item =>
-                String(item.id) ===
-                String(leaderId)
+                normalizeIdValue(item.id) ===
+                normalizeIdValue(leaderId)
+                ||
+                normalizeIdValue(item.oldLocalId) ===
+                normalizeIdValue(leaderId)
+                ||
+                normalizeIdValue(item.leaderId) ===
+                normalizeIdValue(leaderId)
+                ||
+                normalizeIdValue(item.memberId) ===
+                normalizeIdValue(leaderId)
         );
 
-
     return leader
-        ? (
-            leader.name ||
-            leader.fullName ||
-            leader.leaderName ||
-            "Unknown Leader"
-        )
+        ? getLeaderDisplayName(leader)
         : "Unknown Leader";
 
 }
@@ -452,20 +536,33 @@ function getLeadersForCell(cellId) {
 
     }
 
+    const normalizedCellId =
+        normalizeIdValue(cellId);
+
 
     return cellLeaders.filter(
         function(leader) {
 
-            const leaderCellId =
-                leader.cellId ??
-                leader.cell ??
-                leader.cellID ??
-                leader.cell_id;
+            const candidateIds = [
+                leader.cellId,
+                leader.cell_id,
+                leader.cellID,
+                leader.cell,
+                leader.cell_id,
+                leader.cellIdValue,
+                leader.cell_id_value,
+                leader.oldCellId,
+                leader.cell?.id,
+                leader.cell?.value,
+                leader.cellIdValue,
+                leader.member?.cellId,
+                leader.member?.cell_id
+            ];
 
-
-            return (
-                String(leaderCellId) ===
-                String(cellId)
+            return candidateIds.some(
+                candidate =>
+                    normalizeIdValue(candidate) ===
+                    normalizedCellId
             );
 
         }
@@ -596,10 +693,7 @@ function loadLeadersForCell(
 
 
             option.textContent =
-                leader.name ||
-                leader.fullName ||
-                leader.leaderName ||
-                "Unnamed Leader";
+                getLeaderDisplayName(leader);
 
 
             evangelismLeader.appendChild(
@@ -2487,7 +2581,20 @@ function buildPeopleText(
    VIEW
    ===================================================== */
 
+function closeEvangelismViewModalWindow() {
+
+    currentEvangelismViewId = null;
+
+    evangelismViewModal.style.display = "none";
+
+    evangelismViewContent.innerHTML = "";
+
+}
+
+
 function viewEvangelism(id) {
+
+    currentEvangelismViewId = id;
 
     const record =
         evangelismRecords.find(
@@ -2508,104 +2615,133 @@ function viewEvangelism(id) {
     }
 
 
-    alert(
+    const peopleRows = Array.isArray(record.people)
+        ? record.people
+            .map(
+                function(person) {
 
-        "EVANGELISM RECORD\n\n" +
+                    person = normalizePerson(person);
 
-        "Cell:\n" +
-        displayValue(
-            record.cellName
-        ) +
-        "\n\n" +
+                    return `
+                        <tr>
+                            <td>${escapeHTML(displayValue(person.name))}</td>
+                            <td>${escapeHTML(displayValue(person.phone))}</td>
+                            <td>${escapeHTML(displayValue(person.year))}</td>
+                            <td>${escapeHTML(displayValue(person.combination))}</td>
+                            <td>${person.isNew ? "Yes" : "No"}</td>
+                            <td>${escapeHTML(displayValue(person.outcome))}</td>
+                        </tr>
+                    `;
 
-        "Recorded By:\n" +
-        displayValue(
-            record.leaderName
-        ) +
-        "\n\n" +
+                }
+            )
+            .join("")
+        : "";
 
-        "Date:\n" +
-        formatDate(
-            record.date
-        ) +
-        "\n\n" +
 
-        "Type:\n" +
-        displayValue(
-            record.evangelismType
-        ) +
-        "\n\n" +
+    evangelismViewContent.innerHTML = `
 
-        "Location:\n" +
-        displayValue(
-            record.location
-        ) +
-        "\n\n" +
+        <div class="record-detail-grid">
 
-        "People Reached:\n" +
-        displayValue(
-            record.peopleReached
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Cell</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.cellName))}</div>
+            </div>
 
-        "New People:\n" +
-        displayValue(
-            record.newPeople
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Recorded By</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.leaderName || getLeaderName(record.leaderId)))}</div>
+            </div>
 
-        "Saved:\n" +
-        displayValue(
-            record.saved
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Date</span>
+                <div class="detail-value">${formatDate(record.date)}</div>
+            </div>
 
-        "In Progress:\n" +
-        displayValue(
-            record.inProgress
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Evangelism Type</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.evangelismType))}</div>
+            </div>
 
-        "Interested:\n" +
-        displayValue(
-            record.interested
-        ) +
-        "\n\n" +
+            <div class="detail-item full-width">
+                <span class="detail-label">Location / Area</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.location))}</div>
+            </div>
 
-        "Follow-up Needed:\n" +
-        displayValue(
-            record.followUpNeeded
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">People Reached</span>
+                <div class="detail-value">${Number(record.peopleReached) || 0}</div>
+            </div>
 
-        "Not Yet / No Decision:\n" +
-        displayValue(
-            record.notYet
-        ) +
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">New People</span>
+                <div class="detail-value">${Number(record.newPeople) || 0}</div>
+            </div>
 
-        "INDIVIDUAL PEOPLE\n" +
-        "------------------------------\n" +
+            <div class="detail-item">
+                <span class="detail-label">Saved</span>
+                <div class="detail-value">${Number(record.saved) || 0}</div>
+            </div>
 
-        buildPeopleText(
-            record.people
-        ) +
+            <div class="detail-item">
+                <span class="detail-label">In Progress</span>
+                <div class="detail-value">${Number(record.inProgress) || 0}</div>
+            </div>
 
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Interested</span>
+                <div class="detail-value">${Number(record.interested) || 0}</div>
+            </div>
 
-        "Details:\n" +
-        displayValue(
-            record.details
-        ) +
+            <div class="detail-item">
+                <span class="detail-label">Follow-up Needed</span>
+                <div class="detail-value">${Number(record.followUpNeeded) || 0}</div>
+            </div>
 
-        "\n\n" +
+            <div class="detail-item">
+                <span class="detail-label">Not Yet / No Decision</span>
+                <div class="detail-value">${Number(record.notYet) || 0}</div>
+            </div>
 
-        "Next Action:\n" +
-        displayValue(
-            record.nextAction
-        )
+            <div class="detail-item full-width">
+                <span class="detail-label">Details / Experience</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.details))}</div>
+            </div>
 
-    );
+            <div class="detail-item full-width">
+                <span class="detail-label">Next Action</span>
+                <div class="detail-value">${escapeHTML(displayValue(record.nextAction))}</div>
+            </div>
+
+        </div>
+
+        <h3 class="detail-subheading">People Reached</h3>
+
+        ${peopleRows
+            ? `
+                <div class="table-responsive">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Year</th>
+                                <th>Combination</th>
+                                <th>New?</th>
+                                <th>Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${peopleRows}
+                        </tbody>
+                    </table>
+                </div>
+            `
+            : `<p>No individual people were recorded.</p>`}
+    `;
+
+
+    evangelismViewModal.style.display = "flex";
 
 }
 
@@ -2840,22 +2976,91 @@ function printEvangelismById(id) {
     }
 
 
-    const printWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=900,height=800"
+    const printFrame =
+        document.createElement(
+            "iframe"
         );
+
+
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    printFrame.style.position =
+        "fixed";
+
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    printFrame.onload =
+        function() {
+
+            const printWindow =
+                printFrame.contentWindow;
+
+
+            if (!printWindow) {
+
+                printFrame.remove();
+
+                console.error(
+                    "CMS Evangelism could not access the print frame."
+                );
+
+                return;
+            }
+
+
+            printWindow.addEventListener(
+                "afterprint",
+                function() {
+
+                    printFrame.remove();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+            printWindow.focus();
+
+            printWindow.print();
+
+        };
+
+
+    document.body.appendChild(
+        printFrame
+    );
+
+
+    const printWindow =
+        printFrame.contentWindow;
 
 
     if (!printWindow) {
 
+        printFrame.remove();
+
         alert(
-            "Please allow pop-ups to print this record."
+            "The print dialog could not be opened. Please try again."
         );
 
         return;
-
     }
 
 
@@ -3006,6 +3211,8 @@ function printEvangelismById(id) {
 
             `;
 
+
+    printWindow.document.open();
 
     printWindow.document.write(`
 
@@ -3372,17 +3579,6 @@ function printEvangelismById(id) {
             </div>
 
 
-            <script>
-
-                window.onload =
-                    function() {
-
-                        window.print();
-
-                    };
-
-            <\/script>
-
         </body>
 
         </html>
@@ -3544,6 +3740,36 @@ closeEvangelismModal.addEventListener(
 );
 
 
+closeEvangelismViewModal.addEventListener(
+    "click",
+    closeEvangelismViewModalWindow
+);
+
+
+closeEvangelismViewButton.addEventListener(
+    "click",
+    closeEvangelismViewModalWindow
+);
+
+
+printEvangelismViewButton.addEventListener(
+    "click",
+    function() {
+
+        if (!currentEvangelismViewId) {
+
+            return;
+
+        }
+
+        printEvangelismById(
+            currentEvangelismViewId
+        );
+
+    }
+);
+
+
 cancelEvangelismButton.addEventListener(
     "click",
     closeModal
@@ -3597,6 +3823,23 @@ evangelismModal.addEventListener(
 );
 
 
+evangelismViewModal.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target ===
+            evangelismViewModal
+        ) {
+
+            closeEvangelismViewModalWindow();
+
+        }
+
+    }
+);
+
+
 /* =====================================================
    ESCAPE KEY
    ===================================================== */
@@ -3608,6 +3851,16 @@ document.addEventListener(
         if (
             event.key === "Escape"
         ) {
+
+            if (
+                evangelismViewModal.style.display === "flex"
+            ) {
+
+                closeEvangelismViewModalWindow();
+
+                return;
+
+            }
 
             closeModal();
 

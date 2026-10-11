@@ -6171,27 +6171,6 @@ async function printReport(
     }
 
 
-    const printWindow =
-        window.open(
-            "",
-            "_blank"
-        );
-
-
-    if (
-        !printWindow
-    ) {
-
-        alert(
-            "Please allow pop-ups in your browser to print the report."
-        );
-
-
-        return;
-
-    }
-
-
     const attendance =
         await getAttendanceForReport(
             report
@@ -6217,8 +6196,6 @@ async function printReport(
             error
         );
 
-        printWindow.close();
-
         alert(
             "The report photos could not be loaded for printing. Please try again."
         );
@@ -6227,6 +6204,96 @@ async function printReport(
 
     }
 
+
+    const printFrame =
+        document.createElement(
+            "iframe"
+        );
+
+
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    printFrame.style.position =
+        "fixed";
+
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    printFrame.onload =
+        function() {
+
+            const printWindow =
+                printFrame.contentWindow;
+
+
+            if (!printWindow) {
+
+                printFrame.remove();
+
+                console.error(
+                    "CMS Weekly Reports could not access the print frame."
+                );
+
+                return;
+            }
+
+
+            printWindow.addEventListener(
+                "afterprint",
+                function() {
+
+                    printFrame.remove();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+            printWindow.focus();
+
+            printWindow.print();
+
+        };
+
+
+    document.body.appendChild(
+        printFrame
+    );
+
+
+    const printWindow =
+        printFrame.contentWindow;
+
+
+    if (!printWindow) {
+
+        printFrame.remove();
+
+        alert(
+            "The print dialog could not be opened. Please try again."
+        );
+
+        return;
+    }
+
+
+    printWindow.document.open();
 
     printWindow.document.write(`
 
@@ -6611,18 +6678,6 @@ ${reportPhotosMarkup}
 
 
     printWindow.document.close();
-
-
-    setTimeout(
-        function() {
-
-            printWindow.focus();
-
-            printWindow.print();
-
-        },
-        300
-    );
 
 }
 

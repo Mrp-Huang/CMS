@@ -5504,26 +5504,37 @@ function printRecord(
     }
 
 
-    const win =
-        window.open(
-            "",
-            "_blank",
-            "width=1000,height=800"
+    const printFrame =
+        document.createElement(
+            "iframe"
         );
 
 
-    if (
-        !win
-    ) {
-
-        alert(
-            "Please allow pop-ups to print this record."
-        );
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
 
-        return;
+    printFrame.style.position =
+        "fixed";
 
-    }
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    document.body.appendChild(
+        printFrame
+    );
 
 
     function printField(
@@ -5985,7 +5996,50 @@ ${escapeHTML(
     }
 
 
-    win.document.write(`
+    printFrame.onload =
+        function() {
+
+            const printWindow =
+                printFrame.contentWindow;
+
+
+            if (
+                !printWindow
+            ) {
+
+                printFrame.remove();
+
+                throw new Error(
+                    "Unable to open the record print frame."
+                );
+
+            }
+
+
+            printWindow.addEventListener(
+                "afterprint",
+                function() {
+
+                    printFrame.remove();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+            printWindow.focus();
+
+            printWindow.print();
+
+        };
+
+
+    printFrame.contentDocument.open();
+
+
+    printFrame.contentDocument.write(`
 
         <!DOCTYPE html>
 
@@ -6076,17 +6130,6 @@ ${escapeHTML(
                 ${content}
 
 
-                <script>
-
-                    window.onload =
-                        function() {
-
-                            window.print();
-
-                        };
-
-                <\/script>
-
             </body>
 
         </html>
@@ -6094,7 +6137,7 @@ ${escapeHTML(
     `);
 
 
-    win.document.close();
+    printFrame.contentDocument.close();
 
 }
 
