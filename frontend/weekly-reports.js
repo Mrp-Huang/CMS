@@ -82,6 +82,25 @@ let attendanceRecords = [];
 
 let weeklyReports = [];
 
+let reportPhotoPaths = [];
+
+let originalReportPhotoPaths = [];
+
+let selectedReportPhotos = [];
+
+let reportPhotoObjectUrls = [];
+
+let reportPhotoPreviewVersion = 0;
+
+const CMS_WEEKLY_REPORT_PHOTO_BUCKET =
+    "weekly-report-photos";
+
+const CMS_WEEKLY_REPORT_PHOTO_LIMIT =
+    5;
+
+const CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES =
+    5 * 1024 * 1024;
+
 
 /* =====================================================
    CURRENT VIEW
@@ -180,6 +199,15 @@ const additionalComments =
         "additionalComments"
     );
 
+const reportPhotosInput =
+    document.getElementById(
+        "reportPhotos"
+    );
+
+const reportPhotoPreviews =
+    document.getElementById(
+        "reportPhotoPreviews"
+    );
 
 const reportAttendanceSummary =
     document.getElementById(
@@ -2181,6 +2209,388 @@ async function loadReportAttendance() {
    RESET FORM
    ===================================================== */
 
+function resetReportPhotos(
+    paths = []
+) {
+
+    reportPhotoObjectUrls.forEach(
+        function(url) {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        }
+    );
+
+
+    reportPhotoObjectUrls = [];
+    reportPhotoPaths = Array.isArray(paths)
+        ? paths.filter(
+            function(path) {
+
+                return typeof path === "string" && path;
+
+            }
+        )
+        : [];
+    originalReportPhotoPaths =
+        reportPhotoPaths.slice();
+    selectedReportPhotos = [];
+
+
+    if (reportPhotosInput) {
+
+        reportPhotosInput.value = "";
+
+    }
+
+
+    renderReportPhotoPreviews();
+
+}
+
+
+async function getReportPhotoSignedUrl(
+    path
+) {
+
+    if (!CMS_WEEKLY_REPORTS_SUPABASE) {
+
+        throw new Error(
+            "Photo storage is not available."
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await CMS_WEEKLY_REPORTS_SUPABASE
+            .storage
+            .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+            .createSignedUrl(
+                path,
+                3600
+            );
+
+
+    if (error) {
+
+        throw error;
+
+    }
+
+
+    return data.signedUrl;
+
+}
+
+
+async function createReportPhotoMarkup(
+    paths,
+    isPrint = false
+) {
+
+    if (!Array.isArray(paths) || !paths.length) {
+
+        return "";
+
+    }
+
+
+    const urls =
+        await Promise.all(
+            paths.map(
+                getReportPhotoSignedUrl
+            )
+        );
+    const photos =
+        urls.map(
+            function(url, index) {
+
+                return `
+                    <figure>
+                        <a
+                            href="${escapeAttribute(url)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <img
+                                src="${escapeAttribute(url)}"
+                                alt="Weekly report photo ${index + 1}"
+                            >
+                        </a>
+                        ${
+                            isPrint
+                                ? ""
+                                : `<figcaption>Photo ${index + 1}</figcaption>`
+                        }
+                    </figure>
+                `;
+
+            }
+        )
+        .join("");
+
+
+    return `
+        <section class="section report-photo-section">
+            <h2>Meeting Photos</h2>
+            <div class="report-photo-gallery">${photos}</div>
+        </section>
+    `;
+
+}
+
+
+async function renderReportPhotoPreviews() {
+
+    if (!reportPhotoPreviews) {
+
+        return;
+
+    }
+
+    const renderVersion =
+        ++reportPhotoPreviewVersion;
+
+
+    reportPhotoObjectUrls.forEach(
+        function(url) {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        }
+    );
+    reportPhotoObjectUrls = [];
+
+
+    const existingPreviews = [];
+
+    for (
+        let index = 0;
+        index < reportPhotoPaths.length;
+        index += 1
+    ) {
+
+        try {
+
+            const path =
+                reportPhotoPaths[index];
+            const url =
+                await getReportPhotoSignedUrl(path);
+
+            if (renderVersion !== reportPhotoPreviewVersion) {
+
+                return;
+
+            }
+
+            existingPreviews.push(`
+                <div class="report-photo-preview">
+                    <img
+                        src="${escapeAttribute(url)}"
+                        alt="Saved report photo ${index + 1}"
+                    >
+                    <button
+                        type="button"
+                        class="report-photo-remove"
+                        data-existing-photo-index="${index}"
+                        aria-label="Remove saved photo ${index + 1}"
+                    >&times;</button>
+                </div>
+            `);
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CMS Weekly Reports photo preview error:",
+                error
+            );
+
+            existingPreviews.push(`
+                <div class="report-photo-preview">
+                    <div class="report-photo-label">
+                        Saved photo unavailable
+                    </div>
+                    <button
+                        type="button"
+                        class="report-photo-remove"
+                        data-existing-photo-index="${index}"
+                        aria-label="Remove unavailable photo ${index + 1}"
+                    >&times;</button>
+                </div>
+            `);
+
+        }
+
+    }
+
+
+    const selectedPreviews =
+        selectedReportPhotos.map(
+            function(file, index) {
+
+                const url =
+                    URL.createObjectURL(file);
+                reportPhotoObjectUrls.push(url);
+
+                return `
+                    <div class="report-photo-preview">
+                        <img
+                            src="${escapeAttribute(url)}"
+                            alt="${escapeAttribute(file.name)}"
+                        >
+                        <button
+                            type="button"
+                            class="report-photo-remove"
+                            data-selected-photo-index="${index}"
+                            aria-label="Remove ${escapeAttribute(file.name)}"
+                        >&times;</button>
+                        <div class="report-photo-label">
+                            ${escapeHTML(file.name)}
+                        </div>
+                    </div>
+                `;
+
+            }
+        );
+
+
+    if (renderVersion !== reportPhotoPreviewVersion) {
+
+        return;
+
+    }
+
+    reportPhotoPreviews.innerHTML =
+        existingPreviews.concat(selectedPreviews).join("");
+
+}
+
+
+if (reportPhotosInput) {
+
+    reportPhotosInput.addEventListener(
+        "change",
+        function() {
+
+            const files =
+                Array.from(reportPhotosInput.files || []);
+            reportPhotosInput.value = "";
+
+
+            if (
+                reportPhotoPaths.length +
+                selectedReportPhotos.length +
+                files.length >
+                CMS_WEEKLY_REPORT_PHOTO_LIMIT
+            ) {
+
+                alert(
+                    `A report can include up to ${CMS_WEEKLY_REPORT_PHOTO_LIMIT} photos.`
+                );
+
+                return;
+
+            }
+
+
+            const supportedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            for (const file of files) {
+
+                if (!supportedTypes.includes(file.type)) {
+
+                    alert(
+                        `${file.name} is not a supported image. Choose JPG, PNG or WEBP photos.`
+                    );
+
+                    return;
+
+                }
+
+
+                if (file.size > CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES) {
+
+                    alert(
+                        `${file.name} is larger than 5 MB.`
+                    );
+
+                    return;
+
+                }
+
+            }
+
+
+            selectedReportPhotos =
+                selectedReportPhotos.concat(files);
+
+            renderReportPhotoPreviews();
+
+        }
+    );
+
+}
+
+
+if (reportPhotoPreviews) {
+
+    reportPhotoPreviews.addEventListener(
+        "click",
+        function(event) {
+
+            const button =
+                event.target.closest(
+                    "button[data-existing-photo-index], button[data-selected-photo-index]"
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            if (button.dataset.existingPhotoIndex !== undefined) {
+
+                reportPhotoPaths.splice(
+                    Number(button.dataset.existingPhotoIndex),
+                    1
+                );
+
+            }
+            else if (button.dataset.selectedPhotoIndex !== undefined) {
+
+                selectedReportPhotos.splice(
+                    Number(button.dataset.selectedPhotoIndex),
+                    1
+                );
+
+            }
+
+
+            renderReportPhotoPreviews();
+
+        }
+    );
+
+}
+
+
 function resetForm() {
 
     if (
@@ -2200,6 +2610,9 @@ function resetForm() {
             "";
 
     }
+
+
+    resetReportPhotos();
 
 
     if (
@@ -2508,6 +2921,9 @@ function collectReportData(
                 .trim() ||
             "",
 
+        photoPaths:
+            reportPhotoPaths.slice(),
+
         status:
             status,
 
@@ -2679,6 +3095,248 @@ function findDuplicateReport(
 
         }
     );
+
+}
+
+
+function createReportPhotoError(
+    message,
+    cause
+) {
+
+    const error =
+        new Error(
+            message
+        );
+
+    error.name =
+        "WeeklyReportPhotoError";
+
+    error.cause =
+        cause;
+
+    return error;
+
+}
+
+
+async function saveReportPhotos(
+    report
+) {
+
+    const files =
+        selectedReportPhotos.slice();
+    const retainedPaths =
+        reportPhotoPaths.slice();
+    const removedPaths =
+        originalReportPhotoPaths.filter(
+            function(path) {
+
+                return !retainedPaths.includes(path);
+
+            }
+        );
+
+
+    if (
+        !CMS_WEEKLY_REPORTS_SUPABASE &&
+        (files.length || removedPaths.length)
+    ) {
+
+        throw createReportPhotoError(
+            "Connect to CMS storage before changing report photos."
+        );
+
+    }
+
+
+    if (!CMS_WEEKLY_REPORTS_SUPABASE) {
+
+        return report;
+
+    }
+
+
+    const uploadedPaths = [];
+
+    try {
+
+        for (const file of files) {
+
+            const extensionByType = {
+                "image/jpeg": "jpg",
+                "image/png": "png",
+                "image/webp": "webp"
+            };
+            const extension =
+                extensionByType[file.type];
+
+
+            if (!extension) {
+
+                throw new Error(
+                    `Unsupported image type for ${file.name}.`
+                );
+
+            }
+
+
+            const path =
+                `${report.id}/${crypto.randomUUID()}.${extension}`;
+            const {
+                error: uploadError
+            } =
+                await CMS_WEEKLY_REPORTS_SUPABASE
+                    .storage
+                    .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+                    .upload(
+                        path,
+                        file,
+                        {
+                            cacheControl: "3600",
+                            contentType: file.type,
+                            upsert: false
+                        }
+                    );
+
+
+            if (uploadError) {
+
+                throw uploadError;
+
+            }
+
+
+            uploadedPaths.push(path);
+
+        }
+
+
+        const photoPaths =
+            Array.from(
+                new Set(
+                    retainedPaths.concat(uploadedPaths)
+                )
+            );
+        const photosChanged =
+            uploadedPaths.length > 0 ||
+            removedPaths.length > 0;
+
+
+        if (!photosChanged) {
+
+            return report;
+
+        }
+
+
+        const {
+            data: updatedReport,
+            error: updateError
+        } =
+            await CMS_WEEKLY_REPORTS_SUPABASE
+                .from("weekly_reports")
+                .update({
+                    photo_paths: photoPaths
+                })
+                .eq("id", report.id)
+                .select()
+                .single();
+
+
+        if (updateError) {
+
+            throw updateError;
+
+        }
+
+
+        if (removedPaths.length) {
+
+            try {
+
+                const {
+                    error: removeError
+                } =
+                    await CMS_WEEKLY_REPORTS_SUPABASE
+                        .storage
+                        .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+                        .remove(removedPaths);
+
+
+                if (removeError) {
+
+                    throw removeError;
+
+                }
+
+            }
+
+            catch (removeError) {
+
+                console.error(
+                    "CMS Weekly Reports removed-photo cleanup error:",
+                    removeError
+                );
+
+                alert(
+                    "The report was saved, but one or more removed photos could not be deleted from storage."
+                );
+
+            }
+
+        }
+
+
+        return updatedReport;
+
+    }
+
+    catch (error) {
+
+        if (uploadedPaths.length) {
+
+            try {
+
+                const {
+                    error: cleanupError
+                } =
+                    await CMS_WEEKLY_REPORTS_SUPABASE
+                        .storage
+                        .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+                        .remove(uploadedPaths);
+
+
+                if (cleanupError) {
+
+                    console.error(
+                        "CMS Weekly Reports photo rollback error:",
+                        cleanupError
+                    );
+
+                }
+
+            }
+
+            catch (cleanupError) {
+
+                console.error(
+                    "CMS Weekly Reports photo rollback error:",
+                    cleanupError
+                );
+
+            }
+
+        }
+
+
+        throw createReportPhotoError(
+            error.message ||
+            "Unable to save report photos.",
+            error
+        );
+
+    }
 
 }
 
@@ -2875,7 +3533,9 @@ async function saveReportToSupabase(
         }
 
 
-        return updated;
+        return await saveReportPhotos(
+            updated
+        );
 
     }
 
@@ -2918,7 +3578,9 @@ async function saveReportToSupabase(
     }
 
 
-    return inserted;
+    return await saveReportPhotos(
+        inserted
+    );
 
 }
 
@@ -2975,6 +3637,11 @@ function convertSupabaseReport(
             report.additional_comments ||
             "",
 
+        photoPaths:
+            Array.isArray(report.photo_paths)
+                ? report.photo_paths
+                : [],
+
         status:
             report.status ||
             "Draft",
@@ -3017,33 +3684,12 @@ async function loadLiveReports() {
 
     let query =
         CMS_WEEKLY_REPORTS_SUPABASE
-            .from(
-                "weekly_reports"
-            )
-            .select(
-                `
-                    id,
-                    cell_id,
-                    report_date,
-                    status,
-                    meeting_location,
-                    members_life,
-                    activity_done,
-                    challenges_needs,
-                    follow_up_needed,
-                    next_week_plan,
-                    additional_comments,
-                    created_by,
-                    created_at,
-                    updated_at,
-                    submitted_at
-                `
-            )
+            .from("weekly_reports")
+            .select("*")
             .order(
                 "report_date",
                 {
-                    ascending:
-                        false
+                    ascending: false
                 }
             );
 
@@ -3162,6 +3808,27 @@ async function saveReport(
 
     try {
 
+        if (
+            !CMS_WEEKLY_REPORTS_SUPABASE &&
+            (
+                selectedReportPhotos.length ||
+                originalReportPhotoPaths.some(
+                    function(path) {
+
+                        return !reportPhotoPaths.includes(path);
+
+                    }
+                )
+            )
+        ) {
+
+            throw createReportPhotoError(
+                "Connect to CMS storage before changing report photos."
+            );
+
+        }
+
+
         /*
            Supabase is the main source of truth.
         */
@@ -3261,6 +3928,7 @@ async function saveReport(
 
             updateStatistics();
 
+            resetReportPhotos();
 
             closeModal();
 
@@ -3302,6 +3970,20 @@ async function saveReport(
             "CMS Weekly Reports Supabase save error:",
             error
         );
+
+        if (
+            error?.name ===
+            "WeeklyReportPhotoError"
+        ) {
+
+            alert(
+                "The report may already have been saved, but its photos could not be saved. Please check the report and retry the photo upload.\n\n" +
+                (error.message || "")
+            );
+
+            return;
+
+        }
 
 
         /*
@@ -4163,7 +4845,7 @@ function renderReports(
                                     report.id
                                 )}"
                             >
-                                Download
+                                Print / Save PDF
                             </button>
 
 
@@ -4257,7 +4939,7 @@ if (
                 "download"
             ) {
 
-                downloadReport(
+                printReport(
                     id
                 );
 
@@ -4332,28 +5014,8 @@ async function viewReport(
             error
         } =
             await CMS_WEEKLY_REPORTS_SUPABASE
-                .from(
-                    "weekly_reports"
-                )
-                .select(
-                    `
-                        id,
-                        cell_id,
-                        report_date,
-                        status,
-                        meeting_location,
-                        members_life,
-                        activity_done,
-                        challenges_needs,
-                        follow_up_needed,
-                        next_week_plan,
-                        additional_comments,
-                        created_by,
-                        created_at,
-                        updated_at,
-                        submitted_at
-                    `
-                )
+                .from("weekly_reports")
+                .select("*")
                 .eq(
                     "id",
                     id
@@ -4398,6 +5060,34 @@ async function viewReport(
         await getAttendanceForReport(
             report
         );
+
+    let reportPhotosMarkup =
+        "";
+
+    try {
+
+        reportPhotosMarkup =
+            await createReportPhotoMarkup(
+                report.photoPaths
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CMS Weekly Reports photo display error:",
+            error
+        );
+
+        reportPhotosMarkup = `
+            <section class="section report-photo-section" role="alert">
+                <h2>Meeting Photos</h2>
+                <p>Saved photos could not be loaded. Please check your connection or access and try again.</p>
+            </section>
+        `;
+
+    }
 
 
     if (
@@ -4663,6 +5353,8 @@ async function viewReport(
                 report.additionalComments
             )}
 
+            ${reportPhotosMarkup}
+
 
             <div
                 class="report-meta"
@@ -4899,28 +5591,8 @@ async function editReport(
             error
         } =
             await CMS_WEEKLY_REPORTS_SUPABASE
-                .from(
-                    "weekly_reports"
-                )
-                .select(
-                    `
-                        id,
-                        cell_id,
-                        report_date,
-                        status,
-                        meeting_location,
-                        members_life,
-                        activity_done,
-                        challenges_needs,
-                        follow_up_needed,
-                        next_week_plan,
-                        additional_comments,
-                        created_by,
-                        created_at,
-                        updated_at,
-                        submitted_at
-                    `
-                )
+                .from("weekly_reports")
+                .select("*")
                 .eq(
                     "id",
                     id
@@ -4979,6 +5651,11 @@ async function editReport(
         return;
 
     }
+
+
+    resetReportPhotos(
+        report.photoPaths
+    );
 
 
     reportId.value =
@@ -5151,6 +5828,44 @@ async function deleteReport(
 
 
     try {
+
+        const photoPaths =
+            Array.isArray(report.photoPaths)
+                ? report.photoPaths
+                : [];
+
+        if (photoPaths.length) {
+
+            if (
+                !CMS_WEEKLY_REPORTS_SUPABASE ||
+                !id ||
+                String(id).startsWith("report_")
+            ) {
+
+                throw new Error(
+                    "Connect to CMS before deleting a report with saved photos."
+                );
+
+            }
+
+
+            const {
+                error: photoDeleteError
+            } =
+                await CMS_WEEKLY_REPORTS_SUPABASE
+                    .storage
+                    .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+                    .remove(photoPaths);
+
+
+            if (photoDeleteError) {
+
+                throw photoDeleteError;
+
+            }
+
+        }
+
 
         if (
             CMS_WEEKLY_REPORTS_SUPABASE &&
@@ -5360,7 +6075,7 @@ if (
 
 
 /* =====================================================
-   DOWNLOAD
+   PRINT / SAVE PDF
    ===================================================== */
 
 if (
@@ -5375,245 +6090,13 @@ if (
                 currentViewedReportId
             ) {
 
-                downloadReport(
+                printReport(
                     currentViewedReportId
                 );
 
             }
 
         }
-    );
-
-}
-
-
-async function downloadReport(
-    id
-) {
-
-    refreshLocalData();
-
-
-    const report =
-        weeklyReports.find(
-            function(item) {
-
-                return (
-
-                    String(
-                        item.id
-                    ) ===
-
-                    String(
-                        id
-                    )
-
-                );
-
-            }
-        );
-
-
-    if (
-        !report
-    ) {
-
-        alert(
-            "Report could not be found."
-        );
-
-
-        return;
-
-    }
-
-
-    const attendance =
-        await getAttendanceForReport(
-            report
-        );
-
-
-    const content = `
-
-CELL MANAGEMENT SYSTEM
-WEEKLY CELL REPORT
-========================================
-
-CELL:
-${getCellName(
-    report.cellId
-)}
-
-DATE:
-${formatDate(
-    report.date
-)}
-
-MEETING LOCATION:
-${report.meetingLocation || "—"}
-
-STATUS:
-${report.status || "Draft"}
-
-
-ATTENDANCE
-========================================
-
-Total People:
-${attendance.total}
-
-Registered Members:
-${attendance.membersTotal}
-
-Present:
-${attendance.present}
-
-Absent:
-${attendance.absent}
-
-Late:
-${attendance.late}
-
-Excused:
-${attendance.excused}
-
-Visitors / Newcomers:
-${attendance.visitorTotal}
-
-Attendance Rate:
-${attendance.rate}%
-
-
-MEMBERS' LIFE
-========================================
-
-${report.membersLife || "No information provided."}
-
-
-ACTIVITY DONE
-========================================
-
-${report.activityDone || "No information provided."}
-
-
-CHALLENGES / NEEDS
-========================================
-
-${report.challengesNeeds || "No information provided."}
-
-
-FOLLOW-UP NEEDED
-========================================
-
-${report.followUpNeeded || "No information provided."}
-
-
-NEXT WEEK'S PLAN
-========================================
-
-${report.nextWeekPlan || "No information provided."}
-
-
-ADDITIONAL COMMENTS
-========================================
-
-${report.additionalComments || "No information provided."}
-
-
-REPORT INFORMATION
-========================================
-
-Created:
-${
-    report.createdAt
-        ? new Date(
-            report.createdAt
-        ).toLocaleString()
-        : "—"
-}
-
-Last Updated:
-${
-    report.updatedAt
-        ? new Date(
-            report.updatedAt
-        ).toLocaleString()
-        : "—"
-}
-
-Submitted:
-${
-    report.submittedAt
-        ? new Date(
-            report.submittedAt
-        ).toLocaleString()
-        : "Not submitted"
-}
-
-
-========================================
-Generated by CELL MANAGEMENT SYSTEM
-========================================
-
-`;
-
-
-    const blob =
-        new Blob(
-            [content],
-            {
-                type:
-                    "text/plain;charset=utf-8"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    const safeCell =
-        getCellName(
-            report.cellId
-        )
-        .replace(
-            /[^a-z0-9]/gi,
-            "_"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        `CMS_Weekly_Report_${safeCell}_${report.date}.txt`;
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    document.body.removeChild(
-        link
-    );
-
-
-    URL.revokeObjectURL(
-        url
     );
 
 }
@@ -5678,15 +6161,14 @@ async function printReport(
         !report
     ) {
 
+        alert(
+            "Report could not be found."
+        );
+
+
         return;
 
     }
-
-
-    const attendance =
-        await getAttendanceForReport(
-            report
-        );
 
 
     const printWindow =
@@ -5710,6 +6192,42 @@ async function printReport(
     }
 
 
+    const attendance =
+        await getAttendanceForReport(
+            report
+        );
+
+    let reportPhotosMarkup =
+        "";
+
+    try {
+
+        reportPhotosMarkup =
+            await createReportPhotoMarkup(
+                report.photoPaths,
+                true
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CMS Weekly Reports print photo error:",
+            error
+        );
+
+        printWindow.close();
+
+        alert(
+            "The report photos could not be loaded for printing. Please try again."
+        );
+
+        return;
+
+    }
+
+
     printWindow.document.write(`
 
 <!DOCTYPE html>
@@ -5721,7 +6239,16 @@ async function printReport(
 <meta charset="UTF-8">
 
 <title>
-CMS Weekly Report
+CMS Weekly Report - ${escapeHTML(
+    getCellName(
+        report.cellId
+    )
+)} - ${escapeHTML(
+    String(
+        report.date ||
+        ""
+    )
+)}
 </title>
 
 <style>
@@ -5832,6 +6359,20 @@ h2 {
 
     white-space:
         pre-wrap;
+
+}
+
+.report-photo-gallery {
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+}
+
+.report-photo-gallery img {
+
+    height:
+        180px;
 
 }
 
@@ -6058,6 +6599,8 @@ ${printSection(
     "Additional Comments",
     report.additionalComments
 )}
+
+${reportPhotosMarkup}
 
 
 </body>

@@ -12,6 +12,8 @@
 
     <title>CMS - Weekly Reports</title>
 
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <!-- MAIN CMS STYLE -->
     <link
         rel="stylesheet"
@@ -128,7 +130,13 @@
 >
     Visitors
 </a>
-
+<a
+    href="cms-ai.html"
+    class="nav-link"
+    data-coordinator-only="true"
+>
+    🤖 CMS AI
+</a>
             <a
                 href="settings.html"
                 class="nav-link"
@@ -646,6 +654,44 @@
 
 
 
+            <!-- OPTIONAL PHOTOS -->
+
+            <div class="form-group report-photos-field">
+
+                <label for="reportPhotos">
+
+                    Meeting Photos
+                    <span class="optional-label">(Optional)</span>
+
+                </label>
+
+
+                <input
+                    type="file"
+                    id="reportPhotos"
+                    accept="image/jpeg,image/png,image/webp"
+                    capture="environment"
+                    multiple
+                    aria-describedby="reportPhotosHelp"
+                >
+
+
+                <small id="reportPhotosHelp">
+                    Add up to 5 photos (JPG, PNG or WEBP; max 5 MB each).
+                    On a phone, you can take a photo with your camera.
+                </small>
+
+
+                <div
+                    id="reportPhotoPreviews"
+                    class="report-photo-previews"
+                    aria-live="polite"
+                ></div>
+
+            </div>
+
+
+
             <!-- MESSAGE -->
 
             <p
@@ -778,7 +824,7 @@
                 class="secondary-button"
                 id="downloadReportButton"
             >
-                Download
+                Print / Save PDF
             </button>
 
 

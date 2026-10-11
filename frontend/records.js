@@ -2849,7 +2849,7 @@ function renderRecords() {
                     <button
                         type="button"
                         class="record-action download-action"
-                        onclick="downloadRecord(
+                        onclick="printRecord(
                             '${record.type}',
                             '${escapeHTML(
                                 String(
@@ -2858,7 +2858,7 @@ function renderRecords() {
                             )}'
                         )"
                     >
-                        Download
+                        Print / Save PDF
                     </button>
 
 
@@ -6840,26 +6840,23 @@ window.addEventListener(
                 recordsLiveReferenceLoaded
             ) {
 
-                loadRecordsLiveReferenceData()
+                loadAllRecordsLiveData()
                     .then(
                         function() {
-
-                            return loadRecordsLiveVisitors();
-
-                        }
-                    )
-                    .then(
-                        function() {
-
                             renderRecords();
 
                             updateSummary();
 
                         }
                     )
-                    .catch(
-                        function() {}
-                    );
+                    .catch(function(error) {
+
+                        console.error(
+                            "CMS Records: live data refresh failed:",
+                            error
+                        );
+
+                    });
 
             }
 
@@ -6890,26 +6887,23 @@ window.addEventListener(
             recordsLiveReferenceLoaded
         ) {
 
-            loadRecordsLiveReferenceData()
+            loadAllRecordsLiveData()
                 .then(
                     function() {
-
-                        return loadRecordsLiveVisitors();
-
-                    }
-                )
-                .then(
-                    function() {
-
                         renderRecords();
 
                         updateSummary();
 
                     }
                 )
-                .catch(
-                    function() {}
-                );
+                .catch(function(error) {
+
+                    console.error(
+                        "CMS Records: live data refresh failed:",
+                        error
+                    );
+
+                });
 
         }
 
@@ -7574,6 +7568,16 @@ async function loadRecordsLiveVisitors() {
 }
 
 
+async function loadAllRecordsLiveData() {
+
+    await Promise.all([
+        loadRecordsLiveReferenceData(),
+        loadRecordsLiveVisitors()
+    ]);
+
+}
+
+
 /* =====================================================
    PUBLIC FUNCTIONS
    ===================================================== */
@@ -7613,29 +7617,11 @@ async function initializeRecordsCenter() {
     renderRecords();
 
 
-    /*
-       Load live cells + members.
-    */
-
-    await loadRecordsLiveReferenceData();
-
-
-    /*
-       Load live visitor master + history.
-    */
-
-    await loadRecordsLiveVisitors();
-
-
-    /*
-       Render again with all live Supabase data.
-    */
+    await loadAllRecordsLiveData();
 
     updateSummary();
 
-
     renderRecords();
-
 
     console.log(
         "CMS Records Center loaded successfully."

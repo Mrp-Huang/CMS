@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CMS - AI Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="cms-responsive.css"
+    >
+
+    <style>
+        .cms-ai-card {
+            max-width: 1050px;
+            min-height: min(720px, calc(100vh - 190px));
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e2e7ef;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(31, 60, 136, 0.08);
+        }
+
+        .cms-ai-card-header {
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .cms-ai-heading-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cms-ai-avatar {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 13px;
+            background: #edf2ff;
+            font-size: 23px;
+        }
+
+        .cms-ai-title {
+            margin: 0;
+            color: #1f3c88;
+            font-size: 22px;
+        }
+
+        .cms-ai-description {
+            margin: 6px 0 0;
+            color: #667085;
+            line-height: 1.5;
+        }
+
+        .cms-ai-readonly {
+            margin-left: auto;
+            padding: 6px 10px;
+            border: 1px solid #d9e7dc;
+            border-radius: 999px;
+            background: #f1f8f2;
+            color: #276738;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .cms-ai-conversation {
+            min-height: 230px;
+            flex: 1;
+            padding: 26px 28px;
+            overflow-y: auto;
+        }
+
+        .cms-ai-empty {
+            max-width: 620px;
+            margin: 26px auto;
+            text-align: center;
+        }
+
+        .cms-ai-empty-icon {
+            margin-bottom: 12px;
+            font-size: 38px;
+        }
+
+        .cms-ai-empty h3 {
+            margin: 0 0 8px;
+            color: #263653;
+            font-size: 19px;
+        }
+
+        .cms-ai-empty p {
+            margin: 0;
+            color: #667085;
+            line-height: 1.6;
+        }
+
+        .cms-ai-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 9px;
+            margin-top: 21px;
+        }
+
+        .cms-ai-suggestion {
+            padding: 9px 13px;
+            border: 1px solid #dce3f0;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #294895;
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .cms-ai-suggestion:hover {
+            border-color: #aebde0;
+            background: #f4f7ff;
+        }
+
+        .cms-ai-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            margin: 0 0 22px;
+        }
+
+        .cms-ai-message-user {
+            justify-content: flex-end;
+        }
+
+        .cms-ai-message-avatar {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 10px;
+            background: #edf2ff;
+            font-size: 17px;
+        }
+
+        .cms-ai-message-user .cms-ai-message-avatar {
+            order: 1;
+            background: #e8edf7;
+        }
+
+        .cms-ai-message-content {
+            max-width: min(78%, 720px);
+            padding: 13px 16px;
+            border: 1px solid #e4e9f2;
+            border-radius: 4px 14px 14px;
+            background: #f8faff;
+            color: #263653;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .cms-ai-message-user .cms-ai-message-content {
+            border-color: #294895;
+            border-radius: 14px 4px 14px 14px;
+            background: #294895;
+            color: #ffffff;
+        }
+
+        .cms-ai-message.is-error .cms-ai-message-content {
+            border-color: #f2c8c8;
+            background: #fff7f7;
+            color: #922b2b;
+        }
+
+        .cms-ai-message-label {
+            margin-bottom: 5px;
+            color: #667085;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cms-ai-composer-wrap {
+            padding: 16px 22px 18px;
+            border-top: 1px solid #edf0f5;
+            background: #ffffff;
+        }
+
+        .cms-ai-composer {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 10px;
+            border: 1px solid #d5dbe5;
+            border-radius: 13px;
+            background: #ffffff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cms-ai-composer:focus-within {
+            border-color: #294895;
+            box-shadow: 0 0 0 3px rgba(41, 72, 149, 0.1);
+        }
+
+        #cmsAIQuestion {
+            width: 100%;
+            min-height: 52px;
+            max-height: 160px;
+            padding: 9px 8px;
+            border: 0;
+            outline: 0;
+            resize: vertical;
+            color: #263653;
+            font: inherit;
+            line-height: 1.5;
+        }
+
+        #cmsAIQuestion::placeholder {
+            color: #8993a5;
+        }
+
+        .cms-ai-actions {
+            display: flex;
+            flex: 0 0 auto;
+        }
+
+        #cmsAIAskButton {
+            min-height: 42px;
+            padding: 0 17px;
+            border: 0;
+            border-radius: 9px;
+            background: #294895;
+            color: #ffffff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, opacity 0.2s ease;
+        }
+
+        #cmsAIAskButton:hover:not(:disabled) {
+            background: #1f3c88;
+        }
+
+        #cmsAIAskButton:disabled {
+            cursor: wait;
+            opacity: 0.7;
+        }
+
+        #cmsAIStatus {
+            min-height: 18px;
+            margin: 8px 4px 0;
+            color: #667085;
+            font-size: 12px;
+        }
+
+        .cms-ai-typing {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 20px;
+        }
+
+        .cms-ai-typing span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #7182ad;
+            animation: cms-ai-pulse 1.1s ease-in-out infinite;
+        }
+
+        .cms-ai-typing span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .cms-ai-typing span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes cms-ai-pulse {
+            0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cms-ai-typing span {
+                animation: none;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .cms-ai-card {
+                min-height: calc(100vh - 180px);
+                border-radius: 12px;
+            }
+
+            .cms-ai-card-header {
+                padding: 18px;
+            }
+
+            .cms-ai-conversation {
+                padding: 20px 15px;
+            }
+
+            .cms-ai-composer-wrap {
+                padding: 12px;
+            }
+
+            .cms-ai-readonly {
+                display: none;
+            }
+
+            .cms-ai-message-content {
+                max-width: 88%;
+            }
+        }
+
+        @media (max-width: 420px) {
+            #cmsAIAskButton {
+                padding: 0 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard-container">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <h2>
+                CELL MANAGEMENT<br>
+                SYSTEM
+            </h2>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="cells.html"
+                class="nav-link"
+            >
+                Cells
+            </a>
+
+            <a
+                href="cell-leaders.html"
+                class="nav-link"
+            >
+                Cell Leaders
+            </a>
+
+            <a
+                href="members.html"
+                class="nav-link"
+            >
+                Members
+            </a>
+
+            <a
+                href="attendance.html"
+                class="nav-link"
+            >
+                Attendance
+            </a>
+
+            <a
+                href="records.html"
+                class="nav-link"
+            >
+                Records
+            </a>
+
+            <a
+                href="weekly-reports.html"
+                class="nav-link"
+            >
+                Weekly Reports
+            </a>
+
+            <a
+                href="follow-ups.html"
+                class="nav-link"
+            >
+                Follow-ups
+            </a>
+
+            <a
+                href="evangelism.html"
+                class="nav-link"
+            >
+                Evangelism
+            </a>
+
+            <a
+                href="visitors.html"
+                class="nav-link"
+            >
+                Visitors
+            </a>
+
+            <a
+                href="cms-ai.html"
+                class="nav-link active"
+            >
+                🤖 CMS AI
+            </a>
+
+            <a
+                href="settings.html"
+                class="nav-link"
+            >
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <section class="dashboard-section">
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        🤖 CMS AI Assistant
+                    </h1>
+
+                    <p>
+                        Ask questions about your CMS data and receive management insights.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="cms-ai-card">
+                <header class="cms-ai-card-header">
+                    <div class="cms-ai-heading-row">
+                        <div class="cms-ai-avatar" aria-hidden="true">🤖</div>
+                        <div>
+                            <h2 class="cms-ai-title">CMS AI Assistant</h2>
+                            <p class="cms-ai-description">Ask about your CMS data and get helpful, data-informed insights.</p>
+                        </div>
+                        <span class="cms-ai-readonly">Read-only · Live CMS data</span>
+                    </div>
+                </header>
+
+                <div
+                    id="cmsAIAnswer"
+                    class="cms-ai-conversation"
+                    role="log"
+                    aria-live="polite"
+                    aria-relevant="additions text"
+                >
+                    <div class="cms-ai-empty" id="cmsAIEmptyState">
+                        <div class="cms-ai-empty-icon" aria-hidden="true">✨</div>
+                        <h3>How can I help with your CMS?</h3>
+                        <p>Ask a question about your cells, attendance, reports, or follow-ups. CMS AI can analyze your information but won’t change your records.</p>
+                        <div class="cms-ai-suggestions" aria-label="Suggested questions">
+                            <button class="cms-ai-suggestion" type="button" data-question="Which cells need the most attention based on attendance, reports and follow-ups?">Find cells that need attention</button>
+                            <button class="cms-ai-suggestion" type="button" data-question="Summarize the latest attendance trends across our cells.">Summarize attendance trends</button>
+                            <button class="cms-ai-suggestion" type="button" data-question="Which follow-ups should we prioritize?">Prioritize follow-ups</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cms-ai-composer-wrap">
+                    <form id="cmsAIForm">
+                        <div class="cms-ai-composer">
+                            <textarea
+                                id="cmsAIQuestion"
+                                rows="2"
+                                aria-label="Ask CMS AI a question"
+                                placeholder="Message CMS AI..."
+                            ></textarea>
+                            <div class="cms-ai-actions">
+                                <button type="submit" id="cmsAIAskButton">Ask AI</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="cmsAIStatus" role="status" aria-live="polite">AI can make mistakes. Please verify important information.</div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- Load the Supabase JavaScript library FIRST -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Initialize the existing CMS Supabase client -->
+<script src="supabase.js"></script>
+
+<!-- CMS permissions and AI functionality -->
+<script src="cms-access.js"></script>
+<script src="cms-ai.js"></script>
+
+</body>
+
+</html>

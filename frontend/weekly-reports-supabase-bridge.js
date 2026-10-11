@@ -11,6 +11,7 @@
    - attendance_sessions
    - attendance
    - weekly_reports
+   - private weekly-report photo storage
 
    EXISTING UI:
    - continues using cmsCells
@@ -310,27 +311,8 @@ async function cmsWeeklyBridgeLoadReports() {
         error
     } =
         await CMS_WEEKLY_BRIDGE_SUPABASE
-
             .from("weekly_reports")
-
-            .select(`
-                id,
-                cell_id,
-                report_date,
-                meeting_location,
-                members_life,
-                activity_done,
-                challenges_needs,
-                follow_up_needed,
-                next_week_plan,
-                additional_comments,
-                status,
-                created_by,
-                created_at,
-                updated_at,
-                submitted_at
-            `)
-
+            .select("*")
             .order(
                 "report_date",
                 {
@@ -743,6 +725,11 @@ function cmsWeeklyBridgeConvertReports(
                 additionalComments:
                     report.additional_comments ||
                     "",
+
+                photoPaths:
+                    Array.isArray(report.photo_paths)
+                        ? report.photo_paths
+                        : [],
 
                 status:
                     report.status ||
@@ -1164,6 +1151,9 @@ async function cmsWeeklyBridgeSyncReports(
     cmsWeeklyBridgeSyncing =
         true;
 
+    let syncOperation =
+        "loading current database reports";
+
 
     try {
 
@@ -1264,6 +1254,9 @@ async function cmsWeeklyBridgeSyncReports(
             of value
         ) {
 
+            syncOperation =
+                "synchronizing a weekly report";
+
             const payload =
                 await cmsWeeklyBridgeReportPayload(
                     report
@@ -1302,25 +1295,20 @@ async function cmsWeeklyBridgeSyncReports(
                 reportHasUUID
             ) {
 
+                syncOperation =
+                    "updating an existing weekly report";
+
                 const {
                     data,
                     error
                 } =
                     await CMS_WEEKLY_BRIDGE_SUPABASE
-
-                        .from(
-                            "weekly_reports"
-                        )
-
-                        .update(
-                            payload
-                        )
-
+                        .from("weekly_reports")
+                        .update(payload)
                         .eq(
                             "id",
                             reportId
                         )
-
                         .select(
                             `
                             id,
@@ -1333,7 +1321,6 @@ async function cmsWeeklyBridgeSyncReports(
                             created_by
                             `
                         )
-
                         .maybeSingle();
 
 
@@ -1374,6 +1361,9 @@ async function cmsWeeklyBridgeSyncReports(
                 !savedReport
             ) {
 
+                syncOperation =
+                    "inserting a weekly report";
+
                 const insertPayload =
                     {
                         ...payload
@@ -1385,15 +1375,8 @@ async function cmsWeeklyBridgeSyncReports(
                     error
                 } =
                     await CMS_WEEKLY_BRIDGE_SUPABASE
-
-                        .from(
-                            "weekly_reports"
-                        )
-
-                        .insert(
-                            insertPayload
-                        )
-
+                        .from("weekly_reports")
+                        .insert(insertPayload)
                         .select(
                             `
                             id,
@@ -1406,7 +1389,6 @@ async function cmsWeeklyBridgeSyncReports(
                             created_by
                             `
                         )
-
                         .single();
 
 
@@ -1419,6 +1401,9 @@ async function cmsWeeklyBridgeSyncReports(
                     error &&
                     error.code === "23505"
                 ) {
+
+                    syncOperation =
+                        "resolving a duplicate weekly report";
 
                     const {
                         data:
@@ -1489,20 +1474,12 @@ async function cmsWeeklyBridgeSyncReports(
                             updateError
                     } =
                         await CMS_WEEKLY_BRIDGE_SUPABASE
-
-                            .from(
-                                "weekly_reports"
-                            )
-
-                            .update(
-                                updatePayload
-                            )
-
+                            .from("weekly_reports")
+                            .update(updatePayload)
                             .eq(
                                 "id",
                                 existingReport.id
                             )
-
                             .select(
                                 `
                                 id,
@@ -1515,7 +1492,6 @@ async function cmsWeeklyBridgeSyncReports(
                                 created_by
                                 `
                             )
-
                             .single();
 
 
@@ -1622,6 +1598,9 @@ async function cmsWeeklyBridgeSyncReports(
                 )
             ) {
 
+                syncOperation =
+                    "deleting a report removed from local data";
+
                 const {
                     error
                 } =
@@ -1676,8 +1655,28 @@ async function cmsWeeklyBridgeSyncReports(
     catch (error) {
 
         console.error(
-            "CMS Weekly Reports Supabase synchronization failed:",
-            error
+            "CMS Weekly Reports Supabase synchronization failed during " +
+            `${syncOperation}: ` +
+            JSON.stringify({
+                operation:
+                    syncOperation,
+
+                code:
+                    error?.code ||
+                    null,
+
+                message:
+                    error?.message ||
+                    String(error),
+
+                details:
+                    error?.details ||
+                    null,
+
+                hint:
+                    error?.hint ||
+                    null
+            })
         );
 
     }

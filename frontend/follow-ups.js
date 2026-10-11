@@ -1793,7 +1793,7 @@ function renderFollowUps(
                             class="followup-action-button"
                             onclick="downloadFollowUp(followUpById('${safeId}'))"
                         >
-                            Download
+                            Print / Save PDF
                         </button>
 
 
@@ -2206,7 +2206,7 @@ function viewFollowUp(id) {
                     class="secondary-button"
                     id="downloadCurrentFollowUp"
                 >
-                    Download
+                    Print / Save PDF
                 </button>
 
 
@@ -2632,148 +2632,9 @@ function updateStatistics() {
 
 function downloadFollowUp(followUp) {
 
-    if (!followUp) {
+    return printFollowUp(followUp);
 
-        alert(
-            "Follow-up record could not be found."
-        );
-
-        return;
-    }
-
-
-    const content =
-
-        "CELL MANAGEMENT SYSTEM\n" +
-        "FOLLOW-UP RECORD\n" +
-        "========================================\n\n" +
-
-        "Member:\n" +
-        displayValue(
-            followUp.memberName
-        ) +
-        "\n\n" +
-
-        "Cell:\n" +
-        displayValue(
-            followUp.cellName
-        ) +
-        "\n\n" +
-
-        "Assigned To:\n" +
-        displayValue(
-            followUp.assignedToName ||
-            getAssigneeName(
-                followUp.assignedTo
-            )
-        ) +
-        "\n\n" +
-
-        "Priority:\n" +
-        displayValue(
-            followUp.priority
-        ) +
-        "\n\n" +
-
-        "Follow-up Date:\n" +
-        formatDate(
-            followUp.followUpDate
-        ) +
-        "\n\n" +
-
-        "Status:\n" +
-        displayValue(
-            followUp.status
-        ) +
-        "\n\n" +
-
-        "Reason:\n" +
-        displayValue(
-            followUp.reason
-        ) +
-        "\n\n" +
-
-        "Details:\n" +
-        displayValue(
-            followUp.details
-        ) +
-        "\n\n" +
-
-        "Action Taken:\n" +
-        displayValue(
-            followUp.actionTaken
-        ) +
-        "\n\n" +
-
-        "Next Action:\n" +
-        displayValue(
-            followUp.nextAction
-        ) +
-        "\n\n" +
-
-        "Created:\n" +
-        formatDateTime(
-            followUp.createdAt
-        ) +
-        "\n\n" +
-
-        "Last Updated:\n" +
-        formatDateTime(
-            followUp.updatedAt
-        ) +
-        "\n\n" +
-
-        "========================================\n";
-
-
-    const blob =
-        new Blob(
-            [content],
-            {
-                type:
-                    "text/plain;charset=utf-8"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        "CMS-Follow-up-" +
-        getToday() +
-        ".txt";
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-    link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
 }
-
-
 /* =====================================================
    PRINT SINGLE FOLLOW-UP
    ===================================================== */

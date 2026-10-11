@@ -20,6 +20,7 @@ cmsLoadingStyle.textContent = `
     .cms-data-loading {
         position: fixed;
         inset: 0;
+        left: 285px;
         z-index: 99999;
         display: grid;
         place-items: center;
@@ -27,7 +28,20 @@ cmsLoadingStyle.textContent = `
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity 180ms ease, visibility 180ms ease;
+        transition: opacity 100ms ease, visibility 100ms ease;
+    }
+
+    @media (max-width: 900px) {
+        .cms-data-loading {
+            left: 230px;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .cms-data-loading {
+            top: var(--cms-loading-top, 0px);
+            left: 0;
+        }
     }
 
     .cms-data-loading.is-visible {
@@ -141,8 +155,21 @@ cmsLoadingOverlay.setAttribute("aria-hidden", "true");
 
 document.body.appendChild(cmsLoadingOverlay);
 
+function updateCmsLoadingOffset() {
+    const sidebar = document.querySelector(".sidebar");
+
+    if (sidebar && window.matchMedia("(max-width: 700px)").matches) {
+        cmsLoadingOverlay.style.setProperty(
+            "--cms-loading-top",
+            `${sidebar.offsetHeight}px`
+        );
+    }
+}
+
+updateCmsLoadingOffset();
+window.addEventListener("resize", updateCmsLoadingOffset);
+
 let cmsPendingDataRequests = 0;
-let cmsLoadingShowTimer = null;
 
 async function cmsSupabaseFetch(input, init) {
     const requestUrl = new URL(
@@ -154,16 +181,9 @@ async function cmsSupabaseFetch(input, init) {
 
     if (isSupabaseRequest) {
         cmsPendingDataRequests += 1;
-
-        if (cmsLoadingShowTimer === null) {
-            cmsLoadingShowTimer = window.setTimeout(() => {
-                cmsLoadingShowTimer = null;
-
-                if (cmsPendingDataRequests > 0) {
-                    cmsLoadingOverlay.classList.add("is-visible");
-                    cmsLoadingOverlay.setAttribute("aria-hidden", "false");
-                }
-            }, 180);
+        if (cmsPendingDataRequests === 1) {
+            cmsLoadingOverlay.classList.add("is-visible");
+            cmsLoadingOverlay.setAttribute("aria-hidden", "false");
         }
     }
 
@@ -174,11 +194,6 @@ async function cmsSupabaseFetch(input, init) {
             cmsPendingDataRequests -= 1;
 
             if (cmsPendingDataRequests === 0) {
-                if (cmsLoadingShowTimer !== null) {
-                    window.clearTimeout(cmsLoadingShowTimer);
-                    cmsLoadingShowTimer = null;
-                }
-
                 cmsLoadingOverlay.classList.remove("is-visible");
                 cmsLoadingOverlay.setAttribute("aria-hidden", "true");
             }
