@@ -39,6 +39,10 @@
             "coordinator"
         ],
 
+        "cms-ai.html": [
+            "coordinator"
+        ],
+
 
         /* -------------------------------------------------
            SHARED
@@ -483,6 +487,10 @@
                     )
                     ||
                     href.includes(
+                        "cms-ai.html"
+                    )
+                    ||
+                    href.includes(
                         "settings.html"
                     )
                 ) {
@@ -612,50 +620,9 @@
             .forEach(
                 element => {
 
-                    const href =
-                        String(
-                            element.getAttribute(
-                                "href"
-                            ) || ""
-                        )
-                            .toLowerCase();
-
-
-                    const isCoordinatorOnlyPage =
-                        href.includes(
-                            "cells.html"
-                        )
-                        ||
-                        href.includes(
-                            "cell-leaders.html"
-                        )
-                        ||
-                        href.includes(
-                            "settings.html"
-                        );
-
-
-                    if (
-                        isCoordinatorOnlyPage
-                    ) {
-
-                        hideNavigationElement(
-                            element
-                        );
-
-                    }
-
-                    else {
-
-                        element.removeAttribute(
-                            "data-coordinator-only"
-                        );
-
-                        showNavigationElement(
-                            element
-                        );
-
-                    }
+                    hideNavigationElement(
+                        element
+                    );
 
                 }
             );

@@ -5532,11 +5532,6 @@ function printRecord(
         "0";
 
 
-    document.body.appendChild(
-        printFrame
-    );
-
-
     function printField(
         label,
         value
@@ -5996,44 +5991,9 @@ ${escapeHTML(
     }
 
 
-    printFrame.onload =
-        function() {
-
-            const printWindow =
-                printFrame.contentWindow;
-
-
-            if (
-                !printWindow
-            ) {
-
-                printFrame.remove();
-
-                throw new Error(
-                    "Unable to open the record print frame."
-                );
-
-            }
-
-
-            printWindow.addEventListener(
-                "afterprint",
-                function() {
-
-                    printFrame.remove();
-
-                },
-                {
-                    once: true
-                }
-            );
-
-
-            printWindow.focus();
-
-            printWindow.print();
-
-        };
+    document.body.appendChild(
+        printFrame
+    );
 
 
     printFrame.contentDocument.open();
@@ -6138,6 +6098,44 @@ ${escapeHTML(
 
 
     printFrame.contentDocument.close();
+
+
+    const printWindow =
+        printFrame.contentWindow;
+
+
+    if (
+        !printWindow
+    ) {
+
+        printFrame.remove();
+
+        alert(
+            "The print dialog could not be opened. Please try again."
+        );
+
+
+        return;
+
+    }
+
+
+    printWindow.addEventListener(
+        "afterprint",
+        function() {
+
+            printFrame.remove();
+
+        },
+        {
+            once: true
+        }
+    );
+
+
+    printWindow.focus();
+
+    printWindow.print();
 
 }
 
