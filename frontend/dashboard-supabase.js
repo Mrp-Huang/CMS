@@ -543,6 +543,24 @@ function dashboardHideCoordinatorNavigation() {
 
 
                 /* =========================================
+                   CMS AI
+                   ========================================= */
+
+                if (
+                    href.includes(
+                        "cms-ai.html"
+                    )
+                ) {
+
+                    link.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                /* =========================================
                    SETTINGS
                    ========================================= */
 
