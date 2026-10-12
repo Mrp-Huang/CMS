@@ -820,11 +820,30 @@ tr:hover {
 
 @media print {
 
+    @page {
+
+        margin: 12mm;
+
+    }
+
+
+    body {
+
+        background: #fff !important;
+
+        -webkit-print-color-adjust: exact;
+
+        print-color-adjust: exact;
+
+    }
+
+
     .sidebar,
     .header-actions,
     .records-controls,
     .modal-actions,
-    .record-action {
+    .record-action,
+    .record-modal {
 
         display: none !important;
 
@@ -845,6 +864,66 @@ tr:hover {
     .records-panel {
 
         box-shadow: none;
+
+        border: 0;
+
+        margin: 0;
+
+    }
+
+
+    .table-container {
+
+        width: 100%;
+
+        overflow: visible;
+
+    }
+
+
+    .records-panel table {
+
+        width: 100%;
+
+        border-collapse: collapse;
+
+        font-size: 9pt;
+
+    }
+
+
+    .records-panel thead {
+
+        display: table-header-group;
+
+    }
+
+
+    .records-panel th,
+    .records-panel td {
+
+        padding: 6px;
+
+        overflow-wrap: anywhere;
+
+        vertical-align: top;
+
+    }
+
+
+    .records-panel tr {
+
+        break-inside: avoid;
+
+        page-break-inside: avoid;
+
+    }
+
+
+    .records-panel th:last-child,
+    .records-panel td:last-child {
+
+        display: none;
 
     }
 

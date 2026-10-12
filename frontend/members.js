@@ -132,6 +132,21 @@ const memberSearch =
         "memberSearch"
     );
 
+const memberCellFilter =
+    document.getElementById(
+        "memberCellFilter"
+    );
+
+const memberCellFilterLabel =
+    document.querySelector(
+        'label[for="memberCellFilter"]'
+    );
+
+const downloadMembersPdfButton =
+    document.getElementById(
+        "downloadMembersPdfButton"
+    );
+
 const memberModalTitle =
     document.getElementById(
         "memberModalTitle"
@@ -669,6 +684,8 @@ async function refreshMembersData() {
 
     loadCellOptions();
 
+    loadMemberCellFilterOptions();
+
 
     renderMembers(
         memberSearch
@@ -690,6 +707,28 @@ async function refreshMembersData() {
    ===================================================== */
 
 function updateMembersPageForRole() {
+
+    const isCoordinator =
+        membersIsCoordinator();
+
+
+    if (memberCellFilter) {
+        memberCellFilter.hidden =
+            !isCoordinator;
+    }
+
+
+    if (memberCellFilterLabel) {
+        memberCellFilterLabel.hidden =
+            !isCoordinator;
+    }
+
+
+    if (downloadMembersPdfButton) {
+        downloadMembersPdfButton.hidden =
+            !isCoordinator;
+    }
+
 
     if (
         membersIsCellLeader()
@@ -1834,6 +1873,143 @@ async function deleteMember(
    RENDER MEMBERS
    ===================================================== */
 
+function loadMemberCellFilterOptions() {
+
+    if (!memberCellFilter) {
+        return;
+    }
+
+
+    const selectedCellId =
+        memberCellFilter.value;
+
+
+    memberCellFilter.innerHTML = `
+        <option value="">
+            All cells
+        </option>
+    `;
+
+
+    cells.forEach(
+        function (cell) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                cell.id;
+
+
+            option.textContent =
+                cell.name;
+
+
+            memberCellFilter.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    memberCellFilter.value =
+        selectedCellId;
+
+}
+
+
+function getFilteredMembers(
+    searchTerm = ""
+) {
+
+    const search =
+        String(
+            searchTerm
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const selectedCellId =
+        membersIsCoordinator() &&
+        memberCellFilter
+            ? memberCellFilter.value
+            : "";
+
+
+    return members.filter(
+        function (member) {
+
+            if (
+                selectedCellId &&
+                String(member.cellId) !==
+                    String(selectedCellId)
+            ) {
+                return false;
+            }
+
+
+            const name =
+                String(
+                    member.name || ""
+                )
+                    .toLowerCase();
+
+
+            const phone =
+                String(
+                    member.phone || ""
+                )
+                    .toLowerCase();
+
+
+            const gender =
+                String(
+                    member.gender || ""
+                )
+                    .toLowerCase();
+
+
+            const year =
+                String(
+                    member.year || ""
+                )
+                    .toLowerCase();
+
+
+            const combination =
+                String(
+                    member.combination || ""
+                )
+                    .toLowerCase();
+
+
+            const cellName =
+                getCellName(
+                    member.cellId
+                )
+                    .toLowerCase();
+
+
+            return (
+                name.includes(search) ||
+                phone.includes(search) ||
+                gender.includes(search) ||
+                year.includes(search) ||
+                combination.includes(search) ||
+                cellName.includes(search)
+            );
+
+        }
+    );
+
+}
+
+
 function renderMembers(
     searchTerm = ""
 ) {
@@ -1847,87 +2023,9 @@ function renderMembers(
         "";
 
 
-    const search =
-        String(
-            searchTerm
-        )
-            .trim()
-            .toLowerCase();
-
-
     const filteredMembers =
-        members.filter(
-            function (member) {
-
-                const name =
-                    String(
-                        member.name || ""
-                    )
-                        .toLowerCase();
-
-
-                const phone =
-                    String(
-                        member.phone || ""
-                    )
-                        .toLowerCase();
-
-
-                const gender =
-                    String(
-                        member.gender || ""
-                    )
-                        .toLowerCase();
-
-
-                const year =
-                    String(
-                        member.year || ""
-                    )
-                        .toLowerCase();
-
-
-                const combination =
-                    String(
-                        member.combination || ""
-                    )
-                        .toLowerCase();
-
-
-                const cellName =
-                    getCellName(
-                        member.cellId
-                    )
-                        .toLowerCase();
-
-
-                return (
-
-                    name.includes(search)
-
-                    ||
-
-                    phone.includes(search)
-
-                    ||
-
-                    gender.includes(search)
-
-                    ||
-
-                    year.includes(search)
-
-                    ||
-
-                    combination.includes(search)
-
-                    ||
-
-                    cellName.includes(search)
-
-                );
-
-            }
+        getFilteredMembers(
+            searchTerm
         );
 
 
@@ -2175,6 +2273,323 @@ if (
             );
 
         }
+    );
+
+}
+
+
+if (
+    memberCellFilter
+) {
+
+    memberCellFilter.addEventListener(
+        "change",
+        function () {
+
+            renderMembers(
+                memberSearch
+                    ? memberSearch.value
+                    : ""
+            );
+
+        }
+    );
+
+}
+
+
+function printMembersByCell() {
+
+    if (!membersIsCoordinator()) {
+        return;
+    }
+
+
+    const filteredMembers =
+        getFilteredMembers(
+            memberSearch
+                ? memberSearch.value
+                : ""
+        );
+
+
+    if (!filteredMembers.length) {
+
+        alert(
+            "There are no members to include in the PDF for the current filters."
+        );
+
+        return;
+
+    }
+
+
+    const membersByCell =
+        new Map();
+
+
+    filteredMembers.forEach(
+        function (member) {
+
+            const cellName =
+                getCellName(
+                    member.cellId
+                );
+
+
+            if (!membersByCell.has(cellName)) {
+                membersByCell.set(
+                    cellName,
+                    []
+                );
+            }
+
+
+            membersByCell
+                .get(cellName)
+                .push(member);
+
+        }
+    );
+
+
+    const cellSections =
+        Array.from(
+            membersByCell.entries()
+        )
+            .sort(
+                (first, second) =>
+                    first[0].localeCompare(
+                        second[0]
+                    )
+            )
+            .map(
+                function ([cellName, cellMembers]) {
+
+                    const rows =
+                        cellMembers
+                            .map(
+                                function (member) {
+
+                                    return `
+                                        <tr>
+                                            <td>${escapeHTML(member.name || "")}</td>
+                                            <td>${escapeHTML(member.phone || "—")}</td>
+                                            <td>${escapeHTML(member.gender || "—")}</td>
+                                            <td>${escapeHTML(member.year || "—")}</td>
+                                            <td>${escapeHTML(member.combination || "—")}</td>
+                                            <td>${escapeHTML(member.status || "—")}</td>
+                                        </tr>
+                                    `;
+
+                                }
+                            )
+                            .join("");
+
+
+                    return `
+                        <section class="cell-section">
+                            <h2>${escapeHTML(cellName)} Cell</h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Full Name</th>
+                                        <th>Phone</th>
+                                        <th>Gender</th>
+                                        <th>Year</th>
+                                        <th>Combination</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </section>
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    const printFrame =
+        document.createElement(
+            "iframe"
+        );
+
+
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    printFrame.style.position =
+        "fixed";
+
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    document.body.appendChild(
+        printFrame
+    );
+
+
+    if (!printFrame.contentDocument) {
+
+        printFrame.remove();
+
+        console.error(
+            "CMS Members could not access the PDF print document."
+        );
+
+        alert(
+            "The PDF could not be prepared. Please try again."
+        );
+
+        return;
+
+    }
+
+
+    printFrame.contentDocument.open();
+
+    printFrame.contentDocument.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>CMS Members by Cell</title>
+            <style>
+                @page {
+                    size: landscape;
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #172033;
+                    font-family: Arial, sans-serif;
+                    font-size: 10pt;
+                }
+
+                h1 {
+                    margin: 0 0 6px;
+                    color: #1f3c88;
+                    font-size: 20pt;
+                }
+
+                .report-summary {
+                    margin: 0 0 20px;
+                    color: #596579;
+                }
+
+                .cell-section {
+                    margin: 0 0 20px;
+                    page-break-inside: avoid;
+                }
+
+                h2 {
+                    margin: 0 0 8px;
+                    color: #1f3c88;
+                    font-size: 14pt;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                th,
+                td {
+                    padding: 6px 8px;
+                    border: 1px solid #cbd2df;
+                    text-align: left;
+                    vertical-align: top;
+                    overflow-wrap: anywhere;
+                }
+
+                th {
+                    background: #edf1f8;
+                }
+
+                thead {
+                    display: table-header-group;
+                }
+
+                tr {
+                    page-break-inside: avoid;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Members by Cell</h1>
+            <p class="report-summary">
+                ${filteredMembers.length} member${filteredMembers.length === 1 ? "" : "s"}
+                across ${membersByCell.size} cell${membersByCell.size === 1 ? "" : "s"}
+            </p>
+            ${cellSections}
+        </body>
+        </html>
+    `);
+
+    printFrame.contentDocument.close();
+
+
+    const printWindow =
+        printFrame.contentWindow;
+
+
+    if (!printWindow) {
+
+        printFrame.remove();
+
+        console.error(
+            "CMS Members could not access the PDF print window."
+        );
+
+        alert(
+            "The PDF print dialog could not be opened. Please try again."
+        );
+
+        return;
+
+    }
+
+
+    printWindow.addEventListener(
+        "afterprint",
+        function () {
+            printFrame.remove();
+        },
+        {
+            once: true
+        }
+    );
+
+
+    printWindow.focus();
+
+    printWindow.print();
+
+}
+
+
+if (
+    downloadMembersPdfButton
+) {
+
+    downloadMembersPdfButton.addEventListener(
+        "click",
+        printMembersByCell
     );
 
 }

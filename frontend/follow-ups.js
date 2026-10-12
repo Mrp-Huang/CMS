@@ -2756,6 +2756,11 @@ function printFollowUp(followUp) {
 
             <style>
 
+                @page {
+                    margin: 14mm;
+                }
+
+
                 body {
 
                     font-family:
@@ -2763,10 +2768,16 @@ function printFollowUp(followUp) {
                         sans-serif;
 
                     margin:
-                        35px;
+                        0;
 
                     color:
                         #222;
+
+                    font-size:
+                        11pt;
+
+                    line-height:
+                        1.5;
                 }
 
 
@@ -2829,6 +2840,14 @@ function printFollowUp(followUp) {
 
                     white-space:
                         pre-wrap;
+                }
+
+                @media screen {
+
+                    body {
+                        margin: 32px;
+                    }
+
                 }
 
             </style>

@@ -268,6 +268,10 @@ let selectedRecord =
     null;
 
 
+let displayedVisitorGroups =
+    [];
+
+
 /* =====================================================
    LIVE SUPABASE STATE
    ===================================================== */
@@ -1146,6 +1150,9 @@ function buildMemberEntry(
 
         combination:
             resolvedCombination,
+
+        association:
+            "GBU-RUKARA",
 
         status:
             entry?.status ||
@@ -2360,6 +2367,124 @@ function getFilteredRecords() {
 }
 
 
+function groupVisitorRecords(
+    records
+) {
+
+    const displayRecords = [];
+
+    const visitorGroups =
+        new Map();
+
+
+    records.forEach(
+        function(record) {
+
+            if (
+                record.type !==
+                "visitor"
+            ) {
+
+                displayRecords.push(
+                    record
+                );
+
+
+                return;
+
+            }
+
+
+            const cellKey =
+                record.cellId
+                    ? String(
+                        record.cellId
+                    )
+                    : String(
+                        record.cellName ||
+                        ""
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+            const dateKey =
+                String(
+                    record.date ||
+                    ""
+                )
+                .slice(
+                    0,
+                    10
+                );
+
+
+            const groupKey =
+                JSON.stringify([
+                    dateKey,
+                    cellKey,
+                    dateKey
+                        ? ""
+                        : record.id
+                ]);
+
+
+            let group =
+                visitorGroups.get(
+                    groupKey
+                );
+
+
+            if (
+                !group
+            ) {
+
+                group = {
+
+                    type:
+                        "visitor",
+
+                    isVisitorGroup:
+                        true,
+
+                    date:
+                        record.date,
+
+                    cellName:
+                        record.cellName,
+
+                    visitors:
+                        []
+
+                };
+
+
+                visitorGroups.set(
+                    groupKey,
+                    group
+                );
+
+
+                displayRecords.push(
+                    group
+                );
+
+            }
+
+
+            group.visitors.push(
+                record
+            );
+
+        }
+    );
+
+
+    return displayRecords;
+
+}
+
+
 /* =====================================================
    TYPE LABEL
    ===================================================== */
@@ -2566,7 +2691,13 @@ function renderRecords() {
 
 
     const records =
-        getFilteredRecords();
+        groupVisitorRecords(
+            getFilteredRecords()
+        );
+
+
+    displayedVisitorGroups =
+        [];
 
 
     recordsTableBody.innerHTML =
@@ -2734,25 +2865,62 @@ function renderRecords() {
                 "visitor"
             ) {
 
-                summary =
+                if (
+                    record.isVisitorGroup
+                ) {
 
-                    `${displayValue(
-                        record.phone
-                    )} • ` +
-
-                    `${record.visitCount} visit${
-                        Number(
-                            record.visitCount
-                        ) === 1
-                            ? ""
-                            : "s"
-                    }`;
+                    const visitorCount =
+                        record.visitors.length;
 
 
-                status =
-                    record.convertedToMember
-                        ? "Converted to Member"
-                        : "Visitor";
+                    summary =
+                        `${visitorCount} visitor${
+                            visitorCount === 1
+                                ? ""
+                                : "s"
+                        }`;
+
+
+                    const convertedCount =
+                        record.visitors.filter(
+                            visitor =>
+                                visitor.convertedToMember
+                        ).length;
+
+
+                    status =
+                        convertedCount ===
+                            visitorCount
+                            ? "Converted to Members"
+                            : convertedCount
+                                ? "Mixed Status"
+                                : "Visitors";
+
+                }
+
+                else {
+
+                    summary =
+
+                        `${displayValue(
+                            record.phone
+                        )} • ` +
+
+                        `${record.visitCount} visit${
+                            Number(
+                                record.visitCount
+                            ) === 1
+                                ? ""
+                                : "s"
+                        }`;
+
+
+                    status =
+                        record.convertedToMember
+                            ? "Converted to Member"
+                            : "Visitor";
+
+                }
 
             }
 
@@ -2830,36 +2998,54 @@ function renderRecords() {
 
                 <td>
 
-                    <button
-                        type="button"
-                        class="record-action view-action"
-                        onclick="viewRecord(
-                            '${record.type}',
-                            '${escapeHTML(
-                                String(
-                                    record.id
-                                )
-                            )}'
-                        )"
-                    >
-                        View
-                    </button>
+                    ${
+                        record.isVisitorGroup
+                            ? `
+                                <button
+                                    type="button"
+                                    class="record-action view-action"
+                                    onclick="viewVisitorGroup(${
+                                        displayedVisitorGroups.push(
+                                            record
+                                        ) - 1
+                                    })"
+                                >
+                                    View Visitors
+                                </button>
+                            `
+                            : `
+                                <button
+                                    type="button"
+                                    class="record-action view-action"
+                                    onclick="viewRecord(
+                                        '${record.type}',
+                                        '${escapeHTML(
+                                            String(
+                                                record.id
+                                            )
+                                        )}'
+                                    )"
+                                >
+                                    View
+                                </button>
 
 
-                    <button
-                        type="button"
-                        class="record-action download-action"
-                        onclick="printRecord(
-                            '${record.type}',
-                            '${escapeHTML(
-                                String(
-                                    record.id
-                                )
-                            )}'
-                        )"
-                    >
-                        Print / Save PDF
-                    </button>
+                                <button
+                                    type="button"
+                                    class="record-action download-action"
+                                    onclick="printRecord(
+                                        '${record.type}',
+                                        '${escapeHTML(
+                                            String(
+                                                record.id
+                                            )
+                                        )}'
+                                    )"
+                                >
+                                    Print / Save PDF
+                                </button>
+                            `
+                    }
 
 
                     ${
@@ -2988,10 +3174,16 @@ function updateSummary(
         recordCountText
     ) {
 
+        const displayedRecordCount =
+            groupVisitorRecords(
+                filteredRecords
+            ).length;
+
+
         recordCountText.textContent =
 
-            `${filteredRecords.length} record${
-                filteredRecords.length ===
+            `${displayedRecordCount} record${
+                displayedRecordCount ===
                 1
                     ? ""
                     : "s"
@@ -3119,6 +3311,26 @@ function viewRecord(
 
 
     if (
+        downloadRecordButton
+    ) {
+
+        downloadRecordButton.hidden =
+            false;
+
+    }
+
+
+    if (
+        printRecordButton
+    ) {
+
+        printRecordButton.hidden =
+            false;
+
+    }
+
+
+    if (
         type ===
         "attendance"
     ) {
@@ -3187,6 +3399,217 @@ function viewRecord(
         );
 
     }
+
+}
+
+
+function viewVisitorGroup(
+    groupIndex
+) {
+
+    const group =
+        displayedVisitorGroups[
+            groupIndex
+        ];
+
+
+    if (
+        !group
+    ) {
+
+        alert(
+            "Visitor group could not be found."
+        );
+
+
+        return;
+
+    }
+
+
+    selectedRecord =
+        null;
+
+
+    if (
+        modalRecordTitle
+    ) {
+
+        modalRecordTitle.textContent =
+            `${group.visitors.length} Visitors`;
+
+    }
+
+
+    if (
+        downloadRecordButton
+    ) {
+
+        downloadRecordButton.hidden =
+            true;
+
+    }
+
+
+    if (
+        printRecordButton
+    ) {
+
+        printRecordButton.hidden =
+            true;
+
+    }
+
+
+    if (
+        recordDetails
+    ) {
+
+        recordDetails.innerHTML = `
+
+            <div class="detail-section">
+
+                <h3>
+                    ${escapeHTML(
+                        displayValue(
+                            group.cellName
+                        )
+                    )} — ${escapeHTML(
+                        formatDate(
+                            group.date
+                        )
+                    )}
+                </h3>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Visits</th>
+                                <th>Details</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            ${group.visitors
+                                .map(
+                                    function(visitor, visitorIndex) {
+
+                                        return `
+
+                                            <tr>
+
+                                                <td>
+                                                    ${escapeHTML(
+                                                        displayValue(
+                                                            visitor.name
+                                                        )
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    ${escapeHTML(
+                                                        displayValue(
+                                                            visitor.phone
+                                                        )
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    ${escapeHTML(
+                                                        displayValue(
+                                                            visitor.visitCount
+                                                        )
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    <button
+                                                        type="button"
+                                                        class="record-action view-action"
+                                                        onclick="viewVisitorInGroup(
+                                                            ${groupIndex},
+                                                            ${visitorIndex}
+                                                        )"
+                                                    >
+                                                        View
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+
+                                        `;
+
+                                    }
+                                )
+                                .join("")}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    if (
+        recordModal
+    ) {
+
+        recordModal.classList.add(
+            "show"
+        );
+
+    }
+
+}
+
+
+function viewVisitorInGroup(
+    groupIndex,
+    visitorIndex
+) {
+
+    const visitor =
+        displayedVisitorGroups[
+            groupIndex
+        ]?.visitors[
+            visitorIndex
+        ];
+
+
+    if (
+        !visitor
+    ) {
+
+        alert(
+            "Visitor record could not be found."
+        );
+
+
+        return;
+
+    }
+
+
+    viewRecord(
+        "visitor",
+        visitor.id
+    );
 
 }
 
@@ -5539,21 +5962,19 @@ function printRecord(
 
         return `
 
-            <p>
+            <div class="field">
 
-                <strong>
+                <span class="label">
+                    ${escapeHTML(label)}
+                </span>
+
+                <div class="value">
                     ${escapeHTML(
-                        label
-                    )}:
-                </strong>
+                        displayValue(value)
+                    )}
+                </div>
 
-                ${escapeHTML(
-                    displayValue(
-                        value
-                    )
-                )}
-
-            </p>
+            </div>
 
         `;
 
@@ -5935,7 +6356,481 @@ function printRecord(
     }
 
 
+    else if (
+        type ===
+        "report"
+    ) {
+
+        const reportPhotos =
+            record.original?.photoPaths ||
+            record.original?.photo_paths ||
+            [];
+
+
+        const attendanceFields =
+            record.attendance &&
+            typeof record.attendance === "object" &&
+            !Array.isArray(record.attendance)
+                ? Object.entries(
+                    record.attendance
+                )
+                    .filter(
+                        function(entry) {
+
+                            return (
+                                entry[1] === null ||
+                                typeof entry[1] !== "object"
+                            );
+
+                        }
+                    )
+                    .map(
+                        function(entry) {
+
+                            const label =
+                                entry[0]
+                                    .replace(
+                                        /([A-Z])/g,
+                                        " $1"
+                                    )
+                                    .replace(
+                                        /[_-]+/g,
+                                        " "
+                                    )
+                                    .replace(
+                                        /^\w/,
+                                        function(letter) {
+
+                                            return letter.toUpperCase();
+
+                                        }
+                                    );
+
+
+                            return printField(
+                                label,
+                                entry[1]
+                            );
+
+                        }
+                    )
+                    .join("")
+                : printField(
+                    "Summary",
+                    record.attendance
+                );
+
+
+        content = `
+
+            <h1>
+                Weekly Report
+            </h1>
+
+            ${printField(
+                "Cell",
+                record.cellName
+            )}
+
+            ${printField(
+                "Date",
+                formatDate(
+                    record.date
+                )
+            )}
+
+            ${printField(
+                "Meeting Location",
+                record.meetingLocation
+            )}
+
+            ${printField(
+                "Status",
+                record.status
+            )}
+
+            <h2>
+                Attendance Summary
+            </h2>
+
+            ${attendanceFields || printField(
+                "Summary",
+                "No attendance summary recorded."
+            )}
+
+            <h2>
+                Report Details
+            </h2>
+
+            ${printField(
+                "Members' Life",
+                record.membersLife
+            )}
+
+            ${printField(
+                "Activity Done",
+                record.activityDone
+            )}
+
+            ${printField(
+                "Challenges / Needs",
+                record.challenges
+            )}
+
+            ${printField(
+                "Follow-up Needed",
+                record.followUp
+            )}
+
+            ${printField(
+                "Next Week's Plan",
+                record.nextWeekPlan
+            )}
+
+            ${printField(
+                "Additional Comments",
+                record.comments
+            )}
+
+            ${
+                Array.isArray(reportPhotos)
+                    ? reportPhotos
+                        .map(
+                            function(photoPath) {
+
+                                return printField(
+                                    "Meeting Photo",
+                                    String(
+                                        photoPath
+                                    )
+                                        .split("/")
+                                        .pop()
+                                );
+
+                            }
+                        )
+                        .join("")
+                    : ""
+            }
+
+        `;
+
+    }
+
+
+    else if (
+        type ===
+        "followup"
+    ) {
+
+        content = `
+
+            <h1>
+                Follow-up Record
+            </h1>
+
+            ${printField(
+                "Member",
+                record.memberName
+            )}
+
+            ${printField(
+                "Phone",
+                record.memberPhone
+            )}
+
+            ${printField(
+                "Cell",
+                record.cellName
+            )}
+
+            ${printField(
+                "Date",
+                formatDate(
+                    record.date
+                )
+            )}
+
+            ${printField(
+                "Assigned To",
+                record.assignedToName
+            )}
+
+            ${printField(
+                "Priority",
+                record.priority
+            )}
+
+            ${printField(
+                "Status",
+                record.status
+            )}
+
+            ${printField(
+                "Reason",
+                record.reason
+            )}
+
+            ${printField(
+                "Details",
+                record.details
+            )}
+
+            ${printField(
+                "Action Taken",
+                record.actionTaken
+            )}
+
+            ${printField(
+                "Next Action",
+                record.nextAction
+            )}
+
+        `;
+
+    }
+
+
+    else if (
+        type ===
+        "evangelism"
+    ) {
+
+        const peopleRows =
+            record.people
+                .map(
+                    function(person) {
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    ${escapeHTML(
+                                        displayValue(
+                                            person.name ||
+                                            person.fullName
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        displayValue(
+                                            person.phone ||
+                                            person.phoneNumber
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        displayValue(
+                                            person.year ||
+                                            person.memberYear
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        displayValue(
+                                            person.combination ||
+                                            person.memberCombination
+                                        )
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${person.isNew === true || person.isNew === "true"
+                                        ? "Yes"
+                                        : "No"}
+                                </td>
+
+                                <td>
+                                    ${escapeHTML(
+                                        displayValue(
+                                            person.outcome
+                                        )
+                                    )}
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+
+        content = `
+
+            <h1>
+                Evangelism Record
+            </h1>
+
+            ${printField(
+                "Cell",
+                record.cellName
+            )}
+
+            ${printField(
+                "Date",
+                formatDate(
+                    record.date
+                )
+            )}
+
+            ${printField(
+                "Recorded By",
+                record.leaderName
+            )}
+
+            ${printField(
+                "Evangelism Type",
+                record.evangelismType
+            )}
+
+            ${printField(
+                "Location",
+                record.location
+            )}
+
+            <h2>
+                Summary
+            </h2>
+
+            ${printField(
+                "People Reached",
+                record.peopleReached
+            )}
+
+            ${printField(
+                "New People",
+                record.newPeople
+            )}
+
+            ${printField(
+                "Saved",
+                record.saved
+            )}
+
+            ${printField(
+                "In Progress",
+                record.inProgress
+            )}
+
+            ${printField(
+                "Interested",
+                record.interested
+            )}
+
+            ${printField(
+                "Follow-up Needed",
+                record.followUpNeeded
+            )}
+
+            ${printField(
+                "Not Yet",
+                record.notYet
+            )}
+
+            ${printField(
+                "Details",
+                record.details
+            )}
+
+            ${printField(
+                "Next Action",
+                record.nextAction
+            )}
+
+            <h2>
+                People Reached
+            </h2>
+
+            ${
+                peopleRows
+                    ? `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Year</th>
+                                    <th>Combination</th>
+                                    <th>New?</th>
+                                    <th>Outcome</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${peopleRows}
+                            </tbody>
+                        </table>
+                    `
+                    : "<p>No individual people were recorded.</p>"
+            }
+
+        `;
+
+    }
+
+
     else {
+
+        const originalFields =
+            Object.entries(
+                record.original || {}
+            )
+                .filter(
+                    function(entry) {
+
+                        return (
+                            ![
+                                "cell",
+                                "cellid",
+                                "cell_id",
+                                "cellname",
+                                "date",
+                                "reportdate",
+                                "report_date",
+                                "createdat",
+                                "created_at"
+                            ].includes(
+                                String(
+                                    entry[0]
+                                ).toLowerCase()
+                            ) &&
+                            (
+                                entry[1] === null ||
+                                ["string", "number", "boolean"].includes(
+                                    typeof entry[1]
+                                )
+                            )
+                        );
+
+                    }
+                )
+                .map(
+                    function(entry) {
+
+                        return printField(
+                            entry[0]
+                                .replace(
+                                    /([A-Z])/g,
+                                    " $1"
+                                )
+                                .replace(
+                                    /[_-]+/g,
+                                    " "
+                                ),
+                            entry[1]
+                        );
+
+                    }
+                )
+                .join("");
 
         content = `
 
@@ -5948,43 +6843,21 @@ function printRecord(
             </h1>
 
 
-            <p>
-
-                <strong>
-                    Cell:
-                </strong>
-
-                ${escapeHTML(
-                    record.cellName
-                )}
-
-            </p>
+            ${printField(
+                "Cell",
+                record.cellName
+            )}
 
 
-            <p>
-
-                <strong>
-                    Date:
-                </strong>
-
-                ${escapeHTML(
-                    formatDate(
-                        record.date
-                    )
-                )}
-
-            </p>
+            ${printField(
+                "Date",
+                formatDate(
+                    record.date
+                )
+            )}
 
 
-            <pre>
-${escapeHTML(
-    JSON.stringify(
-        record.original,
-        null,
-        2
-    )
-)}
-            </pre>
+            ${originalFields}
 
         `;
 
@@ -6021,17 +6894,110 @@ ${escapeHTML(
 
                 <style>
 
+                    @page {
+                        margin: 14mm;
+                    }
+
+
                     body {
 
                         font-family:
                             Arial,
                             sans-serif;
 
-                        padding:
-                            30px;
+                        margin:
+                            0;
+
+                        font-size:
+                            11pt;
 
                         color:
                             #222;
+
+                        line-height:
+                            1.5;
+
+                    }
+
+
+                    h1 {
+
+                        margin:
+                            0 0 18px;
+
+                        color:
+                            #294895;
+
+                        font-size:
+                            22pt;
+
+                    }
+
+
+                    h2 {
+
+                        margin:
+                            22px 0 10px;
+
+                        padding-bottom:
+                            5px;
+
+                        border-bottom:
+                            1px solid #d5dbe5;
+
+                        color:
+                            #294895;
+
+                        font-size:
+                            14pt;
+
+                        page-break-after:
+                            avoid;
+
+                    }
+
+
+                    .field {
+
+                        margin:
+                            0 0 12px;
+
+                        page-break-inside:
+                            avoid;
+
+                    }
+
+
+                    .label {
+
+                        display:
+                            block;
+
+                        margin-bottom:
+                            3px;
+
+                        color:
+                            #596579;
+
+                        font-size:
+                            9pt;
+
+                        font-weight:
+                            700;
+
+                        text-transform:
+                            uppercase;
+
+                    }
+
+
+                    .value {
+
+                        white-space:
+                            pre-wrap;
+
+                        overflow-wrap:
+                            anywhere;
 
                     }
 
@@ -6043,6 +7009,9 @@ ${escapeHTML(
 
                         border-collapse:
                             collapse;
+
+                        font-size:
+                            9pt;
 
                     }
 
@@ -6062,6 +7031,9 @@ ${escapeHTML(
                         vertical-align:
                             top;
 
+                        overflow-wrap:
+                            anywhere;
+
                     }
 
 
@@ -6073,10 +7045,30 @@ ${escapeHTML(
                     }
 
 
-                    pre {
+                    thead {
 
-                        white-space:
-                            pre-wrap;
+                        display:
+                            table-header-group;
+
+                    }
+
+
+                    tr {
+
+                        page-break-inside:
+                            avoid;
+
+                    }
+
+
+                    @media screen {
+
+                        body {
+                            max-width: 850px;
+                            margin: 32px auto;
+                            padding: 32px;
+                            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+                        }
 
                     }
 
@@ -7625,6 +8617,14 @@ async function loadAllRecordsLiveData() {
 
 window.viewRecord =
     viewRecord;
+
+
+window.viewVisitorGroup =
+    viewVisitorGroup;
+
+
+window.viewVisitorInGroup =
+    viewVisitorInGroup;
 
 
 window.downloadRecord =

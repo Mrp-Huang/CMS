@@ -956,6 +956,10 @@ async function cmsWeeklyBridgeHydrate() {
     );
 
 
+    window.cmsWeeklyReportsHydrated =
+        true;
+
+
     console.log(
         "CMS Weekly Reports: Supabase hydration complete."
     );

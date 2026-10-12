@@ -11,6 +11,10 @@
 
 .search-container {
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .search-container input {
@@ -34,6 +38,21 @@
     box-shadow:
         0 0 0 2px
         rgba(31, 60, 136, 0.08);
+}
+
+.search-container .member-cell-filter {
+    width: 220px;
+    max-width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #062454;
+    border-radius: 7px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.member-cell-filter-label {
+    font-size: 14px;
+    font-weight: 600;
 }
 
 

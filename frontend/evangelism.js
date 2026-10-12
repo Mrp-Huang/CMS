@@ -3229,6 +3229,11 @@ function printEvangelismById(id) {
 
             <style>
 
+                @page {
+                    margin: 14mm;
+                }
+
+
                 body {
 
                     font-family:
@@ -3236,10 +3241,16 @@ function printEvangelismById(id) {
                         sans-serif;
 
                     margin:
-                        35px;
+                        0;
 
                     color:
                         #222;
+
+                    font-size:
+                        11pt;
+
+                    line-height:
+                        1.5;
 
                 }
 
@@ -3350,6 +3361,30 @@ function printEvangelismById(id) {
 
                     background:
                         #f1f3f6;
+
+                }
+
+                thead {
+
+                    display:
+                        table-header-group;
+
+                }
+
+
+                tr,
+                .field {
+
+                    page-break-inside:
+                        avoid;
+
+                }
+
+                @media screen {
+
+                    body {
+                        margin: 32px;
+                    }
 
                 }
 

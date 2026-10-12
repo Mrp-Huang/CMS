@@ -1070,7 +1070,17 @@ function loadCells() {
     `;
 
 
-    cells.forEach(
+    const activeCells =
+        cells.filter(
+            function(cell) {
+
+                return cell.active !== false;
+
+            }
+        );
+
+
+    activeCells.forEach(
         function(cell) {
 
             const option =
@@ -1096,7 +1106,7 @@ function loadCells() {
 
 
     if (
-        !cells.length
+        !activeCells.length
     ) {
 
         reportCell.innerHTML = `
@@ -6320,17 +6330,28 @@ CMS Weekly Report - ${escapeHTML(
 
 <style>
 
+@page {
+
+    margin:
+        14mm;
+
+}
+
+
 body {
 
     font-family:
         Arial,
         sans-serif;
 
-    padding:
-        35px;
+    margin:
+        0;
 
     color:
         #222;
+
+    font-size:
+        11pt;
 
     line-height:
         1.6;
@@ -6341,6 +6362,12 @@ h1 {
 
     color:
         #294895;
+
+    font-size:
+        22pt;
+
+    page-break-after:
+        avoid;
 
 }
 
@@ -6357,6 +6384,9 @@ h2 {
 
     margin-top:
         25px;
+
+    page-break-after:
+        avoid;
 
 }
 
@@ -6420,6 +6450,9 @@ h2 {
     margin-top:
         20px;
 
+    page-break-inside:
+        avoid;
+
 }
 
 .section p {
@@ -6440,6 +6473,23 @@ h2 {
 
     height:
         180px;
+
+    max-width:
+        100%;
+
+    object-fit:
+        contain;
+
+    page-break-inside:
+        avoid;
+
+}
+
+@media screen {
+
+    body {
+        margin: 32px;
+    }
 
 }
 
@@ -6889,13 +6939,51 @@ async function initializeWeeklyReports() {
        Live reference data
     */
 
+    const hasHydratedSupabaseData =
+        window.cmsWeeklyReportsHydrated === true;
+
+
     if (
-        CMS_WEEKLY_REPORTS_SUPABASE
+        hasHydratedSupabaseData
     ) {
 
-        await loadLiveCells();
+        members =
+            members
+                .filter(
+                    function(member) {
 
-        await loadLiveMembers();
+                        return (
+                            member.active !== false &&
+                            member.status !== "Inactive"
+                        );
+
+                    }
+                )
+                .map(
+                    function(member) {
+
+                        return {
+                            ...member,
+                            cell_id:
+                                member.cell_id ||
+                                member.cellId
+                        };
+
+                    }
+                );
+
+    }
+
+
+    if (
+        CMS_WEEKLY_REPORTS_SUPABASE &&
+        !hasHydratedSupabaseData
+    ) {
+
+        await Promise.all([
+            loadLiveCells(),
+            loadLiveMembers()
+        ]);
 
     }
 
@@ -6919,7 +7007,8 @@ async function initializeWeeklyReports() {
     */
 
     if (
-        CMS_WEEKLY_REPORTS_SUPABASE
+        CMS_WEEKLY_REPORTS_SUPABASE &&
+        !hasHydratedSupabaseData
     ) {
 
         await loadLiveReports();

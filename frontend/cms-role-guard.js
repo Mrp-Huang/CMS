@@ -215,6 +215,9 @@
                             "cell-leaders.html"
                         ) ||
                         href.includes(
+                            "cms-ai.html"
+                        ) ||
+                        href.includes(
                             "settings.html"
                         )
                     ) {
