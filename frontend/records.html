@@ -322,6 +322,17 @@
                     Evangelism
                 </button>
 
+
+                <button
+                    type="button"
+                    id="mediaLibraryTab"
+                    class="record-tab"
+                    data-type="media"
+                    hidden
+                >
+                    Photos / Media
+                </button>
+
             </div>
 
 
@@ -361,7 +372,10 @@
              RECORD TABLE
              ===================================== -->
 
-        <section class="records-panel">
+        <section
+            id="recordsTablePanel"
+            class="records-panel"
+        >
 
 
             <div class="panel-header">
@@ -425,6 +439,37 @@
                 </table>
 
             </div>
+
+        </section>
+
+
+        <section
+            id="mediaLibraryPanel"
+            class="records-panel media-library-panel"
+            hidden
+        >
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Photos / Media
+                    </h2>
+
+                    <p id="mediaLibraryCount">
+                        Photos attached to weekly reports will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                id="mediaLibraryGallery"
+                class="media-library-gallery"
+                aria-live="polite"
+            ></div>
 
         </section>
 
@@ -504,6 +549,82 @@
                 type="button"
                 id="closeRecordButton"
                 class="secondary-button"
+            >
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="recordReportModal"
+    class="records-report-overlay"
+>
+
+    <div
+        class="modal records-report-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recordReportTitle"
+    >
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="recordReportTitle">
+                    Weekly Report
+                </h2>
+
+                <p
+                    id="recordReportSubtitle"
+                    class="view-report-subtitle"
+                ></p>
+
+            </div>
+
+            <button
+                type="button"
+                class="close-button"
+                id="closeRecordReportModal"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div
+            id="recordReportContent"
+            class="view-report-content"
+        ></div>
+
+        <div class="view-report-actions">
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="printRecordReportButton"
+            >
+                Print
+            </button>
+
+            <button
+                type="button"
+                class="secondary-button"
+                id="saveRecordReportButton"
+            >
+                Print / Save PDF
+            </button>
+
+            <button
+                type="button"
+                class="cancel-button"
+                id="closeRecordReportButton"
             >
                 Close
             </button>

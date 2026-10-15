@@ -2343,7 +2343,34 @@ function renderEvangelism(
 
     filtered
         .slice()
-        .reverse()
+        .sort(
+            function(a, b) {
+
+                const aRecordDate =
+                    a.date ||
+                    a.evangelism_date ||
+                    0;
+
+                const bRecordDate =
+                    b.date ||
+                    b.evangelism_date ||
+                    0;
+
+                const dateDifference =
+                    new Date(bRecordDate) -
+                    new Date(aRecordDate);
+
+                if (dateDifference) {
+                    return dateDifference;
+                }
+
+                return (
+                    new Date(b.created_at || b.createdAt || 0) -
+                    new Date(a.created_at || a.createdAt || 0)
+                );
+
+            }
+        )
         .forEach(
             function(record) {
 

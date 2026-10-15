@@ -15,8 +15,8 @@
    - Existing working logic preserved
    - No MutationObserver
    - No extra dashboard UI script required
-   - Only Cell Leader presentation is improved
-   - Coordinator presentation remains unchanged
+   - Cell Leader presentation remains scoped to their cell
+   - Coordinators get weekly attendance and report comparisons
 
    LIVE SOURCES:
    - cells
@@ -982,7 +982,7 @@ async function dashboardLoadCells() {
             .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             )
     );
@@ -1039,7 +1039,7 @@ async function dashboardLoadLeaders() {
     /* =====================================================
        COORDINATOR
        -----------------------------------------------------
-       Existing Coordinator behavior remains unchanged.
+       Coordinators load all cell leaders.
        ===================================================== */
 
     const {
@@ -1068,7 +1068,7 @@ async function dashboardLoadLeaders() {
                 "created_at",
                 {
                     ascending:
-                        true
+                        false
                 }
             );
 
@@ -1120,9 +1120,15 @@ async function dashboardLoadMembers() {
                 `
             )
             .order(
+                "date_joined",
+                {
+                    ascending: false
+                }
+            )
+            .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             )
     );
@@ -1158,6 +1164,12 @@ async function dashboardLoadAttendanceSessions() {
                     ascending: false
                 }
             )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
     );
 
 }
@@ -1189,6 +1201,12 @@ async function dashboardLoadAttendance() {
             )
             .order(
                 "meeting_date",
+                {
+                    ascending: false
+                }
+            )
+            .order(
+                "created_at",
                 {
                     ascending: false
                 }
@@ -1230,6 +1248,12 @@ async function dashboardLoadVisitors() {
                 `
             )
             .order(
+                "last_visit_date",
+                {
+                    ascending: false
+                }
+            )
+            .order(
                 "created_at",
                 {
                     ascending: false
@@ -1265,6 +1289,12 @@ async function dashboardLoadVisitorVisits() {
             )
             .order(
                 "visit_date",
+                {
+                    ascending: false
+                }
+            )
+            .order(
+                "created_at",
                 {
                     ascending: false
                 }
@@ -1311,6 +1341,12 @@ async function dashboardLoadReports() {
                     ascending: false
                 }
             )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
     );
 
 }
@@ -1346,6 +1382,12 @@ async function dashboardLoadFollowUps() {
                 created_at,
                 updated_at
                 `
+            )
+            .order(
+                "due_date",
+                {
+                    ascending: false
+                }
             )
             .order(
                 "created_at",
@@ -1395,7 +1437,7 @@ async function dashboardLoadEvangelism() {
                 `
             )
             .order(
-                "evangelism_date",
+                "created_at",
                 {
                     ascending: false
                 }
@@ -2648,7 +2690,20 @@ function dashboardRenderCellsNeedingAttention() {
                             String(
                                 cell.id
                             )
+                            &&
+                            leader.active !==
+                            false
                     );
+
+            const leaderNames =
+                leaders
+                    .map(
+                        leader =>
+                            String(
+                                leader.full_name || ""
+                            ).trim()
+                    )
+                    .filter(Boolean);
 
 
             const recentReports =
@@ -2722,39 +2777,190 @@ function dashboardRenderCellsNeedingAttention() {
             }
 
 
+            const latestAttendance =
+                recentAttendanceSessions
+                    .filter(
+                        session =>
+                            dashboardDateKey(
+                                session.meeting_date
+                            )
+                    )
+                    .sort(
+                        (left, right) =>
+                            dashboardDateKey(
+                                right.meeting_date
+                            ).localeCompare(
+                                dashboardDateKey(
+                                    left.meeting_date
+                                )
+                            )
+                            ||
+                            String(
+                                right.created_at || ""
+                            ).localeCompare(
+                                String(
+                                    left.created_at || ""
+                                )
+                            )
+                    )[0] ||
+                null;
+
+
+            const latestMeetingAttendance =
+                latestAttendance
+                    ? cmsDashboardData.attendance
+                        .filter(
+                            record =>
+                                String(
+                                    record.session_id
+                                ) ===
+                                String(
+                                    latestAttendance.id
+                                )
+                        )
+                    : [];
+
+            const activeMemberIds =
+                new Set(
+                    members.map(
+                        member =>
+                            String(
+                                member.id
+                            )
+                    )
+                );
+
+
+            const markedMemberIds =
+                new Set(
+                    latestMeetingAttendance
+                        .filter(
+                            record =>
+                                record.member_id !==
+                                null
+                                &&
+                                record.member_id !==
+                                undefined
+                                &&
+                                activeMemberIds.has(
+                                    String(
+                                        record.member_id
+                                    )
+                                )
+                        )
+                        .map(
+                            record =>
+                                String(
+                                    record.member_id
+                                )
+                        )
+                );
+
+
             const latestReport =
-                recentReports[0];
+                latestAttendance
+                    ? recentReports.find(
+                        report =>
+                            dashboardDateKey(
+                                report.report_date
+                            ) ===
+                            dashboardDateKey(
+                                latestAttendance.meeting_date
+                            )
+                            &&
+                            dashboardIsSubmittedReport(
+                                report
+                            )
+                    )
+                    : null;
 
 
-            if (
+            const meetingDateKey =
+                dashboardDateKey(
+                    latestAttendance?.meeting_date
+                );
+
+
+            const nextMeetingDueDate =
+                meetingDateKey
+                    ? dashboardAddDaysToDateKey(
+                        meetingDateKey,
+                        7
+                    )
+                    : "";
+
+
+            const weeklyCycleOverdue =
+                Boolean(
+                    nextMeetingDueDate
+                    &&
+                    dashboardTodayDateKey() >=
+                    nextMeetingDueDate
+                );
+
+
+            const reportIssueReason =
                 !latestReport
-                ||
-                dashboardDaysAgo(
-                    latestReport.report_date
-                ) > 14
-            ) {
+                    ? "No submitted report for latest meeting"
+                    : weeklyCycleOverdue
+                        ? `No report for weekly meeting due ${dashboardFormatDateKey(nextMeetingDueDate)}`
+                        : "";
+
+
+            const reportIssue =
+                !latestReport ||
+                weeklyCycleOverdue;
+
+
+            const attendanceIssue =
+                !latestAttendance ||
+                (
+                    members.length > 0
+                        ? markedMemberIds.size <
+                            members.length
+                        : latestMeetingAttendance.length === 0
+                ) ||
+                weeklyCycleOverdue;
+
+
+            const attendanceIssueReason =
+                !latestAttendance
+                    ? "No meeting attendance recorded"
+                    : latestMeetingAttendance.length === 0 ||
+                        (
+                            members.length > 0 &&
+                            markedMemberIds.size === 0
+                        )
+                        ? "No attendance recorded for latest meeting"
+                        : members.length > 0 &&
+                            markedMemberIds.size < members.length
+                            ? "Attendance incomplete for latest meeting"
+                            : `No attendance for weekly meeting due ${dashboardFormatDateKey(nextMeetingDueDate)}`;
+
+
+            const meetingDate =
+                latestAttendance
+                    ? dashboardFormatDateKey(
+                        dashboardDateKey(
+                            latestAttendance.meeting_date
+                        )
+                    )
+                    : "No meeting recorded";
+
+
+            if (reportIssue) {
 
                 reasons.push(
-                    "No recent weekly report"
+                    reportIssueReason
                 );
 
             }
 
 
-            const latestAttendance =
-                recentAttendanceSessions[0];
-
-
-            if (
-                !latestAttendance
-                ||
-                dashboardDaysAgo(
-                    latestAttendance.meeting_date
-                ) > 14
-            ) {
+            if (attendanceIssue) {
 
                 reasons.push(
-                    "No recent attendance"
+                    attendanceIssueReason
                 );
 
             }
@@ -2780,7 +2986,13 @@ function dashboardRenderCellsNeedingAttention() {
 
                     cell,
 
-                    reasons
+                    meetingDate,
+                    leaderNames,
+                    reasons,
+                    reportIssue,
+                    reportIssueReason,
+                    attendanceIssue,
+                    attendanceIssueReason
 
                 });
 
@@ -2799,7 +3011,7 @@ function dashboardRenderCellsNeedingAttention() {
         target.innerHTML = `
 
             <div class="attention-empty">
-                All active cells are currently okay.
+                All active cells have attendance and submitted reports for their latest recorded meeting.
             </div>
 
         `;
@@ -2815,8 +3027,9 @@ function dashboardRenderCellsNeedingAttention() {
         <thead>
             <tr>
                 <th scope="col">Cell</th>
+                <th scope="col">Meeting date</th>
                 <th scope="col">Members</th>
-                <th scope="col">Leader</th>
+                <th scope="col">Leader(s)</th>
                 <th scope="col">Weekly report</th>
                 <th scope="col">Attendance</th>
                 <th scope="col">Follow-ups</th>
@@ -2828,7 +3041,6 @@ function dashboardRenderCellsNeedingAttention() {
     const tableBody = table.querySelector("tbody");
 
     rows
-        .slice(0, 10)
         .forEach(item => {
             const reasonSet = new Set(item.reasons);
             const status = reason => reasonSet.has(reason)
@@ -2842,10 +3054,19 @@ function dashboardRenderCellsNeedingAttention() {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <th scope="row">${escapeDashboardHTML(item.cell.name)}</th>
+                <td>${escapeDashboardHTML(item.meetingDate)}</td>
                 <td>${status("No active members")}</td>
-                <td>${status("No cell leader assigned")}</td>
-                <td>${status("No recent weekly report")}</td>
-                <td>${status("No recent attendance")}</td>
+                <td>${item.leaderNames.length
+                    ? `<span class="attention-leader-names">${item.leaderNames.map(escapeDashboardHTML).join(", ")}</span>${item.reportIssue
+                        ? `<span class="attention-status attention-status-warning">Report pending</span>`
+                        : ""}`
+                    : status("No cell leader assigned")}</td>
+                <td>${item.reportIssue
+                    ? `<span class="attention-status attention-status-warning">${escapeDashboardHTML(item.reportIssueReason)}</span>`
+                    : `<span class="attention-status attention-status-ok">Submitted</span>`}</td>
+                <td>${item.attendanceIssue
+                    ? `<span class="attention-status attention-status-warning">${escapeDashboardHTML(item.attendanceIssueReason)}</span>`
+                    : `<span class="attention-status attention-status-ok">Recorded</span>`}</td>
                 <td>${followUpReason
                     ? `<span class="attention-status attention-status-warning">${escapeDashboardHTML(followUpReason)}</span>`
                     : `<span class="attention-status attention-status-ok">No open follow-ups</span>`}</td>
@@ -2860,8 +3081,597 @@ function dashboardRenderCellsNeedingAttention() {
 
 
 /* =========================================================
+   MEETING DATE HELPERS
+   ========================================================= */
+
+function dashboardDateKey(
+    value
+) {
+
+    if (!value) {
+
+        return "";
+
+    }
+
+
+    const dateKey =
+        String(value)
+            .slice(0, 10);
+
+
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateKey)
+        ? dateKey
+        : "";
+
+}
+
+
+function dashboardFormatDateKey(
+    dateKey
+) {
+
+    if (!dateKey) {
+
+        return "Unknown date";
+
+    }
+
+
+    const date =
+        new Date(
+            `${dateKey}T00:00:00`
+        );
+
+
+    return Number.isNaN(
+        date.getTime()
+    )
+        ? dateKey
+        : date.toLocaleDateString(
+            undefined,
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        );
+
+}
+
+
+function dashboardAddDaysToDateKey(
+    dateKey,
+    days
+) {
+
+    const date =
+        new Date(
+            `${dateKey}T00:00:00Z`
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+
+    date.setUTCDate(
+        date.getUTCDate() +
+        days
+    );
+
+
+    return date.toISOString()
+        .slice(0, 10);
+
+}
+
+
+function dashboardTodayDateKey() {
+
+    const today =
+        new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(
+            today.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            today.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function dashboardIsSubmittedReport(
+    report
+) {
+
+    return dashboardStatus(
+        report.status
+    ) === "submitted"
+        ||
+        Boolean(
+            report.submitted_at
+        );
+
+}
+
+
+function dashboardRenderWeeklyCellComparison() {
+
+    const container =
+        document.getElementById(
+            "weekly-cell-comparison"
+        );
+
+    const select =
+        document.getElementById(
+            "meeting-week-select"
+        );
+
+    const summary =
+        document.getElementById(
+            "meeting-week-summary"
+        );
+
+
+    if (
+        !container ||
+        !select ||
+        !summary
+    ) {
+
+        return;
+
+    }
+
+
+    const previousDate =
+        select.value;
+
+
+    const activeCells =
+        cmsDashboardData.cells
+            .filter(
+                cell =>
+                    cell.active !== false
+            )
+            .sort(
+                (left, right) =>
+                    String(left.name || "")
+                        .localeCompare(
+                            String(right.name || "")
+                        )
+            );
+
+
+    const activeCellIds =
+        new Set(
+            activeCells.map(
+                cell =>
+                    String(
+                        cell.id
+                    )
+            )
+        );
+
+
+    const meetingDates =
+        Array.from(
+            new Set(
+                cmsDashboardData.attendanceSessions
+                    .filter(
+                        session =>
+                            activeCellIds.has(
+                                String(
+                                    session.cell_id
+                                )
+                            )
+                    )
+                    .map(
+                        session =>
+                            dashboardDateKey(
+                                session.meeting_date
+                            )
+                    )
+                    .filter(Boolean)
+            )
+        )
+            .sort()
+            .reverse();
+
+
+    select.innerHTML =
+        meetingDates
+            .map(
+                dateKey =>
+                    `<option value="${escapeDashboardHTML(dateKey)}">${escapeDashboardHTML(dashboardFormatDateKey(dateKey))}</option>`
+            )
+            .join("");
+
+
+    if (!meetingDates.length) {
+
+        summary.textContent =
+            "No cell meeting dates have been recorded yet.";
+
+        container.innerHTML = `
+            <div class="attention-empty">
+                Record meeting attendance to start comparing cells.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    select.value =
+        meetingDates.includes(previousDate)
+            ? previousDate
+            : meetingDates[0];
+
+
+    const selectedDate =
+        select.value;
+
+    const weekStartValue =
+        new Date(
+            `${selectedDate}T00:00:00Z`
+        );
+
+
+    weekStartValue.setUTCDate(
+        weekStartValue.getUTCDate() - 6
+    );
+
+
+    const weekStart =
+        weekStartValue.toISOString()
+            .slice(0, 10);
+
+
+    const comparisonRows =
+        activeCells.map(
+            cell => {
+                const meetings =
+                    cmsDashboardData.attendanceSessions
+                        .filter(
+                            session => {
+                                const meetingDate =
+                                    dashboardDateKey(
+                                        session.meeting_date
+                                    );
+
+                                return String(
+                                    session.cell_id
+                                ) ===
+                                String(
+                                    cell.id
+                                )
+                                    &&
+                                    meetingDate >= weekStart
+                                    &&
+                                    meetingDate <= selectedDate;
+                            }
+                        )
+                        .sort(
+                            (left, right) =>
+                                dashboardDateKey(
+                                    right.meeting_date
+                                ).localeCompare(
+                                    dashboardDateKey(
+                                        left.meeting_date
+                                    )
+                                )
+                                ||
+                                String(
+                                    right.created_at || ""
+                                ).localeCompare(
+                                    String(
+                                        left.created_at || ""
+                                    )
+                                )
+                        );
+
+                const members =
+                    cmsDashboardData.members
+                        .filter(
+                            member =>
+                                String(
+                                    member.cell_id
+                                ) ===
+                                String(
+                                    cell.id
+                                )
+                                &&
+                                member.active !==
+                                false
+                        );
+
+
+                const activeMemberIds =
+                    new Set(
+                        members.map(
+                            member =>
+                                String(
+                                    member.id
+                                )
+                        )
+                    );
+
+
+                const meetingStats =
+                    meetings.map(
+                        meeting => {
+                            const meetingAttendance =
+                                cmsDashboardData.attendance
+                                    .filter(
+                                        record =>
+                                            String(
+                                                record.session_id
+                                            ) ===
+                                            String(
+                                                meeting.id
+                                            )
+                                    );
+
+                            const presentMemberIds =
+                                new Set(
+                                    meetingAttendance
+                                        .filter(
+                                            record =>
+                                                dashboardStatus(
+                                                    record.status
+                                                ) === "present"
+                                                &&
+                                                record.member_id !==
+                                                null
+                                                &&
+                                                record.member_id !==
+                                                undefined
+                                                &&
+                                                activeMemberIds.has(
+                                                    String(
+                                                        record.member_id
+                                                    )
+                                                )
+                                        )
+                                        .map(
+                                            record =>
+                                                String(
+                                                    record.member_id
+                                                )
+                                        )
+                                );
+
+                            return {
+                                meeting,
+                                presentCount:
+                                    presentMemberIds.size,
+                                attendancePercent:
+                                    members.length
+                                        ? presentMemberIds.size /
+                                            members.length *
+                                            100
+                                        : 0
+                            };
+                        }
+                    );
+
+                const averageAttendancePercent =
+                    meetingStats.length
+                        ? Math.round(
+                            meetingStats.reduce(
+                                (sum, item) =>
+                                    sum +
+                                    item.attendancePercent,
+                                0
+                            ) /
+                            meetingStats.length
+                        )
+                        : 0;
+
+                const typicalAttendance =
+                    meetingStats.length
+                        ? Math.round(
+                            meetingStats.reduce(
+                                (sum, item) =>
+                                    sum +
+                                    item.presentCount,
+                                0
+                            ) /
+                            meetingStats.length
+                        )
+                        : 0;
+
+                const submittedMeetingDates =
+                    new Set(
+                        cmsDashboardData.reports
+                            .filter(
+                                report =>
+                                    String(
+                                        report.cell_id
+                                    ) ===
+                                    String(
+                                        cell.id
+                                    )
+                                    &&
+                                    dashboardIsSubmittedReport(
+                                        report
+                                    )
+                            )
+                            .map(
+                                report =>
+                                    dashboardDateKey(
+                                        report.report_date
+                                    )
+                            )
+                            .filter(Boolean)
+                    );
+
+                const submittedReportCount =
+                    new Set(
+                        meetingStats
+                            .filter(
+                                item =>
+                                    submittedMeetingDates.has(
+                                        dashboardDateKey(
+                                            item.meeting.meeting_date
+                                        )
+                                    )
+                            )
+                            .map(
+                                item =>
+                                    dashboardDateKey(
+                                        item.meeting.meeting_date
+                                    )
+                            )
+                    ).size;
+
+                const reportPercent =
+                    meetings.length
+                        ? Math.round(
+                            submittedReportCount /
+                            meetings.length *
+                            100
+                        )
+                        : 0;
+
+
+                return {
+                    cell,
+                    averageAttendancePercent,
+                    typicalAttendance,
+                    meetingCount: meetings.length,
+                    submittedReportCount,
+                    reportPercent,
+                    latestMeetingDate: meetings.length
+                        ? dashboardDateKey(
+                            meetings[0].meeting_date
+                        )
+                        : ""
+                };
+            }
+        );
+
+
+    const meetingCount =
+        comparisonRows.filter(
+            item =>
+                item.meetingCount > 0
+        ).length;
+
+
+    summary.textContent =
+        `Attendance by cell for meetings from ${dashboardFormatDateKey(weekStart)} to ${dashboardFormatDateKey(selectedDate)}. Attendance is the average percentage present per meeting; typical attendance is the average number present. Reports count only when submitted for the meeting date.`;
+
+
+    container.innerHTML =
+        "";
+
+
+    if (!comparisonRows.length) {
+
+        container.innerHTML = `
+            <div class="attention-empty">
+                No active cells are available to compare.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+        <div class="weekly-comparison-table-wrap">
+            <table class="weekly-comparison-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Cell</th>
+                        <th scope="col">Avg. attendance</th>
+                        <th scope="col">Typical attendance</th>
+                        <th scope="col">Meetings</th>
+                        <th scope="col">Reports submitted</th>
+                        <th scope="col">Attendance profile</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${comparisonRows
+                        .map(
+                            item => `
+                                <tr>
+                                    <th scope="row">
+                                        <span class="weekly-comparison-cell">${escapeDashboardHTML(item.cell.name)}</span>
+                                        <small>${item.latestMeetingDate
+                                            ? `Latest meeting ${escapeDashboardHTML(dashboardFormatDateKey(item.latestMeetingDate))}`
+                                            : "No meeting this week"}</small>
+                                    </th>
+                                    <td>${item.averageAttendancePercent}%</td>
+                                    <td>${item.typicalAttendance} present</td>
+                                    <td>${item.meetingCount}</td>
+                                    <td>
+                                        <span class="weekly-comparison-report">${item.submittedReportCount}/${item.meetingCount} (${item.reportPercent}%)</span>
+                                    </td>
+                                    <td>
+                                        <div
+                                            class="weekly-comparison-track"
+                                            role="progressbar"
+                                            aria-label="${escapeDashboardHTML(item.cell.name)} average attendance"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                            aria-valuenow="${item.averageAttendancePercent}"
+                                        >
+                                            <div class="weekly-comparison-bar" style="width: ${item.averageAttendancePercent}%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `
+                        )
+                        .join("")}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+
+    summary.textContent +=
+        ` ${meetingCount} of ${comparisonRows.length} active cells recorded a meeting in this week.`;
+
+
+    select.onchange =
+        dashboardRenderWeeklyCellComparison;
+
+}
+
+
+/* =========================================================
    VISITOR ANALYTICS
    ========================================================= */
+
 
 function calculateDashboardVisitors() {
 
@@ -4432,8 +5242,8 @@ async function loadCMSDashboardFromSupabase() {
         /* =================================================
            COORDINATOR SYSTEM OVERVIEW
 
-           IMPORTANT:
-           This block remains untouched for Coordinator.
+           Coordinator-only views show all-cell summaries and
+           meeting-date reporting status.
            ================================================= */
 
         if (
@@ -4442,6 +5252,8 @@ async function loadCMSDashboardFromSupabase() {
         ) {
 
             dashboardRenderCellsOverview();
+
+            dashboardRenderWeeklyCellComparison();
 
             dashboardRenderCellsNeedingAttention();
 

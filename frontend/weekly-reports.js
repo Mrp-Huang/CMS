@@ -101,6 +101,12 @@ const CMS_WEEKLY_REPORT_PHOTO_LIMIT =
 const CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES =
     5 * 1024 * 1024;
 
+const CMS_WEEKLY_REPORT_PHOTO_MAX_INPUT_BYTES =
+    20 * 1024 * 1024;
+
+let isSavingWeeklyReport =
+    false;
+
 
 /* =====================================================
    CURRENT VIEW
@@ -204,6 +210,11 @@ const reportPhotosInput =
         "reportPhotos"
     );
 
+const reportPhotoUploadStatus =
+    document.getElementById(
+        "reportPhotoUploadStatus"
+    );
+
 const reportPhotoPreviews =
     document.getElementById(
         "reportPhotoPreviews"
@@ -248,6 +259,11 @@ const cancelReportButton =
 const saveDraftButton =
     document.getElementById(
         "saveDraftButton"
+    );
+
+const submitReportButton =
+    document.getElementById(
+        "submitReportButton"
     );
 
 
@@ -2255,8 +2271,330 @@ function resetReportPhotos(
 
     }
 
+    if (reportPhotoUploadStatus) {
+
+        reportPhotoUploadStatus.textContent =
+            "";
+
+    }
+
 
     renderReportPhotoPreviews();
+
+}
+
+
+function getReportPhotoMimeType(
+    file
+) {
+
+    const mimeByExtension = {
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        png: "image/png",
+        webp: "image/webp",
+        heic: "image/heic",
+        heif: "image/heif"
+    };
+    const extension =
+        String(file.name || "")
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    if (
+        Object.values(mimeByExtension).includes(file.type)
+    ) {
+
+        return file.type;
+
+    }
+
+    if (
+        String(file.type || "").startsWith("image/")
+    ) {
+
+        return file.type;
+
+    }
+
+
+    return mimeByExtension[extension] || "";
+
+}
+
+
+async function decodeReportPhoto(
+    file
+) {
+
+    if (
+        typeof createImageBitmap === "function"
+    ) {
+
+        try {
+
+            const bitmap =
+                await createImageBitmap(file);
+
+            return {
+                source: bitmap,
+                width: bitmap.width,
+                height: bitmap.height,
+                close: function() {
+
+                    bitmap.close();
+
+                }
+            };
+
+        }
+
+        catch (error) {
+
+            console.warn(
+                "CMS Weekly Reports image bitmap decoding unavailable; using browser image decoding.",
+                error
+            );
+
+        }
+
+    }
+
+
+    const objectUrl =
+        URL.createObjectURL(file);
+
+    try {
+
+        const image =
+            await new Promise(
+                function(resolve, reject) {
+
+                    const element =
+                        new Image();
+
+                    element.onload =
+                        function() {
+
+                            resolve(element);
+
+                        };
+
+                    element.onerror =
+                        function() {
+
+                            reject(
+                                new Error(
+                                    "The browser could not decode this image."
+                                )
+                            );
+
+                        };
+
+                    element.src =
+                        objectUrl;
+
+                }
+            );
+
+
+        return {
+            source: image,
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+            close: function() {
+
+                URL.revokeObjectURL(objectUrl);
+
+            }
+        };
+
+    }
+
+    catch (error) {
+
+        URL.revokeObjectURL(objectUrl);
+
+        throw error;
+
+    }
+
+}
+
+
+async function compressReportPhoto(
+    file
+) {
+
+    const mimeType =
+        getReportPhotoMimeType(file);
+
+
+    if (!mimeType) {
+
+        throw new Error(
+            `${file.name} is not a supported image. Choose a JPG, PNG or WEBP photo.`
+        );
+
+    }
+
+
+    if (
+        Object.values({
+            jpeg: "image/jpeg",
+            png: "image/png",
+            webp: "image/webp"
+        }).includes(mimeType) &&
+        file.size <= CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES
+    ) {
+
+        return file.type === mimeType
+            ? file
+            : new File(
+                [file],
+                file.name,
+                {
+                    type: mimeType,
+                    lastModified: file.lastModified
+                }
+            );
+
+    }
+
+
+    let decodedImage;
+
+    try {
+
+        decodedImage =
+            await decodeReportPhoto(file);
+
+    }
+
+    catch (error) {
+
+        throw new Error(
+            `${file.name} could not be opened or resized. Choose a JPG, PNG, WEBP or device-supported HEIC photo.`
+        );
+
+    }
+
+
+    try {
+
+        const canvas =
+            document.createElement("canvas");
+
+        let scale =
+            Math.min(
+                1,
+                1920 / Math.max(decodedImage.width, decodedImage.height)
+            );
+
+
+        for (
+            let attempt = 0;
+            attempt < 5;
+            attempt += 1
+        ) {
+
+            canvas.width =
+                Math.max(1, Math.round(decodedImage.width * scale));
+
+            canvas.height =
+                Math.max(1, Math.round(decodedImage.height * scale));
+
+            const context =
+                canvas.getContext("2d");
+
+
+            if (!context) {
+
+                throw new Error(
+                    `This browser could not resize ${file.name}.`
+                );
+
+            }
+
+
+            context.fillStyle =
+                "#ffffff";
+
+            context.fillRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            context.drawImage(
+                decodedImage.source,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            const quality =
+                Math.max(0.58, 0.82 - attempt * 0.06);
+            const blob =
+                await new Promise(
+                    function(resolve) {
+
+                        canvas.toBlob(
+                            resolve,
+                            "image/jpeg",
+                            quality
+                        );
+
+                    }
+                );
+
+
+            if (!blob) {
+
+                throw new Error(
+                    `This browser could not resize ${file.name}.`
+                );
+
+            }
+
+
+            if (
+                blob.size <= CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES
+            ) {
+
+                return new File(
+                    [blob],
+                    `${file.name.replace(/\.[^.]+$/, "")}.jpg`,
+                    {
+                        type: "image/jpeg",
+                        lastModified: Date.now()
+                    }
+                );
+
+            }
+
+
+            scale *= 0.8;
+
+        }
+
+
+        throw new Error(
+            `${file.name} is too large to resize below 5 MB. Choose a smaller photo.`
+        );
+
+    }
+
+    finally {
+
+        decodedImage.close();
+
+    }
 
 }
 
@@ -2290,6 +2628,15 @@ async function getReportPhotoSignedUrl(
     if (error) {
 
         throw error;
+
+    }
+
+
+    if (!data?.signedUrl) {
+
+        throw new Error(
+            "A report photo could not be loaded."
+        );
 
     }
 
@@ -2512,19 +2859,15 @@ if (reportPhotosInput) {
 
             }
 
-
-            const supportedTypes = [
-                "image/jpeg",
-                "image/png",
-                "image/webp"
-            ];
-
             for (const file of files) {
 
-                if (!supportedTypes.includes(file.type)) {
+                if (
+                    !getReportPhotoMimeType(file) &&
+                    !String(file.type || "").startsWith("image/")
+                ) {
 
                     alert(
-                        `${file.name} is not a supported image. Choose JPG, PNG or WEBP photos.`
+                        `${file.name} is not a supported image. Choose a JPG, PNG or WEBP photo.`
                     );
 
                     return;
@@ -2532,10 +2875,10 @@ if (reportPhotosInput) {
                 }
 
 
-                if (file.size > CMS_WEEKLY_REPORT_PHOTO_MAX_BYTES) {
+                if (file.size > CMS_WEEKLY_REPORT_PHOTO_MAX_INPUT_BYTES) {
 
                     alert(
-                        `${file.name} is larger than 5 MB.`
+                        `${file.name} is larger than 20 MB. Choose a smaller photo.`
                     );
 
                     return;
@@ -2547,6 +2890,14 @@ if (reportPhotosInput) {
 
             selectedReportPhotos =
                 selectedReportPhotos.concat(files);
+
+            if (reportPhotoUploadStatus) {
+
+                reportPhotoUploadStatus.textContent =
+                    `${files.length} photo${files.length === 1 ? "" : "s"} added. They will be optimized and uploaded when you save the report.`;
+
+            }
+
 
             renderReportPhotoPreviews();
 
@@ -3171,53 +3522,151 @@ async function saveReportPhotos(
 
     try {
 
-        for (const file of files) {
+        const preparedFiles = [];
 
-            const extensionByType = {
-                "image/jpeg": "jpg",
-                "image/png": "png",
-                "image/webp": "webp"
-            };
-            const extension =
-                extensionByType[file.type];
+        for (
+            let index = 0;
+            index < files.length;
+            index += 1
+        ) {
 
+            if (reportPhotoUploadStatus) {
 
-            if (!extension) {
-
-                throw new Error(
-                    `Unsupported image type for ${file.name}.`
-                );
+                reportPhotoUploadStatus.textContent =
+                    `Preparing photo ${index + 1} of ${files.length}...`;
 
             }
 
 
-            const path =
-                `${report.id}/${crypto.randomUUID()}.${extension}`;
-            const {
-                error: uploadError
-            } =
-                await CMS_WEEKLY_REPORTS_SUPABASE
-                    .storage
-                    .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
-                    .upload(
-                        path,
-                        file,
-                        {
-                            cacheControl: "3600",
-                            contentType: file.type,
-                            upsert: false
-                        }
+            preparedFiles.push(
+                await compressReportPhoto(files[index])
+            );
+
+        }
+
+        let nextFileIndex =
+            0;
+
+        let completedUploads =
+            0;
+
+        const uploadErrors = [];
+
+        async function uploadNextPhoto() {
+
+            while (nextFileIndex < preparedFiles.length) {
+
+                const fileIndex =
+                    nextFileIndex;
+
+                nextFileIndex += 1;
+
+                const file =
+                    preparedFiles[fileIndex];
+
+                const extension =
+                    file.type === "image/jpeg"
+                        ? "jpg"
+                        : file.type === "image/png"
+                            ? "png"
+                            : file.type === "image/webp"
+                                ? "webp"
+                                : "";
+
+
+                if (!extension) {
+
+                    uploadErrors.push(
+                        new Error(
+                            `${file.name} is not a supported image.`
+                        )
                     );
 
+                    continue;
 
-            if (uploadError) {
+                }
 
-                throw uploadError;
+
+                try {
+
+                    const path =
+                        `${report.id}/${crypto.randomUUID()}.${extension}`;
+
+                    const {
+                        error: uploadError
+                    } =
+                        await CMS_WEEKLY_REPORTS_SUPABASE
+                            .storage
+                            .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
+                            .upload(
+                                path,
+                                file,
+                                {
+                                    cacheControl: "3600",
+                                    contentType: file.type,
+                                    upsert: false
+                                }
+                            );
+
+                    if (uploadError) {
+
+                        throw new Error(
+                            `${file.name}: ${uploadError.message || "upload rejected by storage."}`
+                        );
+
+                    }
+
+
+                    uploadedPaths[fileIndex] =
+                        path;
+
+                }
+
+                catch (error) {
+
+                    uploadErrors.push(error);
+
+                }
+
+
+                completedUploads += 1;
+
+                if (reportPhotoUploadStatus) {
+
+                    reportPhotoUploadStatus.textContent =
+                        `Uploaded ${completedUploads} of ${preparedFiles.length} photos...`;
+
+                }
 
             }
 
+        }
 
-            uploadedPaths.push(path);
+
+        const workerCount =
+            Math.min(3, preparedFiles.length);
+
+        await Promise.all(
+            Array.from(
+                {
+                    length: workerCount
+                },
+                uploadNextPhoto
+            )
+        );
+
+
+        if (uploadErrors.length) {
+
+            throw new Error(
+                uploadErrors
+                    .map(function(error) {
+
+                        return error.message;
+
+                    })
+                    .join("\n")
+            );
 
         }
 
@@ -3225,7 +3674,9 @@ async function saveReportPhotos(
         const photoPaths =
             Array.from(
                 new Set(
-                    retainedPaths.concat(uploadedPaths)
+                    retainedPaths.concat(
+                        uploadedPaths.filter(Boolean)
+                    )
                 )
             );
         const photosChanged =
@@ -3298,6 +3749,14 @@ async function saveReportPhotos(
         }
 
 
+        if (reportPhotoUploadStatus) {
+
+            reportPhotoUploadStatus.textContent =
+                "Photos saved successfully.";
+
+        }
+
+
         return updatedReport;
 
     }
@@ -3314,7 +3773,7 @@ async function saveReportPhotos(
                     await CMS_WEEKLY_REPORTS_SUPABASE
                         .storage
                         .from(CMS_WEEKLY_REPORT_PHOTO_BUCKET)
-                        .remove(uploadedPaths);
+                        .remove(uploadedPaths.filter(Boolean));
 
 
                 if (cleanupError) {
@@ -3340,9 +3799,33 @@ async function saveReportPhotos(
         }
 
 
+        const message =
+            String(error?.message || "");
+        const normalizedMessage =
+            message.toLowerCase();
+
+        const userMessage =
+            normalizedMessage.includes("bucket not found") ||
+            normalizedMessage.includes("no such bucket") ||
+            normalizedMessage.includes("photo_paths") &&
+                normalizedMessage.includes("does not exist")
+                ? "The weekly report photo storage is not configured. Ask the CMS administrator to apply the weekly report photo migration in Supabase."
+                : normalizedMessage.includes("row-level security") ||
+                    normalizedMessage.includes("permission denied") ||
+                    normalizedMessage.includes("unauthorized")
+                    ? "Supabase denied the photo upload. Check that the weekly report photo migration is applied and that your cell leader account can access this report."
+                    : message || "Unable to save report photos.";
+
+        if (reportPhotoUploadStatus) {
+
+            reportPhotoUploadStatus.textContent =
+                "Photo upload failed. Your selected photos are still attached; correct the issue and try saving again.";
+
+        }
+
+
         throw createReportPhotoError(
-            error.message ||
-            "Unable to save report photos.",
+            userMessage,
             error
         );
 
@@ -3698,6 +4181,12 @@ async function loadLiveReports() {
             .select("*")
             .order(
                 "report_date",
+                {
+                    ascending: false
+                }
+            )
+            .order(
+                "created_at",
                 {
                     ascending: false
                 }
@@ -4101,6 +4590,115 @@ async function saveReport(
 }
 
 
+async function saveReportWithStatus(
+    status
+) {
+
+    if (isSavingWeeklyReport) {
+
+        return;
+
+    }
+
+
+    isSavingWeeklyReport =
+        true;
+
+    const originalSubmitText =
+        submitReportButton?.textContent ||
+        "";
+
+    const originalDraftText =
+        saveDraftButton?.textContent ||
+        "";
+
+
+    if (submitReportButton) {
+
+        submitReportButton.disabled =
+            true;
+
+        submitReportButton.textContent =
+            "Saving...";
+
+    }
+
+
+    if (saveDraftButton) {
+
+        saveDraftButton.disabled =
+            true;
+
+        saveDraftButton.textContent =
+            "Saving...";
+
+    }
+
+
+    if (reportPhotosInput) {
+
+        reportPhotosInput.disabled =
+            true;
+
+    }
+
+
+    if (reportPhotoUploadStatus) {
+
+        reportPhotoUploadStatus.textContent =
+            selectedReportPhotos.length
+                ? `Saving report and ${selectedReportPhotos.length} photo${selectedReportPhotos.length === 1 ? "" : "s"}...`
+                : "Saving report...";
+
+    }
+
+
+    try {
+
+        await saveReport(status);
+
+    }
+
+    finally {
+
+        isSavingWeeklyReport =
+            false;
+
+
+        if (submitReportButton) {
+
+            submitReportButton.disabled =
+                false;
+
+            submitReportButton.textContent =
+                originalSubmitText;
+
+        }
+
+
+        if (saveDraftButton) {
+
+            saveDraftButton.disabled =
+                false;
+
+            saveDraftButton.textContent =
+                originalDraftText;
+
+        }
+
+
+        if (reportPhotosInput) {
+
+            reportPhotosInput.disabled =
+                false;
+
+        }
+
+    }
+
+}
+
+
 /* =====================================================
    SUBMIT
    ===================================================== */
@@ -4125,7 +4723,7 @@ if (
             }
 
 
-            await saveReport(
+            await saveReportWithStatus(
                 "Submitted"
             );
 
@@ -4181,7 +4779,7 @@ if (
             }
 
 
-            await saveReport(
+            await saveReportWithStatus(
                 "Draft"
             );
 
@@ -4687,19 +5285,25 @@ function renderReports(
         .sort(
             function(a, b) {
 
-                return (
-
-                    String(
+                const dateDifference =
+                    new Date(
                         b.date ||
-                        ""
-                    )
-                    .localeCompare(
-                        String(
-                            a.date ||
-                            ""
-                        )
-                    )
+                        b.report_date ||
+                        0
+                    ) -
+                    new Date(
+                        a.date ||
+                        a.report_date ||
+                        0
+                    );
 
+                if (dateDifference) {
+                    return dateDifference;
+                }
+
+                return (
+                    new Date(b.created_at || b.createdAt || 0) -
+                    new Date(a.created_at || a.createdAt || 0)
                 );
 
             }

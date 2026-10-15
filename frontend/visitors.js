@@ -1019,6 +1019,12 @@ async function loadVisitors() {
                     ascending:
                         false
                 }
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
             );
 
 
@@ -1633,8 +1639,48 @@ function renderVisitors() {
        order as the HTML header.
     */
 
-    filtered.forEach(
-        function(visitor) {
+    filtered
+        .slice()
+        .sort(
+            function(a, b) {
+
+                const dateDifference =
+                    new Date(
+                        b.last_visit_date ||
+                        b.lastVisitDate ||
+                        b.first_visit_date ||
+                        b.firstVisitDate ||
+                        0
+                    ) -
+                    new Date(
+                        a.last_visit_date ||
+                        a.lastVisitDate ||
+                        a.first_visit_date ||
+                        a.firstVisitDate ||
+                        0
+                    );
+
+                if (dateDifference) {
+                    return dateDifference;
+                }
+
+                return (
+                    new Date(
+                        b.created_at ||
+                        b.createdAt ||
+                        0
+                    ) -
+                    new Date(
+                        a.created_at ||
+                        a.createdAt ||
+                        0
+                    )
+                );
+
+            }
+        )
+        .forEach(
+            function(visitor) {
 
             const row =
                 document.createElement(

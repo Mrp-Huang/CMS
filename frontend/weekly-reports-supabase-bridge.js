@@ -316,7 +316,13 @@ async function cmsWeeklyBridgeLoadReports() {
             .order(
                 "report_date",
                 {
-                    ascending: true
+                    ascending: false
+                }
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
                 }
             );
 

@@ -797,7 +797,7 @@ tbody tr:hover {
 
 .attention-table {
     width: 100%;
-    min-width: 760px;
+    min-width: 1040px;
     border-collapse: collapse;
     background: #ffffff;
     border: 1px solid #e3e8f2;
@@ -868,6 +868,13 @@ tbody tr:hover {
 .attention-status-ok {
     background: #e9f6ed;
     color: #28743c;
+}
+
+.attention-leader-names {
+    display: block;
+    margin-bottom: 6px;
+    color: #263858;
+    font-weight: 700;
 }
 
 
@@ -960,6 +967,116 @@ tbody tr:hover {
     background: #f8f9fa;
 
     border-radius: 8px;
+}
+
+
+/* =====================================================
+   WEEKLY CELL COMPARISON
+   ===================================================== */
+
+.meeting-week-filter {
+    display: grid;
+    gap: 6px;
+    color: #53627c;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.meeting-week-filter select {
+    min-width: 170px;
+    padding: 9px 32px 9px 11px;
+    border: 1px solid #d9e0ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #263858;
+    font: inherit;
+}
+
+.meeting-week-summary {
+    margin: -5px 0 16px;
+    color: #68758b;
+    font-size: 13px;
+}
+
+.weekly-cell-comparison {
+    overflow-x: auto;
+    border: 1px solid #e3e8f2;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.weekly-comparison-table-wrap {
+    min-width: 760px;
+}
+
+.weekly-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.weekly-comparison-table th,
+.weekly-comparison-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #edf0f5;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.weekly-comparison-table thead th {
+    background: #f7f8fb;
+    color: #68758b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.weekly-comparison-table tbody tr:last-child th,
+.weekly-comparison-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.weekly-comparison-table tbody tr:hover {
+    background: #fafbfe;
+}
+
+.weekly-comparison-table tbody th {
+    min-width: 170px;
+    color: #1f3c88;
+}
+
+.weekly-comparison-table tbody th small {
+    display: block;
+    margin-top: 4px;
+    color: #7c879a;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.weekly-comparison-table tbody td {
+    color: #35445f;
+    font-weight: 600;
+}
+
+.weekly-comparison-report {
+    color: #28743c;
+}
+
+.weekly-comparison-track {
+    width: min(100%, 220px);
+    min-width: 110px;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #edf0f5;
+}
+
+.weekly-comparison-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: #f2a178;
 }
 
 

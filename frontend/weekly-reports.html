@@ -669,17 +669,24 @@
                 <input
                     type="file"
                     id="reportPhotos"
-                    accept="image/jpeg,image/png,image/webp"
-                    capture="environment"
+                    accept="image/*"
                     multiple
                     aria-describedby="reportPhotosHelp"
                 >
 
 
                 <small id="reportPhotosHelp">
-                    Add up to 5 photos (JPG, PNG or WEBP; max 5 MB each).
-                    On a phone, you can take a photo with your camera.
+                    Add up to 5 photos. Choose photos from your device or take a new photo.
+                    Photos are resized automatically when needed.
                 </small>
+
+
+                <p
+                    id="reportPhotoUploadStatus"
+                    class="report-photo-upload-status"
+                    role="status"
+                    aria-live="polite"
+                ></p>
 
 
                 <div
@@ -727,6 +734,7 @@
                 <button
                     type="submit"
                     class="primary-button"
+                    id="submitReportButton"
                 >
                     Submit Report
                 </button>

@@ -166,7 +166,7 @@ async function loadCellsFromSupabase() {
             .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             );
 
@@ -1094,8 +1094,28 @@ function renderCells(
     }
 
 
-    filteredCells.forEach(
-        function(cell) {
+    filteredCells
+        .slice()
+        .sort(
+            function(a, b) {
+
+                return (
+                    new Date(
+                        b.created_at ||
+                        b.createdAt ||
+                        0
+                    ) -
+                    new Date(
+                        a.created_at ||
+                        a.createdAt ||
+                        0
+                    )
+                );
+
+            }
+        )
+        .forEach(
+            function(cell) {
 
             const row =
                 document.createElement(

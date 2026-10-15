@@ -1269,6 +1269,67 @@
 
 
         <!-- =================================================
+             WEEKLY CELL COMPARISON
+             ================================================= -->
+
+        <section
+            class="dashboard-section"
+            data-coordinator-only="true"
+        >
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Weekly Cell Comparison
+                    </h2>
+
+
+                    <p>
+                        Compare attendance and submitted reports for each cell's meeting dates.
+                    </p>
+
+                </div>
+
+
+                <label class="meeting-week-filter">
+                    Meeting week ending
+                    <select
+                        id="meeting-week-select"
+                        aria-label="Select a meeting week ending date"
+                    >
+                    </select>
+                </label>
+
+            </div>
+
+
+            <p
+                id="meeting-week-summary"
+                class="meeting-week-summary"
+                aria-live="polite"
+            >
+                Loading meeting data...
+            </p>
+
+
+            <div
+                id="weekly-cell-comparison"
+                class="weekly-cell-comparison"
+            >
+
+                <div class="attention-empty">
+                    Loading weekly comparison...
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
              CELLS NEEDING ATTENTION
              ================================================= -->
 
@@ -1285,7 +1346,7 @@
 
 
                     <p>
-                        Areas that may require coordinator attention.
+                        Flags missing attendance, reports not submitted for the latest meeting date, and weekly cycles overdue seven days after the last recorded meeting.
                     </p>
 
                 </div>

@@ -1668,7 +1668,36 @@ function renderFollowUps(
 
     filtered
         .slice()
-        .reverse()
+        .sort(
+            function(a, b) {
+
+                const aRecordDate =
+                    a.followUpDate ||
+                    a.due_date ||
+                    a.date ||
+                    0;
+
+                const bRecordDate =
+                    b.followUpDate ||
+                    b.due_date ||
+                    b.date ||
+                    0;
+
+                const dateDifference =
+                    new Date(bRecordDate) -
+                    new Date(aRecordDate);
+
+                if (dateDifference) {
+                    return dateDifference;
+                }
+
+                return (
+                    new Date(b.created_at || b.createdAt || 0) -
+                    new Date(a.created_at || a.createdAt || 0)
+                );
+
+            }
+        )
         .forEach(
             function(followUp) {
 

@@ -531,7 +531,7 @@ async function loadMembersFromSupabase() {
             .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             );
 
@@ -2080,8 +2080,22 @@ function renderMembers(
        DISPLAY
        ================================================= */
 
-    filteredMembers.forEach(
-        function (member) {
+    filteredMembers
+        .slice()
+        .sort(
+            function(a, b) {
+
+                return (
+                    new Date(b.dateJoined || 0) -
+                        new Date(a.dateJoined || 0) ||
+                    new Date(b.createdAt || b.created_at || 0) -
+                        new Date(a.createdAt || a.created_at || 0)
+                );
+
+            }
+        )
+        .forEach(
+            function (member) {
 
             const row =
                 document.createElement(

@@ -475,7 +475,7 @@ async function cmsFollowUpsLoadMembers() {
             .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             );
 
@@ -787,9 +787,15 @@ async function cmsFollowUpsLoadRecords() {
                 )
             `)
             .order(
+                "due_date",
+                {
+                    ascending: false
+                }
+            )
+            .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             );
 

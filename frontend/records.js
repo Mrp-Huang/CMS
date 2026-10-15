@@ -284,10 +284,44 @@ let cmsRecordsSupabase =
 let recordsLiveReferenceLoaded =
     false;
 
+let recordsMediaCoordinator =
+    false;
+
+let recordsMediaRenderVersion =
+    0;
+
+const CMS_RECORD_REPORT_PHOTO_BUCKET =
+    "weekly-report-photos";
+
 
 /* =====================================================
    DOM ELEMENTS
    ===================================================== */
+
+const recordsTablePanel =
+    document.getElementById(
+        "recordsTablePanel"
+    );
+
+const mediaLibraryTab =
+    document.getElementById(
+        "mediaLibraryTab"
+    );
+
+const mediaLibraryPanel =
+    document.getElementById(
+        "mediaLibraryPanel"
+    );
+
+const mediaLibraryGallery =
+    document.getElementById(
+        "mediaLibraryGallery"
+    );
+
+const mediaLibraryCount =
+    document.getElementById(
+        "mediaLibraryCount"
+    );
 
 const recordsTableBody =
     document.getElementById(
@@ -367,6 +401,52 @@ const recordCountText =
     );
 
 
+const recordsMediaAccessReady =
+    (async function() {
+
+        if (
+            !mediaLibraryTab ||
+            !window.CMSAccess ||
+            typeof window.CMSAccess.initialize !== "function"
+        ) {
+
+            return false;
+
+        }
+
+
+        try {
+
+            const access =
+                await window.CMSAccess.initialize();
+
+            recordsMediaCoordinator =
+                access?.role === "coordinator";
+
+            mediaLibraryTab.hidden =
+                !recordsMediaCoordinator;
+
+            return recordsMediaCoordinator;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CMS Records: coordinator media access could not be verified:",
+                error
+            );
+
+            mediaLibraryTab.hidden =
+                true;
+
+            return false;
+
+        }
+
+    })();
+
+
 const recordModal =
     document.getElementById(
         "recordModal"
@@ -394,6 +474,48 @@ const closeRecordModal =
 const closeRecordButton =
     document.getElementById(
         "closeRecordButton"
+    );
+
+
+const recordReportModal =
+    document.getElementById(
+        "recordReportModal"
+    );
+
+
+const recordReportSubtitle =
+    document.getElementById(
+        "recordReportSubtitle"
+    );
+
+
+const recordReportContent =
+    document.getElementById(
+        "recordReportContent"
+    );
+
+
+const closeRecordReportModal =
+    document.getElementById(
+        "closeRecordReportModal"
+    );
+
+
+const closeRecordReportButton =
+    document.getElementById(
+        "closeRecordReportButton"
+    );
+
+
+const printRecordReportButton =
+    document.getElementById(
+        "printRecordReportButton"
+    );
+
+
+const saveRecordReportButton =
+    document.getElementById(
+        "saveRecordReportButton"
     );
 
 
@@ -2342,20 +2464,35 @@ function getFilteredRecords() {
     records.sort(
         function(a, b) {
 
+            const aRecordDate =
+                a.date ||
+                0;
+
+            const bRecordDate =
+                b.date ||
+                0;
+
+            const dateDifference =
+                new Date(bRecordDate) -
+                new Date(aRecordDate);
+
+            if (dateDifference) {
+                return dateDifference;
+            }
+
+            const aAddedAt =
+                a.original?.created_at ||
+                a.original?.createdAt ||
+                0;
+
+            const bAddedAt =
+                b.original?.created_at ||
+                b.original?.createdAt ||
+                0;
+
             return (
-
-                new Date(
-                    b.date ||
-                    0
-                )
-
-                -
-
-                new Date(
-                    a.date ||
-                    0
-                )
-
+                new Date(bAddedAt) -
+                new Date(aAddedAt)
             );
 
         }
@@ -2675,11 +2812,469 @@ function escapeHTML(
 }
 
 
+function getReportPhotoPaths(
+    report
+) {
+
+    const camelCasePaths =
+        report?.photoPaths;
+
+    const snakeCasePaths =
+        report?.photo_paths;
+
+
+    if (
+        Array.isArray(camelCasePaths) &&
+        camelCasePaths.length
+    ) {
+
+        return camelCasePaths.filter(
+            function(path) {
+
+                return typeof path === "string" && path.trim();
+
+            }
+        );
+
+    }
+
+
+    if (
+        Array.isArray(snakeCasePaths)
+    ) {
+
+        return snakeCasePaths.filter(
+            function(path) {
+
+                return typeof path === "string" && path.trim();
+
+            }
+        );
+
+    }
+
+
+    return Array.isArray(camelCasePaths)
+        ? camelCasePaths.filter(
+            function(path) {
+
+                return typeof path === "string" && path.trim();
+
+            }
+        )
+        : [];
+
+}
+
+
+async function getRecordReportPhotoSignedUrl(
+    path
+) {
+
+    if (
+        !cmsRecordsSupabase
+    ) {
+
+        throw new Error(
+            "Report photo storage is not available."
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await cmsRecordsSupabase
+            .storage
+            .from(CMS_RECORD_REPORT_PHOTO_BUCKET)
+            .createSignedUrl(
+                path,
+                3600
+            );
+
+
+    if (
+        error
+    ) {
+
+        throw error;
+
+    }
+
+
+    if (
+        !data?.signedUrl
+    ) {
+
+        throw new Error(
+            "A report photo could not be loaded."
+        );
+
+    }
+
+
+    return data.signedUrl;
+
+}
+
+
+function getFilteredMediaPhotoItems() {
+
+    if (
+        !recordsMediaCoordinator
+    ) {
+
+        return [];
+
+    }
+
+
+    const search =
+        recordSearch
+            ? recordSearch.value.trim().toLowerCase()
+            : "";
+
+    const selectedDate =
+        recordDate
+            ? recordDate.value
+            : "";
+
+
+    return weeklyReports.flatMap(
+        function(report) {
+
+            const paths =
+                getReportPhotoPaths(report);
+
+            const reportDate =
+                report?.date ||
+                report?.reportDate ||
+                report?.report_date ||
+                report?.createdAt ||
+                report?.created_at ||
+                "";
+
+            const dateKey =
+                String(reportDate).slice(0, 10);
+
+            const cellId =
+                report?.cellId ||
+                report?.cell_id ||
+                "";
+
+            const cellName =
+                report?.cellName ||
+                report?.cell_name ||
+                getCellName(cellId);
+
+
+            if (
+                selectedDate &&
+                dateKey !== selectedDate
+            ) {
+
+                return [];
+
+            }
+
+
+            return paths
+                .map(
+                    function(path, index) {
+
+                        return {
+                            report,
+                            reportId:
+                                report?.id ||
+                                "",
+                            date:
+                                reportDate,
+                            dateKey,
+                            cellName,
+                            path,
+                            index
+                        };
+
+                    }
+                )
+                .filter(
+                    function(item) {
+
+                        return !search || [
+                            item.cellName,
+                            item.date,
+                            item.path
+                        ].some(
+                            function(value) {
+
+                                return String(value || "")
+                                    .toLowerCase()
+                                    .includes(search);
+
+                            }
+                        );
+
+                    }
+                );
+
+        }
+    );
+
+}
+
+
+async function renderMediaLibrary() {
+
+    if (
+        !mediaLibraryGallery ||
+        !recordsMediaCoordinator
+    ) {
+
+        return;
+
+    }
+
+
+    const renderVersion =
+        ++recordsMediaRenderVersion;
+
+    const items =
+        getFilteredMediaPhotoItems();
+
+
+    if (mediaLibraryCount) {
+
+        mediaLibraryCount.textContent =
+            `${items.length} photo${items.length === 1 ? "" : "s"} from weekly reports.`;
+
+    }
+
+
+    if (!items.length) {
+
+        mediaLibraryGallery.innerHTML = `
+            <p class="media-library-empty">
+                No report photos match these filters.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    mediaLibraryGallery.innerHTML = `
+        <p class="media-library-loading" role="status">
+            Loading report photos...
+        </p>
+    `;
+
+
+    const results =
+        await Promise.allSettled(
+            items.map(
+                async function(item) {
+
+                    return {
+                        item,
+                        url: await getRecordReportPhotoSignedUrl(item.path)
+                    };
+
+                }
+            )
+        );
+
+
+    if (
+        renderVersion !== recordsMediaRenderVersion ||
+        currentType !== "media"
+    ) {
+
+        return;
+
+    }
+
+
+    let failedPhotos =
+        0;
+
+    const cards =
+        results.map(
+            function(result, index) {
+
+                const fallbackItem =
+                    items[index];
+
+                if (result.status === "rejected") {
+
+                    failedPhotos += 1;
+
+                    console.error(
+                        "CMS Records: media photo could not be loaded:",
+                        result.reason
+                    );
+
+                    return `
+                        <article class="media-library-card media-library-card-error">
+                            <div class="media-library-photo-unavailable">
+                                Photo unavailable
+                            </div>
+                            <div class="media-library-card-details">
+                                <strong>${escapeHTML(
+                                    fallbackItem.cellName
+                                )}</strong>
+                                <span>${escapeHTML(
+                                    formatDate(fallbackItem.date)
+                                )}</span>
+                                <button
+                                    type="button"
+                                    class="media-library-report-button"
+                                    data-media-report-id="${escapeHTML(
+                                        fallbackItem.reportId
+                                    )}"
+                                >
+                                    View report
+                                </button>
+                            </div>
+                        </article>
+                    `;
+
+                }
+
+
+                const {
+                    item: photoItem,
+                    url
+                } = result.value;
+
+
+                return `
+                    <article class="media-library-card">
+                        <a
+                            class="media-library-photo-link"
+                            href="${escapeHTML(url)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Open meeting photo from ${escapeHTML(photoItem.cellName)}"
+                        >
+                            <img
+                                src="${escapeHTML(url)}"
+                                alt="Meeting photo ${photoItem.index + 1} for ${escapeHTML(photoItem.cellName)}"
+                                loading="lazy"
+                            >
+                        </a>
+                        <div class="media-library-card-details">
+                            <strong>${escapeHTML(photoItem.cellName)}</strong>
+                            <span>${escapeHTML(formatDate(photoItem.date))}</span>
+                            <button
+                                type="button"
+                                class="media-library-report-button"
+                                data-media-report-id="${escapeHTML(photoItem.reportId)}"
+                            >
+                                View report
+                            </button>
+                        </div>
+                    </article>
+                `;
+
+            }
+        );
+
+
+    const failureMessage =
+        failedPhotos
+            ? `
+                <p class="media-library-error" role="alert">
+                    ${failedPhotos} photo${failedPhotos === 1 ? "" : "s"} could not be loaded. Check your connection or access and try again.
+                </p>
+            `
+            : "";
+
+
+    mediaLibraryGallery.innerHTML =
+        failureMessage +
+        cards.join("");
+
+}
+
+
 /* =====================================================
    RENDER RECORDS
    ===================================================== */
 
 function renderRecords() {
+
+    if (
+        currentType === "media"
+    ) {
+
+        if (!recordsMediaCoordinator) {
+
+            currentType =
+                "all";
+
+        }
+
+        else {
+
+            if (recordsTablePanel) {
+
+                recordsTablePanel.hidden =
+                    true;
+
+            }
+
+
+            if (mediaLibraryPanel) {
+
+                mediaLibraryPanel.hidden =
+                    false;
+
+            }
+
+
+            if (recordSearch) {
+
+                recordSearch.placeholder =
+                    "Search photos, cells or reports...";
+
+            }
+
+
+            renderMediaLibrary();
+
+            return;
+
+        }
+
+    }
+
+
+    if (recordsTablePanel) {
+
+        recordsTablePanel.hidden =
+            false;
+
+    }
+
+
+    if (mediaLibraryPanel) {
+
+        mediaLibraryPanel.hidden =
+            true;
+
+    }
+
+
+    if (recordSearch) {
+
+        recordSearch.placeholder =
+            "Search records...";
+
+    }
+
 
     if (
         !recordsTableBody
@@ -3174,20 +3769,36 @@ function updateSummary(
         recordCountText
     ) {
 
-        const displayedRecordCount =
-            groupVisitorRecords(
-                filteredRecords
-            ).length;
+        if (
+            currentType === "media"
+        ) {
+
+            const photoCount =
+                getFilteredMediaPhotoItems().length;
+
+            recordCountText.textContent =
+                `${photoCount} photo${photoCount === 1 ? "" : "s"}`;
+
+        }
+
+        else {
+
+            const displayedRecordCount =
+                groupVisitorRecords(
+                    filteredRecords
+                ).length;
 
 
-        recordCountText.textContent =
+            recordCountText.textContent =
 
-            `${displayedRecordCount} record${
-                displayedRecordCount ===
-                1
-                    ? ""
-                    : "s"
-            }`;
+                `${displayedRecordCount} record${
+                    displayedRecordCount ===
+                    1
+                        ? ""
+                        : "s"
+                }`;
+
+        }
 
     }
 
@@ -3350,6 +3961,19 @@ function viewRecord(
         showReportDetails(
             record
         );
+
+        if (
+            recordReportModal
+        ) {
+
+            recordReportModal.classList.add(
+                "show"
+            );
+
+        }
+
+
+        return;
 
     }
 
@@ -4060,255 +4684,358 @@ function showReportDetails(
 ) {
 
     if (
-        modalRecordTitle
+        !recordReportContent
     ) {
 
-        modalRecordTitle.textContent =
-            "Weekly Report";
+        return;
 
     }
+
+
+    const report =
+        record.original || {};
 
 
     if (
-        recordDetails
+        recordReportSubtitle
     ) {
 
-        recordDetails.innerHTML = `
+        recordReportSubtitle.textContent =
+            `${displayValue(record.cellName)} • ${formatDate(record.date)}`;
 
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Report Information
-                </h3>
+    }
 
 
-                <div
-                    class="detail-grid"
-                >
+    const matchingAttendance =
+        getAllRecords().find(
+            function(item) {
 
-                    <div
-                        class="detail-item"
-                    >
+                return (
+                    item.type === "attendance" &&
+                    String(item.cellId) === String(record.cellId) &&
+                    formatDate(item.date) === formatDate(record.date)
+                );
 
-                        <strong>
-                            Cell
-                        </strong>
-
-                        ${escapeHTML(
-                            displayValue(
-                                record.cellName
-                            )
-                        )}
-
-                    </div>
+            }
+        );
 
 
-                    <div
-                        class="detail-item"
-                    >
-
-                        <strong>
-                            Date
-                        </strong>
-
-                        ${escapeHTML(
-                            formatDate(
-                                record.date
-                            )
-                        )}
-
-                    </div>
+    const attendance =
+        getReportAttendanceSummary(
+            record,
+            matchingAttendance
+        );
 
 
-                    <div
-                        class="detail-item"
-                    >
+    function reportSection(
+        title,
+        value
+    ) {
 
-                        <strong>
-                            Meeting Location
-                        </strong>
-
-                        ${escapeHTML(
-                            displayValue(
-                                record.meetingLocation
-                            )
-                        )}
-
-                    </div>
+        const text =
+            displayValue(value) === "—"
+                ? "No information provided."
+                : displayValue(value);
 
 
-                    <div
-                        class="detail-item"
-                    >
-
-                        <strong>
-                            Status
-                        </strong>
-
-                        ${escapeHTML(
-                            displayValue(
-                                record.status
-                            )
-                        )}
-
-                    </div>
-
-                </div>
-
+        return `
+            <div class="view-report-section">
+                <h3>${escapeHTML(title)}</h3>
+                <p>${escapeHTML(text)}</p>
             </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Attendance
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.attendance
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Members' Life
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.membersLife
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Activity Done
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.activityDone
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Challenges / Needs
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.challenges
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Follow-up Needed
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.followUp
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Next Week's Plan
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.nextWeekPlan
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="detail-section"
-            >
-
-                <h3>
-                    Additional Comments
-                </h3>
-
-                <p>
-
-                    ${escapeHTML(
-                        displayValue(
-                            record.comments
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
         `;
 
     }
+
+
+    recordReportContent.innerHTML = `
+        <div class="report-view-header">
+            <div>
+                <span class="view-label">CELL</span>
+                <strong>${escapeHTML(displayValue(record.cellName))}</strong>
+            </div>
+            <div>
+                <span class="view-label">DATE</span>
+                <strong>${escapeHTML(formatDate(record.date))}</strong>
+            </div>
+            <div>
+                <span class="view-label">LOCATION</span>
+                <strong>${escapeHTML(displayValue(record.meetingLocation))}</strong>
+            </div>
+            <div>
+                <span class="view-label">STATUS</span>
+                <strong>${escapeHTML(displayValue(record.status))}</strong>
+            </div>
+        </div>
+
+        <div class="view-attendance">
+            <h3>Attendance</h3>
+            <div class="view-attendance-grid">
+                <div><span>Total</span><strong>${attendance.total}</strong></div>
+                <div><span>Members</span><strong>${attendance.membersTotal}</strong></div>
+                <div><span>Present</span><strong>${attendance.present}</strong></div>
+                <div><span>Absent</span><strong>${attendance.absent}</strong></div>
+                <div><span>Late</span><strong>${attendance.late}</strong></div>
+                <div><span>Excused</span><strong>${attendance.excused}</strong></div>
+                <div><span>Visitors / Newcomers</span><strong>${attendance.visitorTotal}</strong></div>
+                <div><span>Rate</span><strong>${attendance.rate}%</strong></div>
+            </div>
+        </div>
+
+        ${reportSection("Members' Life", record.membersLife)}
+        ${reportSection("Activity Done", record.activityDone)}
+        ${reportSection("Challenges / Needs", record.challenges)}
+        ${reportSection("Follow-up Needed", record.followUp)}
+        ${reportSection("Next Week's Plan", record.nextWeekPlan)}
+        ${reportSection("Additional Comments", record.comments)}
+
+        <div class="records-report-photo-container"></div>
+
+        <div class="report-meta">
+            <div><strong>Created:</strong> ${report.createdAt || report.created_at ? escapeHTML(new Date(report.createdAt || report.created_at).toLocaleString()) : "—"}</div>
+            <div><strong>Last Updated:</strong> ${report.updatedAt || report.updated_at ? escapeHTML(new Date(report.updatedAt || report.updated_at).toLocaleString()) : "—"}</div>
+            <div><strong>Submitted:</strong> ${report.submittedAt || report.submitted_at ? escapeHTML(new Date(report.submittedAt || report.submitted_at).toLocaleString()) : "Not submitted"}</div>
+        </div>
+    `;
+
+
+    loadRecordReportPhotos(record);
+
+}
+
+
+async function loadRecordReportPhotos(
+    record
+) {
+
+    const paths =
+        getReportPhotoPaths(
+            record.original
+        );
+
+
+    if (
+        !Array.isArray(paths) ||
+        paths.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const urls =
+            await Promise.all(
+                paths
+                    .map(
+                        function(path) {
+
+                            return getRecordReportPhotoSignedUrl(path);
+
+                        }
+                    )
+            );
+
+
+        const photoContainer =
+            recordReportContent?.querySelector(
+                ".records-report-photo-container"
+            );
+
+
+        if (
+            selectedRecord !== record ||
+            !photoContainer
+        ) {
+
+            return;
+
+        }
+
+
+        const photos =
+            urls.map(
+                function(url, index) {
+
+                    return `
+                        <figure>
+                            <a
+                                href="${escapeHTML(url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <img
+                                    src="${escapeHTML(url)}"
+                                    alt="Weekly report photo ${index + 1}"
+                                >
+                            </a>
+                            <figcaption>Photo ${index + 1}</figcaption>
+                        </figure>
+                    `;
+
+                }
+            )
+            .join("");
+
+
+        photoContainer.innerHTML =
+            `
+                <section class="records-report-photo-section">
+                    <h2>Meeting Photos</h2>
+                    <div class="records-report-photo-gallery">${photos}</div>
+                </section>
+            `;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "CMS Records report photo display error:",
+            error
+        );
+
+
+        const photoContainer =
+            recordReportContent?.querySelector(
+                ".records-report-photo-container"
+            );
+
+
+        if (
+            selectedRecord === record &&
+            photoContainer
+        ) {
+
+            photoContainer.innerHTML =
+                `
+                    <section class="records-report-photo-section" role="alert">
+                        <h2>Meeting Photos</h2>
+                        <p>Saved photos could not be loaded. Please check your connection or access and try again.</p>
+                    </section>
+                `;
+
+        }
+
+    }
+
+}
+
+
+function getReportAttendanceSummary(
+    report,
+    attendanceRecord
+) {
+
+    const source =
+        report.original?.attendance ||
+        report.original?.attendanceSummary ||
+        {};
+
+
+    const entries =
+        attendanceRecord?.entries || [];
+
+
+    const memberEntries =
+        attendanceRecord?.memberEntries || [];
+
+
+    const countStatuses =
+        entries.reduce(
+            function(counts, entry) {
+
+                const status =
+                    normalizeStatus(entry.status);
+
+
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        counts,
+                        status
+                    )
+                ) {
+
+                    counts[status]++;
+
+                }
+
+
+                return counts;
+
+            },
+            {
+                present: 0,
+                absent: 0,
+                late: 0,
+                excused: 0
+            }
+        );
+
+
+    const membersTotal =
+        attendanceRecord
+            ? memberEntries.length
+            : Number(
+                source.membersTotal ??
+                source.totalMembers ??
+                source.members_total ??
+                0
+            ) || 0;
+
+
+    const visitorTotal =
+        attendanceRecord
+            ? Number(attendanceRecord.visitors) || 0
+            : Number(
+                source.visitorTotal ??
+                source.visitors ??
+                source.visitor_total ??
+                0
+            ) || 0;
+
+
+    const present =
+        attendanceRecord
+            ? countStatuses.present
+            : Number(source.present) || 0;
+
+
+    const absent =
+        attendanceRecord
+            ? countStatuses.absent
+            : Number(source.absent) || 0;
+
+
+    const late =
+        attendanceRecord
+            ? countStatuses.late
+            : Number(source.late) || 0;
+
+
+    const excused =
+        attendanceRecord
+            ? countStatuses.excused
+            : Number(source.excused) || 0;
+
+
+    return {
+        total:
+            Number(source.total) ||
+            membersTotal + visitorTotal,
+        membersTotal,
+        visitorTotal,
+        present,
+        absent,
+        late,
+        excused,
+        rate:
+            attendanceRecord
+                ? attendanceRecord.attendanceRate
+                : Number(source.rate ?? source.attendanceRate) || 0
+    };
 
 }
 
@@ -5257,6 +5984,122 @@ if (
 }
 
 
+function closeRecordReportView() {
+
+    if (
+        recordReportModal
+    ) {
+
+        recordReportModal.classList.remove(
+            "show"
+        );
+
+    }
+
+
+    selectedRecord =
+        null;
+
+}
+
+
+if (
+    closeRecordReportModal
+) {
+
+    closeRecordReportModal.addEventListener(
+        "click",
+        closeRecordReportView
+    );
+
+}
+
+
+if (
+    closeRecordReportButton
+) {
+
+    closeRecordReportButton.addEventListener(
+        "click",
+        closeRecordReportView
+    );
+
+}
+
+
+if (
+    recordReportModal
+) {
+
+    recordReportModal.addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                recordReportModal
+            ) {
+
+                closeRecordReportView();
+
+            }
+
+        }
+    );
+
+}
+
+
+if (
+    printRecordReportButton
+) {
+
+    printRecordReportButton.addEventListener(
+        "click",
+        function() {
+
+            if (
+                selectedRecord?.type === "report"
+            ) {
+
+                printRecord(
+                    selectedRecord.type,
+                    selectedRecord.id
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+if (
+    saveRecordReportButton
+) {
+
+    saveRecordReportButton.addEventListener(
+        "click",
+        function() {
+
+            if (
+                selectedRecord?.type === "report"
+            ) {
+
+                printRecord(
+                    selectedRecord.type,
+                    selectedRecord.id
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
 if (
     recordModal
 ) {
@@ -5919,6 +6762,20 @@ function printRecord(
 
         alert(
             "Record could not be found."
+        );
+
+
+        return;
+
+    }
+
+
+    if (
+        type === "report"
+    ) {
+
+        printWeeklyReportRecord(
+            record
         );
 
 
@@ -7132,6 +7989,336 @@ function printRecord(
 }
 
 
+async function printWeeklyReportRecord(
+    record
+) {
+
+    const report =
+        record.original || {};
+
+
+    const attendanceRecord =
+        getAllRecords().find(
+            function(item) {
+
+                return (
+                    item.type === "attendance" &&
+                    String(item.cellId) === String(record.cellId) &&
+                    formatDate(item.date) === formatDate(record.date)
+                );
+
+            }
+        );
+
+
+    const attendance =
+        getReportAttendanceSummary(
+            record,
+            attendanceRecord
+        );
+
+
+    let reportPhotosMarkup =
+        "";
+
+
+    const photoPaths =
+        getReportPhotoPaths(report);
+
+
+    if (
+        Array.isArray(photoPaths) &&
+        photoPaths.length
+    ) {
+
+        try {
+
+            if (
+                !cmsRecordsSupabase
+            ) {
+
+                throw new Error(
+                    "Report photo storage is not available."
+                );
+
+            }
+
+
+            const photoUrls =
+                await Promise.all(
+                    photoPaths
+                        .map(
+                            function(path) {
+
+                                return getRecordReportPhotoSignedUrl(path);
+
+                            }
+                        )
+                );
+
+
+            reportPhotosMarkup = `
+                <div class="report-photo-gallery">
+                    ${photoUrls.map(
+                        function(url, index) {
+
+                            return `
+                                <figure>
+                                    <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">
+                                        <img src="${escapeHTML(url)}" alt="Weekly report photo ${index + 1}">
+                                    </a>
+                                </figure>
+                            `;
+
+                        }
+                    ).join("")}
+                </div>
+            `;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CMS Records report print photo error:",
+                error
+            );
+
+            alert(
+                "The report photos could not be loaded for printing. Please try again."
+            );
+
+
+            return;
+
+        }
+
+    }
+
+
+    function printSection(
+        title,
+        value
+    ) {
+
+        const text =
+            displayValue(value) === "—"
+                ? "No information provided."
+                : String(value);
+
+
+        return `
+            <div class="section">
+                <h2>${escapeHTML(title)}</h2>
+                <p>${escapeHTML(text)}</p>
+            </div>
+        `;
+
+    }
+
+
+    const printFrame =
+        document.createElement(
+            "iframe"
+        );
+
+
+    printFrame.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    printFrame.style.position =
+        "fixed";
+
+
+    printFrame.style.width =
+        "0";
+
+
+    printFrame.style.height =
+        "0";
+
+
+    printFrame.style.border =
+        "0";
+
+
+    printFrame.onload =
+        function() {
+
+            const printWindow =
+                printFrame.contentWindow;
+
+
+            if (!printWindow) {
+
+                printFrame.remove();
+
+                console.error(
+                    "CMS Records could not access the report print frame."
+                );
+
+                return;
+
+            }
+
+
+            printWindow.addEventListener(
+                "afterprint",
+                function() {
+
+                    printFrame.remove();
+
+                },
+                {
+                    once: true
+                }
+            );
+
+
+            printWindow.focus();
+
+            printWindow.print();
+
+        };
+
+
+    document.body.appendChild(
+        printFrame
+    );
+
+
+    const printWindow =
+        printFrame.contentWindow;
+
+
+    if (!printWindow) {
+
+        printFrame.remove();
+
+        alert(
+            "The print dialog could not be opened. Please try again."
+        );
+
+
+        return;
+
+    }
+
+
+    printWindow.document.open();
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>CMS Weekly Report - ${escapeHTML(record.cellName)} - ${escapeHTML(String(record.date || ""))}</title>
+            <style>
+                @page { margin: 14mm; }
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    color: #222;
+                    font-size: 11pt;
+                    line-height: 1.6;
+                }
+                h1 {
+                    color: #294895;
+                    font-size: 22pt;
+                    page-break-after: avoid;
+                }
+                h2 {
+                    color: #294895;
+                    border-bottom: 1px solid #ddd;
+                    padding-bottom: 6px;
+                    margin-top: 25px;
+                    page-break-after: avoid;
+                }
+                .info {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    background: #f5f7fb;
+                    padding: 15px;
+                }
+                .attendance {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 10px;
+                }
+                .box {
+                    background: #f5f7fb;
+                    padding: 12px;
+                    text-align: center;
+                }
+                .box strong {
+                    display: block;
+                    font-size: 20px;
+                }
+                .section {
+                    margin-top: 20px;
+                    page-break-inside: avoid;
+                }
+                .section p {
+                    white-space: pre-wrap;
+                }
+                .report-photo-gallery {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+                }
+                .report-photo-gallery img {
+                    height: 180px;
+                    max-width: 100%;
+                    object-fit: contain;
+                    page-break-inside: avoid;
+                }
+                @media screen {
+                    body { margin: 32px; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>CELL MANAGEMENT SYSTEM</h1>
+            <div>WEEKLY CELL REPORT</div>
+            <br>
+            <div class="info">
+                <div><strong>Cell</strong><br>${escapeHTML(displayValue(record.cellName))}</div>
+                <div><strong>Date</strong><br>${escapeHTML(formatDate(record.date))}</div>
+                <div><strong>Meeting Location</strong><br>${escapeHTML(displayValue(record.meetingLocation))}</div>
+                <div><strong>Status</strong><br>${escapeHTML(displayValue(record.status))}</div>
+            </div>
+            <h2>Attendance</h2>
+            <div class="attendance">
+                <div class="box">Total<strong>${attendance.total}</strong></div>
+                <div class="box">Members<strong>${attendance.membersTotal}</strong></div>
+                <div class="box">Present<strong>${attendance.present}</strong></div>
+                <div class="box">Absent<strong>${attendance.absent}</strong></div>
+                <div class="box">Late<strong>${attendance.late}</strong></div>
+                <div class="box">Excused<strong>${attendance.excused}</strong></div>
+                <div class="box">Visitors<strong>${attendance.visitorTotal}</strong></div>
+                <div class="box">Rate<strong>${attendance.rate}%</strong></div>
+            </div>
+            ${printSection("Members' Life", record.membersLife)}
+            ${printSection("Activity Done", record.activityDone)}
+            ${printSection("Challenges / Needs", record.challenges)}
+            ${printSection("Follow-up Needed", record.followUp)}
+            ${printSection("Next Week's Plan", record.nextWeekPlan)}
+            ${printSection("Additional Comments", record.comments)}
+            ${reportPhotosMarkup}
+        </body>
+        </html>
+    `);
+
+
+    printWindow.document.close();
+
+}
+
+
 /* =====================================================
    MODAL DOWNLOAD
    ===================================================== */
@@ -7786,7 +8973,26 @@ recordTabs.forEach(
 
         tab.addEventListener(
             "click",
-            function() {
+            async function() {
+
+                if (
+                    tab.dataset.type === "media"
+                ) {
+
+                    const canOpenMedia =
+                        await recordsMediaAccessReady;
+
+
+                    if (
+                        !canOpenMedia
+                    ) {
+
+                        return;
+
+                    }
+
+                }
+
 
                 recordTabs.forEach(
                     function(item) {
@@ -7821,6 +9027,40 @@ recordTabs.forEach(
 
     }
 );
+
+
+if (
+    mediaLibraryGallery
+) {
+
+    mediaLibraryGallery.addEventListener(
+        "click",
+        function(event) {
+
+            const reportButton =
+                event.target.closest(
+                    "[data-media-report-id]"
+                );
+
+
+            if (
+                !reportButton
+            ) {
+
+                return;
+
+            }
+
+
+            viewRecord(
+                "report",
+                reportButton.dataset.mediaReportId
+            );
+
+        }
+    );
+
+}
 
 
 /* =====================================================
@@ -8488,6 +9728,12 @@ async function loadRecordsLiveVisitors() {
                                 ascending:
                                     false
                             }
+                        )
+                        .order(
+                            "created_at",
+                            {
+                                ascending: false
+                            }
                         ),
 
 
@@ -8502,7 +9748,8 @@ async function loadRecordsLiveVisitors() {
                                 cell_id,
                                 visit_date,
                                 status,
-                                attendance_session_id
+                                attendance_session_id,
+                                created_at
                             `
                         )
                         .order(
@@ -8510,6 +9757,12 @@ async function loadRecordsLiveVisitors() {
                             {
                                 ascending:
                                     false
+                            }
+                        )
+                        .order(
+                            "created_at",
+                            {
+                                ascending: false
                             }
                         )
 

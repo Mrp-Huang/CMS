@@ -1288,7 +1288,12 @@ function convertAttendanceSessions(
                         "comments"
                     ],
                     ""
-                )
+                ),
+
+            photoPaths:
+                safeArray(row.photoPaths).length
+                    ? safeArray(row.photoPaths)
+                    : safeArray(row.photo_paths)
         };
     }
 

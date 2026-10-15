@@ -938,6 +938,28 @@
 }
 
 
+.report-photo-upload-status:not(:empty) {
+
+    margin: 8px 0 0;
+
+    color: #23438f;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+
+.report-modal .modal-actions button:disabled {
+
+    cursor: wait;
+
+    opacity: 0.7;
+
+}
+
+
 .report-photo-previews,
 .report-photo-gallery {
 

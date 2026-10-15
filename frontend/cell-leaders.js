@@ -238,7 +238,7 @@ async function loadLeadersFromSupabase() {
             .order(
                 "created_at",
                 {
-                    ascending: true
+                    ascending: false
                 }
             );
 
@@ -1898,8 +1898,28 @@ function renderLeaders(
        DISPLAY
        ================================================= */
 
-    filteredLeaders.forEach(
-        function(leader) {
+    filteredLeaders
+        .slice()
+        .sort(
+            function(a, b) {
+
+                return (
+                    new Date(
+                        b.created_at ||
+                        b.createdAt ||
+                        0
+                    ) -
+                    new Date(
+                        a.created_at ||
+                        a.createdAt ||
+                        0
+                    )
+                );
+
+            }
+        )
+        .forEach(
+            function(leader) {
 
             const row =
                 document.createElement(
