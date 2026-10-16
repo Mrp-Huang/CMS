@@ -84,6 +84,60 @@
             white-space: nowrap;
         }
 
+        #cmsAIClearButton {
+            margin-left: 8px;
+        }
+
+        .cms-ai-tool-button {
+            min-height: 36px;
+            padding: 0 12px;
+            border: 1px solid #d5dbe5;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #294895;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .cms-ai-tool-button:hover:not(:disabled) {
+            background: #f4f7ff;
+        }
+
+        .cms-ai-tool-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .cms-ai-response-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .cms-ai-sources {
+            margin-top: 12px;
+            color: #475467;
+            font-size: 12px;
+        }
+
+        .cms-ai-sources summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .cms-ai-sources ul {
+            margin: 7px 0 0;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .cms-ai-source-warning {
+            color: #9a5700;
+        }
+
         .cms-ai-conversation {
             min-height: 230px;
             flex: 1;
@@ -175,7 +229,123 @@
             color: #263653;
             line-height: 1.7;
             white-space: pre-wrap;
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
+        }
+
+        .cms-ai-message-assistant .cms-ai-message-content {
+            white-space: normal;
+        }
+
+        .cms-ai-message-assistant .cms-ai-message-body {
+            overflow-wrap: break-word;
+            word-break: normal;
+        }
+
+        .cms-ai-message-body > :first-child {
+            margin-top: 0;
+        }
+
+        .cms-ai-message-body > :last-child {
+            margin-bottom: 0;
+        }
+
+        .cms-ai-message-body p {
+            margin: 0 0 14px;
+        }
+
+        .cms-ai-message-body h2,
+        .cms-ai-message-body h3,
+        .cms-ai-message-body h4 {
+            margin: 19px 0 9px;
+            color: #1f3c88;
+            line-height: 1.35;
+        }
+
+        .cms-ai-message-body h2 {
+            font-size: 20px;
+        }
+
+        .cms-ai-message-body h3 {
+            font-size: 17px;
+        }
+
+        .cms-ai-message-body h4 {
+            font-size: 15px;
+        }
+
+        .cms-ai-message-body ul,
+        .cms-ai-message-body ol {
+            margin: 4px 0 16px;
+            padding-left: 24px;
+        }
+
+        .cms-ai-message-body li {
+            margin: 5px 0;
+            padding-left: 3px;
+        }
+
+        .cms-ai-message-body strong {
+            color: #1f3c88;
+            font-weight: 700;
+        }
+
+        .cms-ai-message-body blockquote {
+            margin: 12px 0;
+            padding: 9px 14px;
+            border-left: 3px solid #8da4db;
+            border-radius: 0 8px 8px 0;
+            background: #f0f4ff;
+            color: #475467;
+        }
+
+        .cms-ai-message-body code {
+            padding: 2px 5px;
+            border-radius: 5px;
+            background: #edf1f7;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.92em;
+        }
+
+        .cms-ai-table-wrap {
+            width: 100%;
+            margin: 14px 0 17px;
+            overflow-x: auto;
+            border: 1px solid #dfe5ef;
+            border-radius: 10px;
+            background: #ffffff;
+            scrollbar-width: thin;
+        }
+
+        .cms-ai-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: collapse;
+            color: #344054;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .cms-ai-table th,
+        .cms-ai-table td {
+            padding: 9px 11px;
+            border-bottom: 1px solid #edf0f5;
+            text-align: left;
+            vertical-align: top;
+            white-space: normal;
+        }
+
+        .cms-ai-table th {
+            background: #edf2ff;
+            color: #1f3c88;
+            font-weight: 700;
+        }
+
+        .cms-ai-table tbody tr:nth-child(even) {
+            background: #f8faff;
+        }
+
+        .cms-ai-table tbody tr:last-child td {
+            border-bottom: 0;
         }
 
         .cms-ai-message-user .cms-ai-message-content {
@@ -240,6 +410,7 @@
         .cms-ai-actions {
             display: flex;
             flex: 0 0 auto;
+            gap: 8px;
         }
 
         #cmsAIAskButton {
@@ -327,8 +498,20 @@
                 display: none;
             }
 
+            .cms-ai-heading-row {
+                flex-wrap: wrap;
+            }
+
+            #cmsAIClearButton {
+                margin-left: auto;
+            }
+
             .cms-ai-message-content {
                 max-width: 88%;
+            }
+
+            .cms-ai-table {
+                min-width: 600px;
             }
         }
 
@@ -480,6 +663,7 @@
                             <p class="cms-ai-description">Ask about your CMS data and get helpful, data-informed insights.</p>
                         </div>
                         <span class="cms-ai-readonly">Read-only · Live CMS data</span>
+                        <button class="cms-ai-tool-button" type="button" id="cmsAIClearButton">New chat</button>
                     </div>
                 </header>
 
@@ -508,11 +692,13 @@
                             <textarea
                                 id="cmsAIQuestion"
                                 rows="2"
+                                maxlength="1500"
                                 aria-label="Ask CMS AI a question"
                                 placeholder="Message CMS AI..."
                             ></textarea>
                             <div class="cms-ai-actions">
                                 <button type="submit" id="cmsAIAskButton">Ask AI</button>
+                                <button class="cms-ai-tool-button" type="button" id="cmsAIStopButton" hidden>Stop</button>
                             </div>
                         </div>
                     </form>

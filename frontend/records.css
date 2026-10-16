@@ -574,6 +574,20 @@ tr:hover {
 }
 
 
+.records-photo-viewer-hint,
+.report-photo-viewer-hint {
+
+    margin: 6px 0 0;
+
+    color: #6d7480;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+}
+
+
 .media-library-report-button {
 
     justify-self: start;

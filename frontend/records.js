@@ -3155,8 +3155,11 @@ async function renderMediaLibrary() {
                         <a
                             class="media-library-photo-link"
                             href="${escapeHTML(url)}"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            data-photo-viewer="true"
+                            data-photo-name="${escapeHTML(
+                                `${photoItem.cellName} - ${formatDate(photoItem.date)} - Photo ${photoItem.index + 1}`
+                            )}"
+                            data-download-name="meeting-photo-${photoItem.index + 1}"
                             aria-label="Open meeting photo from ${escapeHTML(photoItem.cellName)}"
                         >
                             <img
@@ -4863,8 +4866,10 @@ async function loadRecordReportPhotos(
                         <figure>
                             <a
                                 href="${escapeHTML(url)}"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                data-photo-viewer="true"
+                                data-photo-name="Meeting photo ${index + 1}"
+                                data-download-name="meeting-photo-${index + 1}"
+                                aria-label="View meeting photo ${index + 1}"
                             >
                                 <img
                                     src="${escapeHTML(url)}"
@@ -4884,6 +4889,7 @@ async function loadRecordReportPhotos(
             `
                 <section class="records-report-photo-section">
                     <h2>Meeting Photos</h2>
+                    <p class="records-photo-viewer-hint">Select a photo to zoom, browse or download it.</p>
                     <div class="records-report-photo-gallery">${photos}</div>
                 </section>
             `;
@@ -8064,9 +8070,7 @@ async function printWeeklyReportRecord(
 
                             return `
                                 <figure>
-                                    <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">
-                                        <img src="${escapeHTML(url)}" alt="Weekly report photo ${index + 1}">
-                                    </a>
+                                    <img src="${escapeHTML(url)}" alt="Weekly report photo ${index + 1}">
                                 </figure>
                             `;
 

@@ -2668,18 +2668,33 @@ async function createReportPhotoMarkup(
         urls.map(
             function(url, index) {
 
-                return `
-                    <figure>
-                        <a
-                            href="${escapeAttribute(url)}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                const photo =
+                    isPrint
+                        ? `
                             <img
                                 src="${escapeAttribute(url)}"
                                 alt="Weekly report photo ${index + 1}"
                             >
-                        </a>
+                        `
+                        : `
+                            <a
+                                href="${escapeAttribute(url)}"
+                                data-photo-viewer="true"
+                                data-photo-name="Meeting photo ${index + 1}"
+                                data-download-name="meeting-photo-${index + 1}"
+                                aria-label="View meeting photo ${index + 1}"
+                            >
+                                <img
+                                    src="${escapeAttribute(url)}"
+                                    alt="Weekly report photo ${index + 1}"
+                                >
+                            </a>
+                        `;
+
+
+                return `
+                    <figure>
+                        ${photo}
                         ${
                             isPrint
                                 ? ""
@@ -2696,6 +2711,11 @@ async function createReportPhotoMarkup(
     return `
         <section class="section report-photo-section">
             <h2>Meeting Photos</h2>
+            ${
+                isPrint
+                    ? ""
+                    : `<p class="report-photo-viewer-hint">Select a photo to zoom, browse or download it.</p>`
+            }
             <div class="report-photo-gallery">${photos}</div>
         </section>
     `;

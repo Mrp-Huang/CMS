@@ -1069,9 +1069,48 @@
 }
 
 
+.report-photo-viewer-hint {
+
+    margin: 0 0 10px;
+
+    color: #6d7480;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+}
+
+
 .report-photo-gallery a {
 
     display: block;
+
+}
+
+
+.report-photo-gallery a:focus-visible,
+.records-report-photo-gallery a:focus-visible {
+
+    outline: 3px solid #f0b429;
+
+    outline-offset: 2px;
+
+}
+
+
+.report-photo-gallery img,
+.records-report-photo-gallery img {
+
+    transition: filter 0.18s ease;
+
+}
+
+
+.report-photo-gallery a:hover img,
+.records-report-photo-gallery a:hover img {
+
+    filter: brightness(0.92);
 
 }
 
